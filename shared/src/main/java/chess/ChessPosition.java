@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Objects;
+
 /**
  * Represents a single square position on a chess board
  * <p>
@@ -38,5 +40,22 @@ public class ChessPosition {
 
     public void updateColumn(int newColumn){
         this.col = newColumn;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPosition that = (ChessPosition) o;
+        // This was the only line I was confused by, so I looked it up
+        // If the function receives a subclass of ChessPosition it is cast as a ChessPosition
+        return row == that.row && col == that.col;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(row, col);
     }
 }
