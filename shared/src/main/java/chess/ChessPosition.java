@@ -34,15 +34,6 @@ public class ChessPosition {
         return this.col;
     }
 
-    public void updateRow(int newRow){
-        this.row = newRow;
-    }
-
-    public void updateColumn(int newColumn){
-        this.col = newColumn;
-    }
-
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
