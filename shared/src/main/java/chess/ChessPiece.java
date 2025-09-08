@@ -23,12 +23,22 @@ public class ChessPiece {
      * The various different chess piece options
      */
     public enum PieceType {
-        KING,
-        QUEEN,
-        BISHOP,
-        KNIGHT,
-        ROOK,
-        PAWN
+        KING(0),
+        QUEEN(1),
+        BISHOP(2),
+        KNIGHT(3),
+        ROOK(4),
+        PAWN(5);
+
+        private final int pieceID;
+
+        PieceType(int pieceID){
+            this.pieceID = pieceID;
+        }
+
+        public int getPieceID(){
+            return this.pieceID;
+        }
     }
 
     /**
@@ -76,5 +86,16 @@ public class ChessPiece {
                 "pieceColor=" + pieceColor +
                 ", type=" + type +
                 '}';
+    }
+
+    public char toChar(){
+        String blackPieces = "kqbnrp";
+        String whitePieces = "KQBNRP";
+        if (pieceColor == ChessGame.TeamColor.BLACK){
+            return blackPieces.charAt(type.getPieceID());
+        }
+        else{
+            return whitePieces.charAt(type.getPieceID());
+        }
     }
 }

@@ -71,4 +71,18 @@ public class ChessBoard {
     public int hashCode() {
         return Arrays.deepHashCode(board);
     }
+
+    @Override
+    public String toString() {
+        String boardString = "";
+        for(ChessPiece[] rows:board){
+            for(ChessPiece piece: rows) {
+                boardString += piece.toChar();
+            }
+            boardString += "\n";
+        }
+        return boardString;
+    }
+
+    //TODO: Run test to make sure toString works
 }
