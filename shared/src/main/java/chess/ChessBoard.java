@@ -32,7 +32,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
+        return board[8 - position.getRow()][position.getColumn() - 1];
     }
 
     /**
@@ -40,6 +40,18 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        final ChessPiece.PieceType[] orderOfPieces = {ChessPiece.PieceType.ROOK, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.KING, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.ROOK};
+        for(int i = 0; i < 8; i++){
+            board[0][i] = new ChessPiece(ChessGame.TeamColor.BLACK, orderOfPieces[i]);
+        }
+        for(int i = 0; i < 8; i++){
+            board[1][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+        }
+        for(int i = 0; i < 8; i++){
+            board[6][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+        }
+        for(int i = 0; i < 8; i++){
+            board[7][i] = new ChessPiece(ChessGame.TeamColor.WHITE, orderOfPieces[i]);
+        }
     }
 }
