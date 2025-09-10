@@ -76,6 +76,12 @@ public class ChessPiece {
             possibleMoves.addAll(getMovesInLine(board, myPosition, -1, -1));
             possibleMoves.addAll(getMovesInLine(board, myPosition, -1, 1));
             possibleMoves.addAll(getMovesInLine(board, myPosition, 1, -1));
+        } else if(myPiece == PieceType.KNIGHT){
+            final int[][] setOfMoves = {{1,2},{-1,2},{1,-2},{-1,-2},{2,1},{-2,1},{2,-1},{-2,-1}};
+            possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves));
+        } else if(myPiece == PieceType.KING){
+            final int[][] setOfMoves = {{0,1},{1,0},{0,-1},{-1,0},{1,1},{-1,-1},{1,-1},{-1,1}};
+            possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves));
         }
         return possibleMoves;
     }
@@ -85,26 +91,47 @@ public class ChessPiece {
         int nextColumn = myPosition.getColumn() + xDirection;
         int nextRow = myPosition.getRow() + yDirection;
         ChessPosition nextPosition = new ChessPosition(nextRow, nextColumn);
-        while (nextColumn < 9 && nextColumn > 0 &&
-                nextRow < 9 && nextRow > 0 &&
-                board.getPiece(nextPosition) == null){
+        ChessPiece pieceAtNextSpace = board.getPiece(nextPosition);
+
+        while (nextColumn > 0 && nextColumn < 9 &&
+                nextRow > 0 && nextRow < 9 &&
+                pieceAtNextSpace == null){
             possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
             nextColumn += xDirection;
             nextRow += yDirection;
             nextPosition = new ChessPosition(nextRow, nextColumn);
+            pieceAtNextSpace = board.getPiece(nextPosition);
         }
-        if (nextColumn < 9 && nextColumn > 0 &&
-                nextRow < 9 && nextRow > 0 &&
-                board.getPiece(nextPosition).pieceColor != board.getPiece(myPosition).pieceColor){
-            possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
-            // You can capture!
+
+        if (nextColumn > 0 && nextColumn < 9 &&
+                nextRow > 0 && nextRow < 9){
+            if (board.getPiece(myPosition).pieceColor != pieceAtNextSpace.pieceColor) {
+                possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
+                // You can capture!
+            }
         }
         return possibleMoves;
     }
 
-    public Collection<ChessMove> checkEachMove(ChessBoard board, ChessPosition myPosition, int[][] possibleMoves){
-        //Check moves individually for King and Knight
-        throw new RuntimeException("Not implemented");
+    public Collection<ChessMove> checkEachMove(ChessBoard board, ChessPosition myPosition, int[][] setOfMoves){
+        Collection<ChessMove> possibleMoves = new ArrayList<>();
+        int nextColumn;
+        int nextRow;
+        ChessPosition nextPosition;
+        for(int[] move:setOfMoves){
+            nextColumn = myPosition.getColumn() + move[0];
+            nextRow = myPosition.getRow() + move[1];
+            if(nextColumn > 0 && nextColumn < 9 &&
+                    nextRow > 0 && nextRow < 9){
+                nextPosition = new ChessPosition(nextRow, nextColumn);
+                    ChessPiece pieceAtNextSpace = board.getPiece(nextPosition);
+                    if(pieceAtNextSpace == null ||
+                            board.getPiece(myPosition).pieceColor != pieceAtNextSpace.pieceColor) {
+                        possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
+                    }
+            }
+        }
+        return possibleMoves;
     }
 
     public Collection<ChessMove> checkPawnMoves(ChessBoard board, ChessPosition myPosition){
