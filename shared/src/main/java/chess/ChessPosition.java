@@ -8,22 +8,13 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessPosition {
-
-    private final int row;
-    private final int col;
-
-    public ChessPosition(int row, int col) {
-        this.row = row;
-        this.col = col;
-    }
-
+public record ChessPosition (int row, int col){
     /**
      * @return which row this position is in
      * 1 codes for the bottom row
      */
     public int getRow() {
-        return this.row;
+        return row;
     }
 
     /**
@@ -31,7 +22,7 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        return this.col;
+        return col;
     }
 
     @Override
