@@ -143,7 +143,7 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         int nextRow;
         ChessPosition nextPosition;
         ChessPiece pieceAtNextSpace;
-        PieceType promotionPiece;
+        boolean isPromoted;
         for (int columnMove : setOfColumns) {
             nextColumn = myPosition.getColumn() + columnMove;
             nextRow = myPosition.getRow() + direction;
@@ -151,32 +151,43 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
                     nextRow > 0 && nextRow < 9) {
                 nextPosition = new ChessPosition(nextRow, nextColumn);
                 pieceAtNextSpace = board.getPiece(nextPosition);
-                if ((direction == 1 && nextRow == 8) ||
-                        (direction == -1 && nextRow == 1)){
-                    promotionPiece = PieceType.QUEEN;
-                }
-                else{ // Not at the end of the board
-                    promotionPiece = null;
-                }
+                isPromoted = (direction == 1 && nextRow == 8) ||
+                        (direction == -1 && nextRow == 1);
                 if(columnMove == 0){ // Forward move
                     if (pieceAtNextSpace == null){
-                        possibleMoves.add(new ChessMove(myPosition, nextPosition, promotionPiece));
-                    }
-                    if((direction == 1 && myPosition.getRow() == 2) ||
-                            (direction == -1 && myPosition.getRow() == 7)){
-                        nextPosition = new ChessPosition(nextRow + direction, nextColumn);
-                        if(board.getPiece(nextPosition) == null){
-                            possibleMoves.add(new ChessMove(myPosition, nextPosition, promotionPiece));
+                        possibleMoves.addAll(getPromotedPieces(myPosition, nextPosition, isPromoted));
+                        if((direction == 1 && myPosition.getRow() == 2) ||
+                                (direction == -1 && myPosition.getRow() == 7)){
+                            nextPosition = new ChessPosition(nextRow + direction, nextColumn);
+                            if(board.getPiece(nextPosition) == null){
+                                possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
+                            }
                         }
                     }
                 }
                 else{ // Diagonal move
                     if(pieceAtNextSpace != null &&
                             myPiece.pieceColor != pieceAtNextSpace.pieceColor){
-                        possibleMoves.add(new ChessMove(myPosition, nextPosition, promotionPiece));
+                        possibleMoves.addAll(getPromotedPieces(myPosition, nextPosition, isPromoted));
                     }
                 }
             }
+        }
+        return possibleMoves;
+    }
+
+    public Collection<ChessMove> getPromotedPieces(ChessPosition myPosition, ChessPosition nextPosition, boolean isPromoted){
+        Collection<ChessMove> possibleMoves = new ArrayList<>();
+        if(isPromoted){
+            PieceType[] typesOfPieces = PieceType.values();
+            for(PieceType promotionType: typesOfPieces){
+                if(promotionType != PieceType.PAWN && promotionType != PieceType.KING) {
+                    possibleMoves.add(new ChessMove(myPosition, nextPosition, promotionType));
+                }
+            }
+        }
+        else{
+            possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
         }
         return possibleMoves;
     }
