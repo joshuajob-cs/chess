@@ -75,6 +75,9 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
             final int[][] setOfMoves = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
             possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves));
         }
+        else{ // PieceType.PAWN
+            possibleMoves.addAll(checkPawnMoves(board, myPosition));
+        }
         return possibleMoves;
     }
 
@@ -125,8 +128,57 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
     }
 
     public Collection<ChessMove> checkPawnMoves(ChessBoard board, ChessPosition myPosition) {
-        // Pawns are weird
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> possibleMoves = new ArrayList<>();
+        ChessPiece myPiece = board.getPiece(myPosition);
+        int direction;
+        if (myPiece.pieceColor() == ChessGame.TeamColor.WHITE){
+            direction = 1;
+        }
+        else{ // TeamColor.Black
+            direction = -1;
+        }
+        final int[] setOfColumns = {-1, 0, 1};
+
+        int nextColumn;
+        int nextRow;
+        ChessPosition nextPosition;
+        ChessPiece pieceAtNextSpace;
+        PieceType promotionPiece;
+        for (int columnMove : setOfColumns) {
+            nextColumn = myPosition.getColumn() + columnMove;
+            nextRow = myPosition.getRow() + direction;
+            if (nextColumn > 0 && nextColumn < 9 &&
+                    nextRow > 0 && nextRow < 9) {
+                nextPosition = new ChessPosition(nextRow, nextColumn);
+                pieceAtNextSpace = board.getPiece(nextPosition);
+                if ((direction == 1 && nextRow == 8) ||
+                        (direction == -1 && nextRow == 1)){
+                    promotionPiece = PieceType.QUEEN;
+                }
+                else{ // Not at the end of the board
+                    promotionPiece = null;
+                }
+                if(columnMove == 0){ // Forward move
+                    if (pieceAtNextSpace == null){
+                        possibleMoves.add(new ChessMove(myPosition, nextPosition, promotionPiece));
+                    }
+                    if((direction == 1 && myPosition.getRow() == 2) ||
+                            (direction == -1 && myPosition.getRow() == 7)){
+                        nextPosition = new ChessPosition(nextRow + direction, nextColumn);
+                        if(board.getPiece(nextPosition) == null){
+                            possibleMoves.add(new ChessMove(myPosition, nextPosition, promotionPiece));
+                        }
+                    }
+                }
+                else{ // Diagonal move
+                    if(pieceAtNextSpace != null &&
+                            myPiece.pieceColor != pieceAtNextSpace.pieceColor){
+                        possibleMoves.add(new ChessMove(myPosition, nextPosition, promotionPiece));
+                    }
+                }
+            }
+        }
+        return possibleMoves;
     }
 
     @Override
