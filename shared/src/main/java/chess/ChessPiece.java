@@ -57,22 +57,25 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         PieceType myPiece = board.getPiece(myPosition).getPieceType();
         Collection<ChessMove> possibleMoves = new ArrayList<>();
-        if (myPiece == PieceType.ROOK || myPiece == PieceType.QUEEN) {
-            final int[][] setOfMoves = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-            possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves, true));
-        }
-        if (myPiece == PieceType.BISHOP || myPiece == PieceType.QUEEN) {
-            final int[][] setOfMoves = {{1, 1}, {-1, -1}, {-1, 1}, {1, -1}};
-            possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves, true));
-        } else if (myPiece == PieceType.KNIGHT) {
-            final int[][] setOfMoves = {{1, 2}, {-1, 2}, {1, -2}, {-1, -2}, {2, 1}, {-2, 1}, {2, -1}, {-2, -1}};
-            possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves, false));
-        } else if (myPiece == PieceType.KING) {
-            final int[][] setOfMoves = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
-            possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves, false));
-        }
-        else{ // PieceType.PAWN
-            possibleMoves.addAll(checkPawnMoves(board, myPosition));
+        int[][] setOfMoves;
+        switch(myPiece){
+            case ROOK:
+                setOfMoves = new int[][] {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+                possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves, true));
+            case BISHOP:
+                setOfMoves = new int[][] {{1, 1}, {-1, -1}, {-1, 1}, {1, -1}};
+                possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves, true));
+            case QUEEN:
+                setOfMoves = new int[][] {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {-1, -1}, {-1, 1}, {1, -1}};
+                possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves, true));
+            case KNIGHT:
+                setOfMoves = new int[][] {{1, 2}, {-1, 2}, {1, -2}, {-1, -2}, {2, 1}, {-2, 1}, {2, -1}, {-2, -1}};
+                possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves, false));
+            case KING:
+                setOfMoves = new int[][] {{0, 1}, {1, 0}, {0, -1}, {-1, 0}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
+                possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves, false));
+            case PAWN:
+                possibleMoves.addAll(checkPawnMoves(board, myPosition));
         }
         return possibleMoves;
     }
