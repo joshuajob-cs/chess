@@ -83,21 +83,15 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
 
     private Collection<ChessMove> getMovesInLine(ChessBoard board, ChessPosition myPosition, int yDirection, int xDirection) {
         Collection<ChessMove> possibleMoves = new ArrayList<>();
-        int nextRow = myPosition.getRow() + yDirection;
-        int nextColumn = myPosition.getColumn() + xDirection;
-        ChessPosition nextPosition = new ChessPosition(nextRow, nextColumn);
+        ChessPosition nextPosition = myPosition.getNextPosition(yDirection, xDirection);
 
-        while (nextRow > 0 && nextRow < 9 &&
-                nextColumn > 0 && nextColumn < 9 &&
+        while (nextPosition.getRow() != -1 &&
                 board.getPiece(nextPosition) == null) {
             possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
-            nextRow += yDirection;
-            nextColumn += xDirection;
-            nextPosition = new ChessPosition(nextRow, nextColumn);
+            nextPosition = nextPosition.getNextPosition(yDirection, xDirection);
         }
 
-        if (nextRow > 0 && nextRow < 9 &&
-                nextColumn > 0 && nextColumn < 9) {
+        if (nextPosition.getRow() != -1) {
             if (board.getPiece(myPosition).pieceColor != board.getPiece(nextPosition).pieceColor) {
                 possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
                 // You can capture!
@@ -108,15 +102,10 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
 
     private Collection<ChessMove> checkEachMove(ChessBoard board, ChessPosition myPosition, int[][] setOfMoves) {
         Collection<ChessMove> possibleMoves = new ArrayList<>();
-        int nextRow;
-        int nextColumn;
         ChessPosition nextPosition;
         for (int[] move : setOfMoves) {
-            nextRow = myPosition.getRow() + move[0];
-            nextColumn = myPosition.getColumn() + move[1];
-            if (nextRow > 0 && nextRow < 9 &&
-                    nextColumn > 0 && nextColumn < 9) {
-                nextPosition = new ChessPosition(nextRow, nextColumn);
+            nextPosition = myPosition.getNextPosition(move[0], move[1]);
+            if (nextPosition.getRow() != -1) {
                 ChessPiece pieceAtNextSpace = board.getPiece(nextPosition);
                 if (pieceAtNextSpace == null ||
                         board.getPiece(myPosition).pieceColor != pieceAtNextSpace.pieceColor) {
@@ -139,26 +128,21 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         }
         final int[] setOfColumns = {-1, 0, 1};
 
-        int nextColumn;
-        int nextRow;
-        ChessPosition nextPosition;
+        ChessPosition nextPosition = myPosition.copy();
         ChessPiece pieceAtNextSpace;
         boolean isPromoted;
         for (int columnMove : setOfColumns) {
-            nextRow = myPosition.getRow() + direction;
-            nextColumn = myPosition.getColumn() + columnMove;
-            if (nextRow > 0 && nextRow < 9 &&
-                    nextColumn > 0 && nextColumn < 9) {
-                nextPosition = new ChessPosition(nextRow, nextColumn);
+            nextPosition = nextPosition.getNextPosition(direction, columnMove);
+            if (nextPosition.getRow() != -1){
                 pieceAtNextSpace = board.getPiece(nextPosition);
-                isPromoted = (direction == 1 && nextRow == 8) ||
-                        (direction == -1 && nextRow == 1);
+                isPromoted = (direction == 1 && nextPosition.getRow() == 8) ||
+                        (direction == -1 && nextPosition.getRow() == 1);
                 if(columnMove == 0){ // Forward move
                     if (pieceAtNextSpace == null){
                         possibleMoves.addAll(getPromotedPieces(myPosition, nextPosition, isPromoted));
                         if((direction == 1 && myPosition.getRow() == 2) ||
                                 (direction == -1 && myPosition.getRow() == 7)){
-                            nextPosition = new ChessPosition(nextRow + direction, nextColumn);
+                            nextPosition = nextPosition.getNextPosition(direction, 0);
                             if(board.getPiece(nextPosition) == null){
                                 possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
                             }
@@ -219,5 +203,3 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         }
     }
 }
-
-//TODO: Make sure row and col are consistently in the same order

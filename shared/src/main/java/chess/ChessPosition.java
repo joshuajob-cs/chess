@@ -14,7 +14,13 @@ public record ChessPosition (int row, int col){
      * 1 codes for the bottom row
      */
     public int getRow() {
-        return row;
+        if (row > 0 && row < 9 &&
+                col > 0 && col < 9){
+            return row;
+        }
+        else{
+            return -1;
+        }
     }
 
     /**
@@ -22,14 +28,28 @@ public record ChessPosition (int row, int col){
      * 1 codes for the left row
      */
     public int getColumn() {
-        return col;
+        if (row > 0 && row < 9 &&
+                col > 0 && col < 9) {
+            return col;
+        }
+        else{
+            return -1;
+        }
+    }
+
+    public ChessPosition getNextPosition(int rowChange, int colChange){
+        return new ChessPosition(row + rowChange, col + colChange);
+    }
+
+    public ChessPosition copy() {
+        return new ChessPosition(row, col);
     }
 
     @Override
     public String toString() {
         return "ChessPosition{" +
-                "row=" + row +
-                ", col=" + col +
+                "row=" + getRow() +
+                ", col=" + getColumn() +
                 '}';
     }
 
@@ -41,11 +61,11 @@ public record ChessPosition (int row, int col){
         ChessPosition that = (ChessPosition) o;
         // This was the only line I was confused by, so I looked it up
         // If the function receives a subclass of ChessPosition it is cast as a ChessPosition
-        return row == that.row && col == that.col;
+        return getRow() == that.getRow() && getColumn() == that.getColumn();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(row, col);
+        return Objects.hash(getRow(), getColumn());
     }
 }
