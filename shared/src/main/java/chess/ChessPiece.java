@@ -81,23 +81,23 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         return possibleMoves;
     }
 
-    public Collection<ChessMove> getMovesInLine(ChessBoard board, ChessPosition myPosition, int xDirection, int yDirection) {
+    private Collection<ChessMove> getMovesInLine(ChessBoard board, ChessPosition myPosition, int yDirection, int xDirection) {
         Collection<ChessMove> possibleMoves = new ArrayList<>();
-        int nextColumn = myPosition.getColumn() + xDirection;
         int nextRow = myPosition.getRow() + yDirection;
+        int nextColumn = myPosition.getColumn() + xDirection;
         ChessPosition nextPosition = new ChessPosition(nextRow, nextColumn);
 
-        while (nextColumn > 0 && nextColumn < 9 &&
-                nextRow > 0 && nextRow < 9 &&
+        while (nextRow > 0 && nextRow < 9 &&
+                nextColumn > 0 && nextColumn < 9 &&
                 board.getPiece(nextPosition) == null) {
             possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
-            nextColumn += xDirection;
             nextRow += yDirection;
+            nextColumn += xDirection;
             nextPosition = new ChessPosition(nextRow, nextColumn);
         }
 
-        if (nextColumn > 0 && nextColumn < 9 &&
-                nextRow > 0 && nextRow < 9) {
+        if (nextRow > 0 && nextRow < 9 &&
+                nextColumn > 0 && nextColumn < 9) {
             if (board.getPiece(myPosition).pieceColor != board.getPiece(nextPosition).pieceColor) {
                 possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
                 // You can capture!
@@ -106,16 +106,16 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         return possibleMoves;
     }
 
-    public Collection<ChessMove> checkEachMove(ChessBoard board, ChessPosition myPosition, int[][] setOfMoves) {
+    private Collection<ChessMove> checkEachMove(ChessBoard board, ChessPosition myPosition, int[][] setOfMoves) {
         Collection<ChessMove> possibleMoves = new ArrayList<>();
-        int nextColumn;
         int nextRow;
+        int nextColumn;
         ChessPosition nextPosition;
         for (int[] move : setOfMoves) {
-            nextColumn = myPosition.getColumn() + move[0];
-            nextRow = myPosition.getRow() + move[1];
-            if (nextColumn > 0 && nextColumn < 9 &&
-                    nextRow > 0 && nextRow < 9) {
+            nextRow = myPosition.getRow() + move[0];
+            nextColumn = myPosition.getColumn() + move[1];
+            if (nextRow > 0 && nextRow < 9 &&
+                    nextColumn > 0 && nextColumn < 9) {
                 nextPosition = new ChessPosition(nextRow, nextColumn);
                 ChessPiece pieceAtNextSpace = board.getPiece(nextPosition);
                 if (pieceAtNextSpace == null ||
@@ -127,7 +127,7 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         return possibleMoves;
     }
 
-    public Collection<ChessMove> checkPawnMoves(ChessBoard board, ChessPosition myPosition) {
+    private Collection<ChessMove> checkPawnMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> possibleMoves = new ArrayList<>();
         ChessPiece myPiece = board.getPiece(myPosition);
         int direction;
@@ -145,10 +145,10 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         ChessPiece pieceAtNextSpace;
         boolean isPromoted;
         for (int columnMove : setOfColumns) {
-            nextColumn = myPosition.getColumn() + columnMove;
             nextRow = myPosition.getRow() + direction;
-            if (nextColumn > 0 && nextColumn < 9 &&
-                    nextRow > 0 && nextRow < 9) {
+            nextColumn = myPosition.getColumn() + columnMove;
+            if (nextRow > 0 && nextRow < 9 &&
+                    nextColumn > 0 && nextColumn < 9) {
                 nextPosition = new ChessPosition(nextRow, nextColumn);
                 pieceAtNextSpace = board.getPiece(nextPosition);
                 isPromoted = (direction == 1 && nextRow == 8) ||
@@ -176,7 +176,7 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         return possibleMoves;
     }
 
-    public Collection<ChessMove> getPromotedPieces(ChessPosition myPosition, ChessPosition nextPosition, boolean isPromoted){
+    private Collection<ChessMove> getPromotedPieces(ChessPosition myPosition, ChessPosition nextPosition, boolean isPromoted){
         Collection<ChessMove> possibleMoves = new ArrayList<>();
         if(isPromoted){
             PieceType[] typesOfPieces = PieceType.values();
@@ -219,3 +219,5 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         }
     }
 }
+
+//TODO: Make sure row and col are consistently in the same order
