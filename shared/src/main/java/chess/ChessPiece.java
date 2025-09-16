@@ -55,56 +55,64 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        PieceType myPiece = board.getPiece(myPosition).getPieceType();
         Collection<ChessMove> possibleMoves = new ArrayList<>();
         int[][] setOfMoves;
-        switch(myPiece){
+        Collection<ChessPosition> possiblePositions = new ArrayList<>();
+        switch(type){
             case ROOK:
                 setOfMoves = new int[][] {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-                possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves, true));
+                possiblePositions = checkEachMove(board, myPosition, setOfMoves, true);
+                break;
             case BISHOP:
                 setOfMoves = new int[][] {{1, 1}, {-1, -1}, {-1, 1}, {1, -1}};
-                possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves, true));
+                possiblePositions = checkEachMove(board, myPosition, setOfMoves, true);
+                break;
             case QUEEN:
                 setOfMoves = new int[][] {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {-1, -1}, {-1, 1}, {1, -1}};
-                possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves, true));
+                possiblePositions = checkEachMove(board, myPosition, setOfMoves, true);
+                break;
             case KNIGHT:
                 setOfMoves = new int[][] {{1, 2}, {-1, 2}, {1, -2}, {-1, -2}, {2, 1}, {-2, 1}, {2, -1}, {-2, -1}};
-                possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves, false));
+                possiblePositions = checkEachMove(board, myPosition, setOfMoves, false);
+                break;
             case KING:
                 setOfMoves = new int[][] {{0, 1}, {1, 0}, {0, -1}, {-1, 0}, {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
-                possibleMoves.addAll(checkEachMove(board, myPosition, setOfMoves, false));
+                possiblePositions = checkEachMove(board, myPosition, setOfMoves, false);
+                break;
             case PAWN:
                 possibleMoves.addAll(checkPawnMoves(board, myPosition));
+                break;
         }
+        Collection<ChessMove> newMoves = ChessMove.getMovesFromSameStart(myPosition, possiblePositions);
+        possibleMoves.addAll(newMoves);
         return possibleMoves;
     }
 
-    private Collection<ChessMove> checkEachMove(ChessBoard board, ChessPosition myPosition, int[][] setOfMoves, boolean recursive) {
-        Collection<ChessMove> possibleMoves = new ArrayList<>();
+    private Collection<ChessPosition> checkEachMove(ChessBoard board, ChessPosition myPosition, int[][] setOfMoves, boolean recursive) {
+        Collection<ChessPosition> possiblePositions = new ArrayList<>();
         ChessPosition nextPosition;
         for (int[] move : setOfMoves) {
             nextPosition = myPosition.getNextPosition(move[0], move[1]);
             if (nextPosition.getRow() != -1) {
                 ChessPiece pieceAtNextSpace = board.getPiece(nextPosition);
                 if(pieceAtNextSpace == null){
-                    possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
+                    possiblePositions.add(nextPosition);
                     if (recursive) {
-                        possibleMoves.addAll(checkEachMove(board, nextPosition, move, true));
+                        possiblePositions.addAll(checkEachMove(board, nextPosition, move));
                     }
                 }else {
-                    if(board.getPiece(myPosition).pieceColor != pieceAtNextSpace.pieceColor){
-                        possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
+                    if(pieceColor != pieceAtNextSpace.pieceColor){
+                        possiblePositions.add(nextPosition);
                     }
                 }
             }
         }
-        return possibleMoves;
+        return possiblePositions;
     }
 
-    private Collection<ChessMove> checkEachMove(ChessBoard board, ChessPosition myPosition, int[] move, boolean recursive) {
+    private Collection<ChessPosition> checkEachMove(ChessBoard board, ChessPosition myPosition, int[] move) {
         int[][] setOfMoves = {move};
-        return checkEachMove(board, myPosition, setOfMoves, recursive);
+        return checkEachMove(board, myPosition, setOfMoves, true);
     }
 
     private Collection<ChessMove> checkPawnMoves(ChessBoard board, ChessPosition myPosition) {
@@ -119,11 +127,11 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         }
         final int[] setOfColumns = {-1, 0, 1};
 
-        ChessPosition nextPosition = myPosition.copy();
         ChessPiece pieceAtNextSpace;
         boolean isPromoted;
+        ChessPosition nextPosition;
         for (int columnMove : setOfColumns) {
-            nextPosition = nextPosition.getNextPosition(direction, columnMove);
+            nextPosition = myPosition.getNextPosition(direction, columnMove);
             if (nextPosition.getRow() != -1){
                 pieceAtNextSpace = board.getPiece(nextPosition);
                 isPromoted = (direction == 1 && nextPosition.getRow() == 8) ||

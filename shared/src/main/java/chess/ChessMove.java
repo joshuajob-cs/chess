@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -31,6 +33,14 @@ public record ChessMove(ChessPosition startPosition, ChessPosition endPosition, 
      */
     public ChessPiece.PieceType getPromotionPiece() {
         return promotionPiece;
+    }
+
+    public static Collection<ChessMove> getMovesFromSameStart(ChessPosition startPosition, Collection<ChessPosition> endPositions){
+        Collection<ChessMove> moves = new ArrayList<>();
+        for (ChessPosition endPosition:endPositions){
+            moves.add(new ChessMove(startPosition, endPosition, null));
+        }
+        return moves;
     }
 
     @Override

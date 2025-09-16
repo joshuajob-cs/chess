@@ -41,10 +41,6 @@ public record ChessPosition (int row, int col){
         return new ChessPosition(row + rowChange, col + colChange);
     }
 
-    public ChessPosition copy() {
-        return new ChessPosition(row, col);
-    }
-
     @Override
     public String toString() {
         return "ChessPosition{" +
