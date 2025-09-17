@@ -117,41 +117,27 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
 
     private Collection<ChessMove> checkPawnMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> possibleMoves = new ArrayList<>();
-        ChessPiece myPiece = board.getPiece(myPosition);
         int direction;
-        if (myPiece.pieceColor() == ChessGame.TeamColor.WHITE){
+        if (pieceColor == ChessGame.TeamColor.WHITE){
             direction = 1;
         }
         else{ // TeamColor.Black
             direction = -1;
         }
-        final int[] setOfColumns = {-1, 0, 1};
 
-        ChessPiece pieceAtNextSpace;
-        boolean isPromoted;
+        final int[] setOfColumns = {-1, 0, 1};
         ChessPosition nextPosition;
         for (int columnMove : setOfColumns) {
             nextPosition = myPosition.getNextPosition(direction, columnMove);
             if (nextPosition.getRow() != -1){
-                pieceAtNextSpace = board.getPiece(nextPosition);
-                isPromoted = (direction == 1 && nextPosition.getRow() == 8) ||
-                        (direction == -1 && nextPosition.getRow() == 1);
                 if(columnMove == 0){ // Forward move
-                    if (pieceAtNextSpace == null){
-                        possibleMoves.addAll(getPromotedPieces(myPosition, nextPosition, isPromoted));
-                        if((direction == 1 && myPosition.getRow() == 2) ||
-                                (direction == -1 && myPosition.getRow() == 7)){
-                            nextPosition = nextPosition.getNextPosition(direction, 0);
-                            if(board.getPiece(nextPosition) == null){
-                                possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
-                            }
-                        }
-                    }
+                    possibleMoves.addAll(checkPawnForward(board, myPosition, nextPosition, direction));
                 }
                 else{ // Diagonal move
+                    ChessPiece pieceAtNextSpace = board.getPiece(nextPosition);
                     if(pieceAtNextSpace != null &&
-                            myPiece.pieceColor != pieceAtNextSpace.pieceColor){
-                        possibleMoves.addAll(getPromotedPieces(myPosition, nextPosition, isPromoted));
+                            pieceColor != pieceAtNextSpace.pieceColor){
+                        possibleMoves.addAll(getPromotedPieces(myPosition, nextPosition));
                     }
                 }
             }
@@ -159,8 +145,25 @@ public record ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         return possibleMoves;
     }
 
-    private Collection<ChessMove> getPromotedPieces(ChessPosition myPosition, ChessPosition nextPosition, boolean isPromoted){
+    private Collection<ChessMove> checkPawnForward(ChessBoard board, ChessPosition myPosition, ChessPosition nextPosition, int direction){
         Collection<ChessMove> possibleMoves = new ArrayList<>();
+        if (board.getPiece(nextPosition) == null){
+            possibleMoves.addAll(getPromotedPieces(myPosition, nextPosition));
+            if((direction == 1 && myPosition.getRow() == 2) ||
+                    (direction == -1 && myPosition.getRow() == 7)){
+                nextPosition = nextPosition.getNextPosition(direction, 0);
+                if(board.getPiece(nextPosition) == null){
+                    possibleMoves.add(new ChessMove(myPosition, nextPosition, null));
+                }
+            }
+        }
+        return possibleMoves;
+    }
+
+    private Collection<ChessMove> getPromotedPieces(ChessPosition myPosition, ChessPosition nextPosition){
+        Collection<ChessMove> possibleMoves = new ArrayList<>();
+        boolean isPromoted = (nextPosition.getRow() == 8 && myPosition.getRow() < 8) ||
+                (nextPosition.getRow() == 1 && myPosition.getRow() > 1);
         if(isPromoted){
             PieceType[] typesOfPieces = PieceType.values();
             for(PieceType promotionType: typesOfPieces){
