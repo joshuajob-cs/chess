@@ -103,7 +103,9 @@ public class ChessGame {
         ChessPosition kingPosition = board.getPosition(new ChessPiece(teamColor, ChessPiece.PieceType.KING));
         Collection<ChessPosition> threatPositions = board.positionsOfThreatPieces(kingPosition, teamColor);
         // If there is only one threat piece, you can capture or block the piece
-        // Otherwise move the king
+        if (threatPositions.isEmpty()){
+            return false;
+        }
         if (threatPositions.size() == 1){
             // The enemy of my enemy is my friend
             ChessPosition threatPosition = threatPositions.iterator().next();
@@ -125,10 +127,18 @@ public class ChessGame {
                 }
             }
         }
-        // Get possible moves for King
-        // Check the King's current space and all spaces that the king could move for threat positions
-        // If there is a space that the king can move to with no threatPositions, King can get out of check
-        throw new RuntimeException("Not implemented");
+        // Move the king
+        ChessPiece kingPiece = board.getPiece(kingPosition);
+        Collection<ChessMove> kingMoves = kingPiece.pieceMoves(board, kingPosition);
+        ChessPosition nextKingPosition;
+        for (ChessMove move: kingMoves){
+            nextKingPosition = move.getEndPosition();
+            threatPositions = board.positionsOfThreatPieces(nextKingPosition, teamColor);
+            if (threatPositions.isEmpty()){
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
