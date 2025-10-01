@@ -60,8 +60,8 @@ public class ChessBoard {
         throw new IllegalArgumentException("Piece is not on board");
     }
 
-    public Collection<ChessPosition> getEnemyMovePositions(ChessGame.TeamColor teamColor){
-        Collection<ChessPosition> enemyMoves = new ArrayList<>();
+    public Collection<ChessPosition> threatPositions(ChessPosition position, ChessGame.TeamColor teamColor){
+        Collection<ChessPosition> threatPieces = new ArrayList<>();
         ChessPiece nextPiece;
         for (int i = 0; i < 8; i++){
             for (int j = 0; j < 8; j++){
@@ -70,14 +70,14 @@ public class ChessBoard {
                     ChessPosition piecePosition = new ChessPosition(8-i, j-1);
                     Collection<ChessMove> nextPieceMoves = nextPiece.pieceMoves(this, piecePosition);
                     for (ChessMove move:nextPieceMoves){
-                        if (!enemyMoves.contains(move.getEndPosition())){
-                            enemyMoves.add(move.getEndPosition());
+                        if (move.getEndPosition().equals(position)){
+                            threatPieces.add(piecePosition);
                         }
                     }
                 }
             }
         }
-        return enemyMoves;
+        return threatPieces;
     }
 
     /**

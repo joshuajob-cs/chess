@@ -82,13 +82,8 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingPosition = board.getPosition(new ChessPiece(teamColor, ChessPiece.PieceType.KING));
-        Collection<ChessPosition> enemyMovePositions = board.getEnemyMovePositions(teamColor);
-        for(ChessPosition position: enemyMovePositions){
-            if (position.equals(kingPosition)){
-                return true;
-            }
-        }
-        return false;
+        Collection<ChessPosition> threatPositions = board.threatPositions(kingPosition, teamColor);
+        return !threatPositions.isEmpty();
     }
 
     /**
