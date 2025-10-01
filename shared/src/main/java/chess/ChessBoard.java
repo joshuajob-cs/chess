@@ -60,7 +60,7 @@ public class ChessBoard {
         throw new IllegalArgumentException("Piece is not on board");
     }
 
-    public Collection<ChessPosition> threatPositions(ChessPosition position, ChessGame.TeamColor teamColor){
+    public Collection<ChessPosition> positionsOfThreatPieces(ChessPosition position, ChessGame.TeamColor teamColor){
         Collection<ChessPosition> threatPieces = new ArrayList<>();
         ChessPiece nextPiece;
         for (int i = 0; i < 8; i++){

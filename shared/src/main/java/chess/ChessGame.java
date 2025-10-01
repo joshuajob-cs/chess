@@ -43,6 +43,13 @@ public class ChessGame {
         BLACK
     }
 
+    public TeamColor notColor(TeamColor color){
+        if (color == TeamColor.WHITE){
+            return TeamColor.BLACK;
+        }
+        return TeamColor.WHITE;
+    }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -82,7 +89,7 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingPosition = board.getPosition(new ChessPiece(teamColor, ChessPiece.PieceType.KING));
-        Collection<ChessPosition> threatPositions = board.threatPositions(kingPosition, teamColor);
+        Collection<ChessPosition> threatPositions = board.positionsOfThreatPieces(kingPosition, teamColor);
         return !threatPositions.isEmpty();
     }
 
@@ -93,17 +100,27 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        // Store the original board for safe keeping
-        // Get all possible moves for King
-        // For each of the moves of the king
-        // Run makeMove to make the move
-        // If the king is not in check, he is not in checkmate
-        // If the king is still in check continue
-        // Reset the board back to what it was before moving the king again
-
-        // It is also possible for other pieces gto block the king
-        // How do we figure out which pieces can block the king
-        // Without trying every combination
+        ChessPosition kingPosition = board.getPosition(new ChessPiece(teamColor, ChessPiece.PieceType.KING));
+        Collection<ChessPosition> threatPositions = board.positionsOfThreatPieces(kingPosition, teamColor);
+        // If there is only one threat piece, you can capture or block the piece
+        // Otherwise move the king
+        if (threatPositions.size() == 1){
+            // The enemy of my enemy is my friend
+            ChessPosition threatPosition = threatPositions.iterator().next();
+            Collection<ChessPosition> saviorPieces = board.positionsOfThreatPieces(threatPosition, notColor(teamColor));
+            if (!saviorPieces.isEmpty()){
+                return false;
+            }
+            ChessPiece threatPiece = board.getPiece(threatPosition);
+            ChessPiece.PieceType threatType = threatPiece.getPieceType();
+            if(threatType == ChessPiece.PieceType.QUEEN || threatType == ChessPiece.PieceType.BISHOP || threatType == ChessPiece.PieceType.ROOK){
+                // Find the direction of the king from the threatPiece by comparing positions
+                // Iteratively check every square in the way of the king to see if a piece can move to it
+            }
+        }
+        // Get possible moves for King
+        // Check the King's current space and all spaces that the king could move for threat positions
+        // If there is a space that the king can move to with no threatPositions, King can get out of check
         throw new RuntimeException("Not implemented");
     }
 
