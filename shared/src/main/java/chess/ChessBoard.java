@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -45,6 +47,37 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
         return board[8 - position.getRow()][position.getColumn() - 1];
+    }
+
+    public ChessPosition getPosition(ChessPiece piece) {
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                if (board[i][j].equals(piece)){
+                   return new ChessPosition(8-i, j-1);
+                }
+            }
+        }
+        throw new IllegalArgumentException("Piece is not on board");
+    }
+
+    public Collection<ChessPosition> getEnemyMovePositions(ChessGame.TeamColor teamColor){
+        Collection<ChessPosition> enemyMoves = new ArrayList<>();
+        ChessPiece nextPiece;
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                nextPiece = board[i][j];
+                if (nextPiece != null && nextPiece.pieceColor() != teamColor){
+                    ChessPosition piecePosition = new ChessPosition(8-i, j-1);
+                    Collection<ChessMove> nextPieceMoves = nextPiece.pieceMoves(this, piecePosition);
+                    for (ChessMove move:nextPieceMoves){
+                        if (!enemyMoves.contains(move.getEndPosition())){
+                            enemyMoves.add(move.getEndPosition());
+                        }
+                    }
+                }
+            }
+        }
+        return enemyMoves;
     }
 
     /**

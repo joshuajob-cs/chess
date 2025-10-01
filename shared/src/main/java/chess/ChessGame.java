@@ -81,7 +81,14 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPosition = board.getPosition(new ChessPiece(teamColor, ChessPiece.PieceType.KING));
+        Collection<ChessPosition> enemyMovePositions = board.getEnemyMovePositions(teamColor);
+        for(ChessPosition position: enemyMovePositions){
+            if (position.equals(kingPosition)){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -91,6 +98,17 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
+        // Store the original board for safe keeping
+        // Get all possible moves for King
+        // For each of the moves of the king
+        // Run makeMove to make the move
+        // If the king is not in check, he is not in checkmate
+        // If the king is still in check continue
+        // Reset the board back to what it was before moving the king again
+
+        // It is also possible for other pieces gto block the king
+        // How do we figure out which pieces can block the king
+        // Without trying every combination
         throw new RuntimeException("Not implemented");
     }
 
