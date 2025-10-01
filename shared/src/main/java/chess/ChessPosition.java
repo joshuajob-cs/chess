@@ -66,10 +66,9 @@ public record ChessPosition (int row, int col){
 
     @Override
     public String toString() {
-        return "ChessPosition{" +
-                "row=" + getRow() +
-                ", col=" + getColumn() +
-                '}';
+        return "(" + getRow() +
+                ", " + getColumn() +
+                ')';
     }
 
     @Override

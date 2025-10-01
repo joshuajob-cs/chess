@@ -56,4 +56,14 @@ public record ChessMove(ChessPosition startPosition, ChessPosition endPosition, 
     public int hashCode() {
         return Objects.hash(startPosition, endPosition, promotionPiece);
     }
+
+    @Override
+    public String toString() {
+        String str = "Move " + startPosition +
+                " to " + endPosition;
+        if (promotionPiece != null){
+            str += ": " + promotionPiece;
+        }
+        return str;
+    }
 }

@@ -52,7 +52,7 @@ public class ChessBoard {
     public ChessPosition getPosition(ChessPiece piece) {
         for (int i = 0; i < 8; i++){
             for (int j = 0; j < 8; j++){
-                if (board[i][j].equals(piece)){
+                if (board[i][j] != null && board[i][j].equals(piece)){
                    return new ChessPosition(8-i, j-1);
                 }
             }
