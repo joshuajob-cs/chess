@@ -16,7 +16,6 @@ public class ChessGame {
     private TeamColor teamTurn = TeamColor.WHITE;
 
     public ChessGame() {
-
     }
 
     /**
@@ -105,8 +104,16 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition startPosition = move.getStartPosition();
-        if (validMoves(startPosition).contains(move)){
+        ChessPiece piece = board.getPiece(startPosition);
+        if (piece == null){
+            throw new InvalidMoveException("Starting square is empty");
+        }
+        else if(piece.pieceColor() != teamTurn){
+            throw new InvalidMoveException("It is not your turn");
+        }
+        else if (validMoves(startPosition).contains(move)){
             board.movePiece(move);
+            setTeamTurn(notColor(teamTurn));
         }
         else{
             throw new InvalidMoveException("Invalid move");
