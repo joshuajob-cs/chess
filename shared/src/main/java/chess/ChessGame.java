@@ -62,7 +62,18 @@ public class ChessGame {
         if (piece == null) {
             return new ArrayList<>();
         }
-        return piece.pieceMoves(board, startPosition);
+        // For each move, try the move, check for check
+        // If it puts you in check it is not a valid move
+        Collection<ChessMove> possibleMoves = piece.pieceMoves(board, startPosition);
+        ChessBoard startBoard = board;
+        for (ChessMove move: possibleMoves){
+            board.movePiece(move);
+            if (isInCheck(piece.getTeamColor())){
+                possibleMoves.remove(move);
+            }
+            setBoard(startBoard);
+        }
+        return possibleMoves;
     }
 
     /**
@@ -102,10 +113,21 @@ public class ChessGame {
     public boolean isInCheckmate(TeamColor teamColor) {
         ChessPosition kingPosition = board.getPosition(new ChessPiece(teamColor, ChessPiece.PieceType.KING));
         Collection<ChessPosition> threatPositions = board.positionsOfThreatPieces(kingPosition, teamColor);
-        // If there is only one threat piece, you can capture or block the piece
         if (threatPositions.isEmpty()){
             return false;
         }
+        // Move the king
+        ChessPiece kingPiece = board.getPiece(kingPosition);
+        Collection<ChessMove> kingMoves = kingPiece.pieceMoves(board, kingPosition);
+        ChessPosition nextKingPosition;
+        for (ChessMove move: kingMoves){
+            nextKingPosition = move.getEndPosition();
+            threatPositions = board.positionsOfThreatPieces(nextKingPosition, teamColor);
+            if (threatPositions.isEmpty()){
+                return false;
+            }
+        }
+        // If there is only one threat piece, you can capture or block the piece
         if (threatPositions.size() == 1){
             // The enemy of my enemy is my friend
             ChessPosition threatPosition = threatPositions.iterator().next();
@@ -125,17 +147,6 @@ public class ChessGame {
                     }
                     blockPosition = blockPosition.getNextPosition(threatVector.rowChange(), threatVector.colChange());
                 }
-            }
-        }
-        // Move the king
-        ChessPiece kingPiece = board.getPiece(kingPosition);
-        Collection<ChessMove> kingMoves = kingPiece.pieceMoves(board, kingPosition);
-        ChessPosition nextKingPosition;
-        for (ChessMove move: kingMoves){
-            nextKingPosition = move.getEndPosition();
-            threatPositions = board.positionsOfThreatPieces(nextKingPosition, teamColor);
-            if (threatPositions.isEmpty()){
-                return false;
             }
         }
         return true;
