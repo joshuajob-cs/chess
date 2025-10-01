@@ -114,8 +114,15 @@ public class ChessGame {
             ChessPiece threatPiece = board.getPiece(threatPosition);
             ChessPiece.PieceType threatType = threatPiece.getPieceType();
             if(threatType == ChessPiece.PieceType.QUEEN || threatType == ChessPiece.PieceType.BISHOP || threatType == ChessPiece.PieceType.ROOK){
-                // Find the direction of the king from the threatPiece by comparing positions
-                // Iteratively check every square in the way of the king to see if a piece can move to it
+                ChessPosition.ChessVector threatVector = ChessPosition.getVector(kingPosition, threatPosition);
+                ChessPosition blockPosition = kingPosition.getNextPosition(threatVector.rowChange(), threatVector.colChange());
+                for (int i = 0; i < threatVector.magnitude() - 1; i++){
+                    saviorPieces = board.positionsOfThreatPieces(blockPosition, notColor(teamColor));
+                    if (!saviorPieces.isEmpty()){
+                        return false;
+                    }
+                    blockPosition = blockPosition.getNextPosition(threatVector.rowChange(), threatVector.colChange());
+                }
             }
         }
         // Get possible moves for King

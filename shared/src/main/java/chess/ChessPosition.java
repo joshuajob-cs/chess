@@ -2,6 +2,8 @@ package chess;
 
 import java.util.Objects;
 
+import static java.lang.Math.abs;
+
 /**
  * Represents a single square position on a chess board
  * <p>
@@ -39,6 +41,27 @@ public record ChessPosition (int row, int col){
 
     public ChessPosition getNextPosition(int rowChange, int colChange){
         return new ChessPosition(row + rowChange, col + colChange);
+    }
+
+    public record ChessVector(int rowChange, int colChange, int magnitude){}
+
+    public static ChessVector getVector(ChessPosition fromPosition, ChessPosition toPosition){
+        int rowChange = toPosition.getRow() - fromPosition.getRow();
+        int colChange = toPosition.getColumn() - fromPosition.getColumn();
+        int amplitude;
+        if (abs(rowChange) == abs(colChange)){
+            amplitude = abs(rowChange);
+        }
+        else if(rowChange == 0){
+            amplitude = abs(colChange);
+        }
+        else if(colChange == 0){
+            amplitude = abs(rowChange);
+        }
+        else{
+            throw new IllegalArgumentException("Can not solve for vectors if vector's direction would contain float value");
+        }
+        return new ChessVector(rowChange/amplitude, colChange/amplitude, amplitude);
     }
 
     @Override
