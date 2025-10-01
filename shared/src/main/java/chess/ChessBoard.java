@@ -26,6 +26,16 @@ public class ChessBoard {
         board[8-position.getRow()][position.getColumn() - 1] = piece;
     }
 
+    public void movePiece(ChessMove move){
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPiece piece = getPiece(startPosition);
+        if (move.getPromotionPiece() != null){
+            piece = new ChessPiece(piece.pieceColor(), move.getPromotionPiece());
+        }
+        addPiece(move.getEndPosition(), piece);
+        board[8-startPosition.getRow()][startPosition.getColumn() - 1] = null;
+    }
+
     /**
      * Gets a chess piece on the chessboard
      *
