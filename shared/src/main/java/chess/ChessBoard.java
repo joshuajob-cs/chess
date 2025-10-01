@@ -1,8 +1,6 @@
 package chess;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -10,6 +8,8 @@ import java.util.Objects;
  * <p>
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
+ * The key difference between ChessBoard and ChessGame
+ * is that ChessBoard does not know the rules.
  */
 public class ChessBoard {
 
@@ -38,6 +38,16 @@ public class ChessBoard {
         board[8-startPosition.getRow()][startPosition.getColumn() - 1] = null;
     }
 
+    public void undoMove(ChessMove move, ChessPiece replacedPiece){
+        ChessPosition endPosition = move.getEndPosition();
+        ChessPiece piece = getPiece(endPosition);
+        if (move.getPromotionPiece() != null){
+            piece = new ChessPiece(piece.pieceColor(), ChessPiece.PieceType.PAWN);
+        }
+        addPiece(move.getStartPosition(), piece);
+        board[8-endPosition.getRow()][endPosition.getColumn() - 1] = replacedPiece;
+    }
+
     /**
      * Gets a chess piece on the chessboard
      *
@@ -53,31 +63,11 @@ public class ChessBoard {
         for (int i = 0; i < 8; i++){
             for (int j = 0; j < 8; j++){
                 if (board[i][j] != null && board[i][j].equals(piece)){
-                   return new ChessPosition(8-i, j-1);
+                   return new ChessPosition(8-i, j+1);
                 }
             }
         }
         throw new IllegalArgumentException("Piece is not on board");
-    }
-
-    public Collection<ChessPosition> positionsOfThreatPieces(ChessPosition position, ChessGame.TeamColor teamColor){
-        Collection<ChessPosition> threatPieces = new ArrayList<>();
-        ChessPiece nextPiece;
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j < 8; j++){
-                nextPiece = board[i][j];
-                if (nextPiece != null && nextPiece.pieceColor() != teamColor){
-                    ChessPosition piecePosition = new ChessPosition(8-i, j-1);
-                    Collection<ChessMove> nextPieceMoves = nextPiece.pieceMoves(this, piecePosition);
-                    for (ChessMove move:nextPieceMoves){
-                        if (move.getEndPosition().equals(position)){
-                            threatPieces.add(piecePosition);
-                        }
-                    }
-                }
-            }
-        }
-        return threatPieces;
     }
 
     /**

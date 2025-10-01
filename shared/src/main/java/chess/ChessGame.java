@@ -50,6 +50,27 @@ public class ChessGame {
         return TeamColor.WHITE;
     }
 
+    private Collection<ChessPosition> positionsOfThreatPieces(ChessPosition position, ChessGame.TeamColor teamColor){
+        Collection<ChessPosition> threatPieces = new ArrayList<>();
+        ChessPosition threatPosition;
+        ChessPiece threatPiece;
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++){
+                threatPosition = new ChessPosition(i, j);
+                threatPiece = board.getPiece(threatPosition);
+                if (threatPiece != null && threatPiece.pieceColor() != teamColor){
+                    Collection<ChessMove> nextPieceMoves = threatPiece.pieceMoves(board, threatPosition);
+                    for (ChessMove move:nextPieceMoves){
+                        if (move.getEndPosition().equals(position)){
+                            threatPieces.add(threatPosition);
+                        }
+                    }
+                }
+            }
+        }
+        return threatPieces;
+    }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -62,18 +83,18 @@ public class ChessGame {
         if (piece == null) {
             return new ArrayList<>();
         }
-        // For each move, try the move, check for check
-        // If it puts you in check it is not a valid move
         Collection<ChessMove> possibleMoves = piece.pieceMoves(board, startPosition);
-        ChessBoard startBoard = board;
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        ChessPiece capturedPiece;
         for (ChessMove move: possibleMoves){
+            capturedPiece = board.getPiece(move.getEndPosition());
             board.movePiece(move);
-            if (isInCheck(piece.getTeamColor())){
-                possibleMoves.remove(move);
+            if (!isInCheck(piece.getTeamColor())){
+                validMoves.add(move);
             }
-            setBoard(startBoard);
+            board.undoMove(move, capturedPiece);
         }
-        return possibleMoves;
+        return validMoves;
     }
 
     /**
@@ -100,7 +121,7 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor) {
         ChessPosition kingPosition = board.getPosition(new ChessPiece(teamColor, ChessPiece.PieceType.KING));
-        Collection<ChessPosition> threatPositions = board.positionsOfThreatPieces(kingPosition, teamColor);
+        Collection<ChessPosition> threatPositions = positionsOfThreatPieces(kingPosition, teamColor);
         return !threatPositions.isEmpty();
     }
 
@@ -112,7 +133,7 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         ChessPosition kingPosition = board.getPosition(new ChessPiece(teamColor, ChessPiece.PieceType.KING));
-        Collection<ChessPosition> threatPositions = board.positionsOfThreatPieces(kingPosition, teamColor);
+        Collection<ChessPosition> threatPositions = positionsOfThreatPieces(kingPosition, teamColor);
         if (threatPositions.isEmpty()){
             return false;
         }
@@ -122,7 +143,7 @@ public class ChessGame {
         ChessPosition nextKingPosition;
         for (ChessMove move: kingMoves){
             nextKingPosition = move.getEndPosition();
-            threatPositions = board.positionsOfThreatPieces(nextKingPosition, teamColor);
+            threatPositions = positionsOfThreatPieces(nextKingPosition, teamColor);
             if (threatPositions.isEmpty()){
                 return false;
             }
@@ -131,7 +152,7 @@ public class ChessGame {
         if (threatPositions.size() == 1){
             // The enemy of my enemy is my friend
             ChessPosition threatPosition = threatPositions.iterator().next();
-            Collection<ChessPosition> saviorPieces = board.positionsOfThreatPieces(threatPosition, notColor(teamColor));
+            Collection<ChessPosition> saviorPieces = positionsOfThreatPieces(threatPosition, notColor(teamColor));
             if (!saviorPieces.isEmpty()){
                 return false;
             }
@@ -141,7 +162,7 @@ public class ChessGame {
                 ChessPosition.ChessVector threatVector = ChessPosition.getVector(kingPosition, threatPosition);
                 ChessPosition blockPosition = kingPosition.getNextPosition(threatVector.rowChange(), threatVector.colChange());
                 for (int i = 0; i < threatVector.magnitude() - 1; i++){
-                    saviorPieces = board.positionsOfThreatPieces(blockPosition, notColor(teamColor));
+                    saviorPieces = positionsOfThreatPieces(blockPosition, notColor(teamColor));
                     if (!saviorPieces.isEmpty()){
                         return false;
                     }
