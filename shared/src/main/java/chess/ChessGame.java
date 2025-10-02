@@ -160,50 +160,6 @@ public class ChessGame {
         return false;
     }
 
-    abstract class CheckStatus{
-
-        abstract boolean checkForCheck(Collection<ChessPosition> threatPositions);
-
-        public boolean isCheckStatus(TeamColor teamColor) {
-            ChessPosition kingPosition = board.getPosition(new ChessPiece(teamColor, ChessPiece.PieceType.KING));
-            Collection<ChessPosition> threatPositions = positionsOfThreatPieces(kingPosition, teamColor);
-            if (checkForCheck(threatPositions)){
-                return false;
-            }
-            // Move the king
-            ChessPiece kingPiece = board.getPiece(kingPosition);
-            Collection<ChessMove> kingMoves = kingPiece.pieceMoves(board, kingPosition);
-            if(movesPreventCheck(kingMoves, teamColor)){
-                return false;
-            }
-            // If there is only one piece threatening the king, you can capture or block the piece
-            if (threatPositions.size() == 1){
-                // CAPTURE
-                ChessPosition threatPosition = threatPositions.iterator().next();
-                // An enemy to my enemy is my friend
-                Collection<ChessPosition> saviorPieces = positionsOfThreatPieces(threatPosition, notColor(teamColor));
-                if (movesPreventCheck(saviorPieces, threatPosition, teamColor)){
-                    return false;
-                }
-                // BLOCK
-                ChessPiece threatPiece = board.getPiece(threatPosition);
-                ChessPiece.PieceType threatType = threatPiece.getPieceType();
-                if(threatType == ChessPiece.PieceType.QUEEN || threatType == ChessPiece.PieceType.BISHOP || threatType == ChessPiece.PieceType.ROOK){
-                    ChessPosition.ChessVector threatVector = ChessPosition.getVector(kingPosition, threatPosition);
-                    ChessPosition blockPosition = kingPosition.getNextPosition(threatVector.rowChange(), threatVector.colChange());
-                    for (int i = 0; i < threatVector.magnitude() - 1; i++){
-                        saviorPieces = positionsOfThreatPieces(blockPosition, notColor(teamColor));
-                        if (movesPreventCheck(saviorPieces, blockPosition, teamColor)){
-                            return false;
-                        }
-                        blockPosition = blockPosition.getNextPosition(threatVector.rowChange(), threatVector.colChange());
-                    }
-                }
-            }
-            return true;
-        }
-    }
-
     /**
      * Determines if the given team is in checkmate
      *
@@ -211,14 +167,42 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        class CheckmateStatus extends CheckStatus{
-            boolean checkForCheck(Collection<ChessPosition> threatPositions){
-                return threatPositions.isEmpty();
+        ChessPosition kingPosition = board.getPosition(new ChessPiece(teamColor, ChessPiece.PieceType.KING));
+        Collection<ChessPosition> threatPositions = positionsOfThreatPieces(kingPosition, teamColor);
+        if (threatPositions.isEmpty()){
+            return false;
+        }
+        // Move the king
+        ChessPiece kingPiece = board.getPiece(kingPosition);
+        Collection<ChessMove> kingMoves = kingPiece.pieceMoves(board, kingPosition);
+        if(movesPreventCheck(kingMoves, teamColor)){
+            return false;
+        }
+        // If there is only one piece threatening the king, you can capture or block the piece
+        if (threatPositions.size() == 1){
+            // CAPTURE
+            ChessPosition threatPosition = threatPositions.iterator().next();
+            // An enemy to my enemy is my friend
+            Collection<ChessPosition> saviorPieces = positionsOfThreatPieces(threatPosition, notColor(teamColor));
+            if (movesPreventCheck(saviorPieces, threatPosition, teamColor)){
+                return false;
+            }
+            // BLOCK
+            ChessPiece threatPiece = board.getPiece(threatPosition);
+            ChessPiece.PieceType threatType = threatPiece.getPieceType();
+            if(threatType == ChessPiece.PieceType.QUEEN || threatType == ChessPiece.PieceType.BISHOP || threatType == ChessPiece.PieceType.ROOK){
+                ChessPosition.ChessVector threatVector = ChessPosition.getVector(kingPosition, threatPosition);
+                ChessPosition blockPosition = kingPosition.getNextPosition(threatVector.rowChange(), threatVector.colChange());
+                for (int i = 0; i < threatVector.magnitude() - 1; i++){
+                    saviorPieces = positionsOfThreatPieces(blockPosition, notColor(teamColor));
+                    if (movesPreventCheck(saviorPieces, blockPosition, teamColor)){
+                        return false;
+                    }
+                    blockPosition = blockPosition.getNextPosition(threatVector.rowChange(), threatVector.colChange());
+                }
             }
         }
-
-        CheckmateStatus checkmateChecker = new CheckmateStatus();
-        return checkmateChecker.isCheckStatus(teamColor);
+        return true;
     }
 
     /**
@@ -229,14 +213,24 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        class StalemateStatus extends CheckStatus{
-            boolean checkForCheck(Collection<ChessPosition> threatPositions){
-                return !threatPositions.isEmpty();
-            }
+        if (isInCheck(teamColor)){
+            return false;
         }
 
-        StalemateStatus stalemateChecker = new StalemateStatus();
-        return stalemateChecker.isCheckStatus(teamColor);
+        ChessPosition nextPosition;
+        ChessPiece nextPiece;
+        for (int i = 1; i < 9; i++){
+            for (int j = 1; j < 9; j++) {
+                nextPosition = new ChessPosition(i, j);
+                nextPiece = board.getPiece(nextPosition);
+                if(nextPiece != null && nextPiece.pieceColor() == teamColor){
+                    if (!validMoves(nextPosition).isEmpty()){
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
