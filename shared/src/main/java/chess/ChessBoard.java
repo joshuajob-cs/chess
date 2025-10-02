@@ -107,15 +107,21 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        String boardString = "";
+        StringBuilder boardString = new StringBuilder();
         for(ChessPiece[] rows:board){
             for(ChessPiece piece: rows) {
-                boardString += piece.toChar();
+                boardString.append("|");
+                if (piece == null){
+                    boardString.append(" ");
+                }
+                else {
+                    boardString.append(piece.toChar());
+                }
             }
-            boardString += "\n";
+            boardString.append("|");
+            boardString.append("\n");
         }
-        return boardString;
+        boardString.setLength(boardString.length() - 1);
+        return boardString.toString();
     }
-
-    //TODO: Run test to make sure toString works
 }
