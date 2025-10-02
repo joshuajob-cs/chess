@@ -50,21 +50,27 @@ public class ChessGame {
         return TeamColor.WHITE;
     }
 
+    private boolean isThreat(ChessPosition threatPosition, ChessPosition endPosition, TeamColor teamColor){
+        ChessPiece threatPiece = board.getPiece(threatPosition);
+        if (threatPiece != null && threatPiece.pieceColor() != teamColor){
+            Collection<ChessMove> nextPieceMoves = threatPiece.pieceMoves(board, threatPosition);
+            for (ChessMove move:nextPieceMoves){
+                if (move.getEndPosition().equals(endPosition)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private Collection<ChessPosition> positionsOfThreatPieces(ChessPosition position, ChessGame.TeamColor teamColor){
         Collection<ChessPosition> threatPieces = new ArrayList<>();
-        ChessPosition threatPosition;
-        ChessPiece threatPiece;
+        ChessPosition potentialThreat;
         for (int i = 1; i < 9; i++){
             for (int j = 1; j < 9; j++){
-                threatPosition = new ChessPosition(i, j);
-                threatPiece = board.getPiece(threatPosition);
-                if (threatPiece != null && threatPiece.pieceColor() != teamColor){
-                    Collection<ChessMove> nextPieceMoves = threatPiece.pieceMoves(board, threatPosition);
-                    for (ChessMove move:nextPieceMoves){
-                        if (move.getEndPosition().equals(position) && !threatPieces.contains(threatPosition)){
-                            threatPieces.add(threatPosition);
-                        }
-                    }
+                potentialThreat = new ChessPosition(i, j);
+                if (isThreat(potentialThreat, position, teamColor)) {
+                    threatPieces.add(potentialThreat);
                 }
             }
         }
