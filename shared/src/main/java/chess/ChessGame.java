@@ -132,6 +132,34 @@ public class ChessGame {
         return !threatPositions.isEmpty();
     }
 
+    private boolean movesPreventCheck(Collection<ChessMove> moves, TeamColor teamColor){
+        ChessPiece capturedPiece;
+        for (ChessMove move: moves){
+            capturedPiece = board.getPiece(move.getEndPosition());
+            board.movePiece(move);
+            if (!isInCheck(teamColor)){
+                return true;
+            }
+            board.undoMove(move, capturedPiece);
+        }
+        return false;
+    }
+
+    private boolean movesPreventCheck(Collection<ChessPosition> startPositions, ChessPosition endPosition, TeamColor teamColor){
+        ChessPiece capturedPiece;
+        ChessMove move;
+        for (ChessPosition startPosition: startPositions){
+            capturedPiece = board.getPiece(endPosition);
+            move = new ChessMove(startPosition, endPosition, null);
+            board.movePiece(move);
+            if (!isInCheck(teamColor)){
+                return true;
+            }
+            board.undoMove(move, capturedPiece);
+        }
+        return false;
+    }
+
     /**
      * Determines if the given team is in checkmate
      *
@@ -147,28 +175,19 @@ public class ChessGame {
         // Move the king
         ChessPiece kingPiece = board.getPiece(kingPosition);
         Collection<ChessMove> kingMoves = kingPiece.pieceMoves(board, kingPosition);
-        ChessPiece capturedPiece;
-        for (ChessMove move: kingMoves){
-            capturedPiece = board.getPiece(move.getEndPosition());
-            board.movePiece(move);
-            if (!isInCheck(teamColor)){
+        if(movesPreventCheck(kingMoves, teamColor)){
+            return false;
+        }
+        // If there is only one piece threatening the king, you can capture or block the piece
+        if (threatPositions.size() == 1){
+            // Capture
+            ChessPosition threatPosition = threatPositions.iterator().next();
+            // An enemy to my enemy is my friend
+            Collection<ChessPosition> saviorPieces = positionsOfThreatPieces(threatPosition, notColor(teamColor));
+            if (movesPreventCheck(saviorPieces, threatPosition, teamColor)){
                 return false;
             }
-            board.undoMove(move, capturedPiece);
-        }
-        // If there is only one threat piece, you can capture or block the piece
-        if (threatPositions.size() == 1){
-            // The enemy of my enemy is my friend
-            ChessPosition threatPosition = threatPositions.iterator().next();
-            Collection<ChessPosition> saviorPieces = positionsOfThreatPieces(threatPosition, notColor(teamColor));
-            for (ChessPosition saviorPiece: saviorPieces){
-                capturedPiece = board.getPiece(threatPosition);
-                board.movePiece(new ChessMove(saviorPiece, threatPosition, null));
-                if (!isInCheck(teamColor)){
-                    return false;
-                }
-                board.undoMove(new ChessMove(saviorPiece, threatPosition, null), capturedPiece);
-            }
+            // Block
             ChessPiece threatPiece = board.getPiece(threatPosition);
             ChessPiece.PieceType threatType = threatPiece.getPieceType();
             if(threatType == ChessPiece.PieceType.QUEEN || threatType == ChessPiece.PieceType.BISHOP || threatType == ChessPiece.PieceType.ROOK){
@@ -176,13 +195,8 @@ public class ChessGame {
                 ChessPosition blockPosition = kingPosition.getNextPosition(threatVector.rowChange(), threatVector.colChange());
                 for (int i = 0; i < threatVector.magnitude() - 1; i++){
                     saviorPieces = positionsOfThreatPieces(blockPosition, notColor(teamColor));
-                    for (ChessPosition saviorPiece: saviorPieces){
-                        capturedPiece = null;
-                        board.movePiece(new ChessMove(saviorPiece, blockPosition, null));
-                        if (!isInCheck(teamColor)){
-                            return false;
-                        }
-                        board.undoMove(new ChessMove(saviorPiece, blockPosition, null), capturedPiece);
+                    if (movesPreventCheck(saviorPieces, blockPosition, teamColor)){
+                        return false;
                     }
                     blockPosition = blockPosition.getNextPosition(threatVector.rowChange(), threatVector.colChange());
                 }
