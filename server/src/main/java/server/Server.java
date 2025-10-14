@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import io.javalin.*;
 
 import io.javalin.http.Context;
+import model.RegisterResponse;
 import model.UserData;
 
 import java.util.HashMap;
@@ -24,15 +25,11 @@ public class Server {
     private void register(Context ctx){
         var serializer = new Gson();
 
-        var data = new UserData("a", "b", "c");
+        var request = serializer.fromJson(ctx.body(), UserData.class);
 
-        // serialize to JSON
-        var json = serializer.toJson(data);
-
-        // deserialize back to ChessGame
-        var req = serializer.fromJson(json, UserData.class);
-
-        ctx.result("{\"username\":\"joe\", \"authToken\":\"xyz\"}");
+        var response = new RegisterResponse("joe", "xyz");
+        var jsonResponse = serializer.toJson(response);
+        ctx.result(jsonResponse);
     }
 
     public int run(int desiredPort) {
