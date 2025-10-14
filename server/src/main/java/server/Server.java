@@ -1,16 +1,22 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
+import dataaccess.MemoryUserDAO;
+import dataaccess.UserDAO;
 import io.javalin.*;
 
 import io.javalin.http.Context;
 import model.RegisterResponse;
 import model.UserData;
+
+import java.util.Map;
 import java.util.UUID;
 
 public class Server {
 
     private final Javalin server;
+    private final UserDAO userMemory = new MemoryUserDAO();
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
@@ -24,6 +30,13 @@ public class Server {
     private void register(Context ctx){
         var serializer = new Gson();
         var request = serializer.fromJson(ctx.body(), UserData.class);
+        try {
+            userMemory.createUser(request);
+        } catch (dataaccess.DataAccessException ex) {
+            ctx.status(403);
+            ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
+            return;
+        }
         var authToken = generateToken();
         var response = new RegisterResponse(request.username(), authToken);
         ctx.result(serializer.toJson(response));
