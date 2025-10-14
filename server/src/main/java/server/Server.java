@@ -6,8 +6,7 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import model.RegisterResponse;
 import model.UserData;
-
-import java.util.HashMap;
+import java.util.UUID;
 
 public class Server {
 
@@ -24,12 +23,14 @@ public class Server {
 
     private void register(Context ctx){
         var serializer = new Gson();
-
         var request = serializer.fromJson(ctx.body(), UserData.class);
+        var authToken = generateToken();
+        var response = new RegisterResponse(request.username(), authToken);
+        ctx.result(serializer.toJson(response));
+    }
 
-        var response = new RegisterResponse("joe", "xyz");
-        var jsonResponse = serializer.toJson(response);
-        ctx.result(jsonResponse);
+    private static String generateToken() {
+        return UUID.randomUUID().toString();
     }
 
     public int run(int desiredPort) {
