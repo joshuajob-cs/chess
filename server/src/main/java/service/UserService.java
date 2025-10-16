@@ -30,11 +30,6 @@ public class UserService {
         if (userData == null || !loginData.password().equals(userData.password())){
             throw new DataAccessException("401", new DataAccessException("Error: unauthorized"));
         }
-        /*
-        var authData = authMemoryAccess.getAuthWithUsername(loginData.username());
-        if(authData != null){
-            return new LoginResponse(authData.username(), authData.authToken());
-        }*/
         var authToken = generateToken();
         authMemoryAccess.createAuth(new AuthData(authToken, loginData.username()));
         return new LoginResponse(loginData.username(), authToken);
