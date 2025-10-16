@@ -1,18 +1,16 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.MemoryUserDAO;
-import dataaccess.UserDAO;
 import io.javalin.*;
 
 import io.javalin.http.Context;
-import model.RegisterResponse;
+import model.LoginData;
+import model.LoginResponse;
 import model.UserData;
 import service.ClearService;
 import service.UserService;
 
 import java.util.Map;
-import java.util.UUID;
 
 public class Server {
 
@@ -25,6 +23,7 @@ public class Server {
 
         server.delete("db", this::clear);
         server.post("user", this::register);
+        server.post("session", this::login);
         // Register your endpoints and exception handlers here.
 
     }
@@ -37,9 +36,23 @@ public class Server {
     private void register(Context ctx){
         var serializer = new Gson();
         var request = serializer.fromJson(ctx.body(), UserData.class);
-        RegisterResponse response;
+        LoginResponse response;
         try {
             response =  userService.register(request);
+        } catch (dataaccess.DataAccessException ex) {
+            ctx.status(Integer.parseInt(ex.getMessage()));
+            ctx.result(serializer.toJson(Map.of("message", ex.getCause().getMessage())));
+            return;
+        }
+        ctx.result(serializer.toJson(response));
+    }
+
+    public void login(Context ctx){
+        var serializer = new Gson();
+        var request = serializer.fromJson(ctx.body(), LoginData.class);
+        LoginResponse response;
+        try {
+            response =  userService.login(request);
         } catch (dataaccess.DataAccessException ex) {
             ctx.status(Integer.parseInt(ex.getMessage()));
             ctx.result(serializer.toJson(Map.of("message", ex.getCause().getMessage())));

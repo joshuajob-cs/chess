@@ -15,11 +15,27 @@ public class MemoryAuthDAO implements AuthDAO{
 
     @Override
     public void createAuth(AuthData data) throws DataAccessException {
-
+        if(data.authToken() == null || data.username() == null){
+            throw new DataAccessException("400", new DataAccessException("Error: Bad Request"));
+        }
+        if (allAuthData.containsKey(data.authToken())){
+            throw new DataAccessException("403", new DataAccessException("Error: already taken"));
+        }
+        allAuthData.put(data.authToken(), data);
     }
 
     @Override
     public AuthData getAuth(String authToken) {
-        return null;
+        return allAuthData.get(authToken);
+    }
+
+    @Override
+    public boolean isLoggedIn(String username) {
+        for(AuthData auth: allAuthData.values()){
+            if (username.equals(auth.username())){
+                return true;
+            }
+        }
+        return false;
     }
 }
