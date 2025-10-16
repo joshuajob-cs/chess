@@ -13,6 +13,9 @@ public class UserService {
     private final AuthDAO authMemoryAccess = new MemoryAuthDAO();
 
     public LoginResponse register(UserData data) throws DataAccessException {
+        if(data.username() == null || data.password() == null || data.email() == null){
+            throw new DataAccessException("400", new DataAccessException("Error: Bad Request"));
+        }
         userMemoryAccess.createUser(data);
         var authToken = generateToken();
         authMemoryAccess.createAuth(new AuthData(authToken, data.username()));
@@ -20,14 +23,18 @@ public class UserService {
     }
 
     public LoginResponse login(LoginData loginData) throws DataAccessException {
+        if(loginData.username() == null || loginData.password() == null){
+            throw new DataAccessException("400", new DataAccessException("Error: Bad Request"));
+        }
         var userData = userMemoryAccess.getUser(loginData.username());
-        if (userData == null){
+        if (userData == null || !loginData.password().equals(userData.password())){
             throw new DataAccessException("401", new DataAccessException("Error: unauthorized"));
         }
+        /*
         var authData = authMemoryAccess.getAuthWithUsername(loginData.username());
         if(authData != null){
             return new LoginResponse(authData.username(), authData.authToken());
-        }
+        }*/
         var authToken = generateToken();
         authMemoryAccess.createAuth(new AuthData(authToken, loginData.username()));
         return new LoginResponse(loginData.username(), authToken);
