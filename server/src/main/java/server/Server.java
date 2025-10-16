@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
 import dataaccess.MemoryUserDAO;
 import dataaccess.UserDAO;
 import io.javalin.*;
@@ -33,8 +32,8 @@ public class Server {
         try {
             userMemory.createUser(request);
         } catch (dataaccess.DataAccessException ex) {
-            ctx.status(403);
-            ctx.result(serializer.toJson(Map.of("message", ex.getMessage())));
+            ctx.status(Integer.parseInt(ex.getMessage()));
+            ctx.result(serializer.toJson(Map.of("message", ex.getCause().getMessage())));
             return;
         }
         var authToken = generateToken();
