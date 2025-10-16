@@ -8,6 +8,7 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import model.RegisterResponse;
 import model.UserData;
+import service.UserService;
 
 import java.util.Map;
 import java.util.UUID;
@@ -15,7 +16,7 @@ import java.util.UUID;
 public class Server {
 
     private final Javalin server;
-    private final UserDAO userMemory = new MemoryUserDAO();
+    private final UserService userService = new UserService();
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
@@ -29,20 +30,15 @@ public class Server {
     private void register(Context ctx){
         var serializer = new Gson();
         var request = serializer.fromJson(ctx.body(), UserData.class);
+        RegisterResponse response;
         try {
-            userMemory.createUser(request);
+            response =  userService.register(request);
         } catch (dataaccess.DataAccessException ex) {
             ctx.status(Integer.parseInt(ex.getMessage()));
             ctx.result(serializer.toJson(Map.of("message", ex.getCause().getMessage())));
             return;
         }
-        var authToken = generateToken();
-        var response = new RegisterResponse(request.username(), authToken);
         ctx.result(serializer.toJson(response));
-    }
-
-    private static String generateToken() {
-        return UUID.randomUUID().toString();
     }
 
     public int run(int desiredPort) {
