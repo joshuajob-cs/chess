@@ -30,12 +30,12 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     @Override
-    public boolean isLoggedIn(String username) {
+    public AuthData getAuthWithUsername(String username) {
         for(AuthData auth: allAuthData.values()){
             if (username.equals(auth.username())){
-                return true;
+                return auth;
             }
         }
-        return false;
+        return null;
     }
 }

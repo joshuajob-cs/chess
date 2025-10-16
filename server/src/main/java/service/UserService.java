@@ -20,12 +20,13 @@ public class UserService {
     }
 
     public LoginResponse login(LoginData loginData) throws DataAccessException {
-        if(authMemoryAccess.isLoggedIn(loginData.username())){
-            throw new DataAccessException("403", new DataAccessException("Error: already logged in"));
-        }
         var userData = userMemoryAccess.getUser(loginData.username());
         if (userData == null){
             throw new DataAccessException("401", new DataAccessException("Error: unauthorized"));
+        }
+        var authData = authMemoryAccess.getAuthWithUsername(loginData.username());
+        if(authData != null){
+            return new LoginResponse(authData.username(), authData.authToken());
         }
         var authToken = generateToken();
         authMemoryAccess.createAuth(new AuthData(authToken, loginData.username()));

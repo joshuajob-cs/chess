@@ -6,5 +6,5 @@ public interface AuthDAO {
     void clear();
     void createAuth(AuthData data) throws DataAccessException;
     AuthData getAuth(String authToken);
-    boolean isLoggedIn(String username);
+    AuthData getAuthWithUsername(String username);
 }
