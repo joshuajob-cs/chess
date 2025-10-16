@@ -17,6 +17,9 @@ public class UserService {
         return new RegisterResponse(data.username(), authToken);
     }
 
+    //Log in
+    //Log out
+
     private static String generateToken() {
         return UUID.randomUUID().toString();
     }

@@ -3,6 +3,7 @@ package dataaccess;
 import model.GameData;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MemoryGameDAO implements GameDAO{
@@ -21,5 +22,15 @@ public class MemoryGameDAO implements GameDAO{
     @Override
     public GameData getGame(String gameID) {
         return null;
+    }
+
+    @Override
+    public List<GameData> listGames() {
+        return List.of();
+    }
+
+    @Override
+    public void updateGame(GameData data) throws DataAccessException{
+
     }
 }
