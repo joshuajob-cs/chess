@@ -24,6 +24,7 @@ public class Server {
         server.delete("db", this::clear);
         server.post("user", this::register);
         server.post("session", this::login);
+        server.delete("session", this::logout);
         // Register your endpoints and exception handlers here.
 
     }
@@ -59,6 +60,19 @@ public class Server {
             return;
         }
         ctx.result(serializer.toJson(response));
+    }
+
+    public void logout(Context ctx){
+        var serializer = new Gson();
+        String request = ctx.header("authorization");
+        try {
+            userService.logout(request);
+        } catch (dataaccess.DataAccessException ex) {
+            ctx.status(Integer.parseInt(ex.getMessage()));
+            ctx.result(serializer.toJson(Map.of("message", ex.getCause().getMessage())));
+            return;
+        }
+        ctx.result("{}");
     }
 
     public int run(int desiredPort) {

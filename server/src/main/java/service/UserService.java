@@ -35,8 +35,8 @@ public class UserService {
         return new LoginResponse(loginData.username(), authToken);
     }
 
-    public void logout(){
-
+    public void logout(String authToken) throws DataAccessException{
+        authMemoryAccess.deleteAuth(authToken);
     }
 
     private static String generateToken() {
