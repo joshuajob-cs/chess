@@ -9,10 +9,10 @@ import model.UserData;
 import java.util.UUID;
 
 public class UserService {
-    private final UserDAO userMemory = new MemoryUserDAO();
+    private final UserDAO userMemoryAccess = new MemoryUserDAO();
 
     public RegisterResponse register(UserData data) throws DataAccessException {
-        userMemory.createUser(data);
+        userMemoryAccess.createUser(data);
         var authToken = generateToken();
         return new RegisterResponse(data.username(), authToken);
     }

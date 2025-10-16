@@ -8,6 +8,7 @@ import io.javalin.*;
 import io.javalin.http.Context;
 import model.RegisterResponse;
 import model.UserData;
+import service.ClearService;
 import service.UserService;
 
 import java.util.Map;
@@ -17,14 +18,20 @@ public class Server {
 
     private final Javalin server;
     private final UserService userService = new UserService();
+    private final ClearService clearService = new ClearService();
 
     public Server() {
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
-        server.delete("db", ctx -> ctx.result("{}"));
+        server.delete("db", this::clear);
         server.post("user", this::register);
         // Register your endpoints and exception handlers here.
 
+    }
+
+    private void clear(Context ctx){
+        clearService.clearAll();
+        ctx.result("{}");
     }
 
     private void register(Context ctx){
