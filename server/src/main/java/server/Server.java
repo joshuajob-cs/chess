@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.*;
 
 import io.javalin.http.Context;
@@ -35,44 +36,51 @@ public class Server {
     }
 
     private void register(Context ctx){
-        var serializer = new Gson();
-        var request = serializer.fromJson(ctx.body(), UserData.class);
-        LoginResponse response;
-        try {
-            response =  userService.register(request);
-        } catch (dataaccess.DataAccessException ex) {
-            ctx.status(Integer.parseInt(ex.getMessage()));
-            ctx.result(serializer.toJson(Map.of("message", ex.getCause().getMessage())));
-            return;
+        class RegisterRequest extends ServiceRequest{
+            void requestService(){}
+
+            String getResponse() throws DataAccessException{
+                var serializer = new Gson();
+                var request = serializer.fromJson(ctx.body(), UserData.class);
+                LoginResponse response = userService.register(request);
+                return serializer.toJson(response);
+            }
         }
-        ctx.result(serializer.toJson(response));
+
+        RegisterRequest request = new RegisterRequest();
+        request.sendServiceRequest(ctx);
     }
 
-    public void login(Context ctx){
-        var serializer = new Gson();
-        var request = serializer.fromJson(ctx.body(), LoginData.class);
-        LoginResponse response;
-        try {
-            response =  userService.login(request);
-        } catch (dataaccess.DataAccessException ex) {
-            ctx.status(Integer.parseInt(ex.getMessage()));
-            ctx.result(serializer.toJson(Map.of("message", ex.getCause().getMessage())));
-            return;
+    private void login(Context ctx){
+        class LoginRequest extends ServiceRequest{
+            void requestService(){}
+
+            String getResponse() throws DataAccessException{
+                var serializer = new Gson();
+                var request = serializer.fromJson(ctx.body(), LoginData.class);
+                LoginResponse response = userService.login(request);
+                return serializer.toJson(response);
+            }
         }
-        ctx.result(serializer.toJson(response));
+
+        LoginRequest request = new LoginRequest();
+        request.sendServiceRequest(ctx);
     }
 
-    public void logout(Context ctx){
-        var serializer = new Gson();
-        String request = ctx.header("authorization");
-        try {
-            userService.logout(request);
-        } catch (dataaccess.DataAccessException ex) {
-            ctx.status(Integer.parseInt(ex.getMessage()));
-            ctx.result(serializer.toJson(Map.of("message", ex.getCause().getMessage())));
-            return;
+    private void logout(Context ctx){
+        class LogoutRequest extends ServiceRequest{
+            void requestService() throws DataAccessException{
+                String request = ctx.header("authorization");
+                userService.logout(request);
+            }
+
+            String getResponse(){
+                return "{}";
+            }
         }
-        ctx.result("{}");
+
+        LogoutRequest request = new LogoutRequest();
+        request.sendServiceRequest(ctx);
     }
 
     public int run(int desiredPort) {
@@ -81,4 +89,23 @@ public class Server {
     }
 
     public void stop() {server.stop();}
+
+    public static abstract class ServiceRequest{
+        void sendServiceRequest(Context ctx){
+            var serializer = new Gson();
+            String response;
+            try {
+                requestService();
+                response = getResponse();
+            } catch (dataaccess.DataAccessException ex) {
+                ctx.status(Integer.parseInt(ex.getMessage()));
+                ctx.result(serializer.toJson(Map.of("message", ex.getCause().getMessage())));
+                return;
+            }
+            ctx.result(response);
+        }
+
+        abstract void requestService() throws DataAccessException;
+        abstract String getResponse() throws DataAccessException;
+    }
 }
