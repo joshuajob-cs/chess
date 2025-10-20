@@ -26,6 +26,9 @@ public class Server {
         server.post("user", this::register);
         server.post("session", this::login);
         server.delete("session", this::logout);
+        server.get("game", this::listGames);
+        server.post("game", this::createGame);
+        server.put("game", this::joinGame);
         // Register your endpoints and exception handlers here.
 
     }
@@ -81,6 +84,18 @@ public class Server {
 
         LogoutRequest request = new LogoutRequest();
         request.sendServiceRequest(ctx);
+    }
+
+    private void listGames(Context ctx){
+
+    }
+
+    private void createGame(Context ctx){
+
+    }
+
+    private void joinGame(Context ctx){
+
     }
 
     public int run(int desiredPort) {
