@@ -15,7 +15,7 @@ import static chess.ChessGame.TeamColor.WHITE;
 public class GameService {
     private final AuthDAO authMemoryAccess = new MemoryAuthDAO();
     private final GameDAO gameMemoryAccess = new MemoryGameDAO();
-    public static int nextID = 0;
+    public static int nextID = 1;
 
     public List<GameData> listGames(String authToken) throws DataAccessException{
         validateRequest(authToken);

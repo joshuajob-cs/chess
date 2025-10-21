@@ -107,7 +107,7 @@ public class Server {
                 String gameName = ctx.body();
                 var request = new CreateGameRequest(auth, gameName);
                 int response = gameService.createGame(request);
-                return serializer.toJson(response);
+                return serializer.toJson(Map.of("gameID",response));
             }
         }
 
