@@ -122,7 +122,7 @@ public class Server {
                 var serializer = new Gson();
                 String auth = ctx.header("authorization");
                 var colorAndID = serializer.fromJson(ctx.body(), JoinRequestNoAuth.class);
-                var request = new JoinGameRequest(auth, colorAndID.color(), colorAndID.gameID());
+                var request = new JoinGameRequest(auth, colorAndID.playerColor(), colorAndID.gameID());
                 gameService.joinGame(request);
                 return "{}";
             }

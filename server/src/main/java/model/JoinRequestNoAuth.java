@@ -2,5 +2,5 @@ package model;
 
 import chess.ChessGame;
 
-public record JoinRequestNoAuth(ChessGame.TeamColor color, int gameID) {
+public record JoinRequestNoAuth(ChessGame.TeamColor playerColor, int gameID) {
 }

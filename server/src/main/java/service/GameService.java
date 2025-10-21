@@ -32,11 +32,14 @@ public class GameService {
     }
 
     public void joinGame(JoinGameRequest request) throws DataAccessException{
+        if(request.authToken() == null || request.playerColor() == null || request.gameID() < 1){
+            throw new DataAccessException("400", new DataAccessException("Error: Bad Request"));
+        }
         AuthData auth = validateRequest(request.authToken());
         GameData gameData = gameMemoryAccess.getGame(request.gameID());
-        if (request.color() == WHITE && gameData.whiteUsername() == null){
+        if (request.playerColor() == WHITE && gameData.whiteUsername() == null){
             gameMemoryAccess.updateGame(new GameData(gameData.gameID(), auth.username(), gameData.blackUsername(), gameData.gameName(), gameData.game()));
-        } else if (request.color() == BLACK && gameData.blackUsername() == null) {
+        } else if (request.playerColor() == BLACK && gameData.blackUsername() == null) {
             gameMemoryAccess.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(), auth.username(), gameData.gameName(), gameData.game()));
         }
         else{
