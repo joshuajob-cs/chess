@@ -104,8 +104,8 @@ public class Server {
             String getResponse() throws DataAccessException{
                 var serializer = new Gson();
                 String auth = ctx.header("authorization");
-                String gameName = ctx.body();
-                var request = new CreateGameRequest(auth, gameName);
+                var gameName = serializer.fromJson(ctx.body(), GameName.class);
+                var request = new CreateGameRequest(auth, gameName.gameName());
                 int response = gameService.createGame(request);
                 return serializer.toJson(Map.of("gameID",response));
             }

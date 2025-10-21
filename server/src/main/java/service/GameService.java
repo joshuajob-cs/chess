@@ -23,6 +23,9 @@ public class GameService {
     }
 
     public int createGame(CreateGameRequest request) throws DataAccessException{
+        if(request.authToken() == null || request.gameName() == null){
+            throw new DataAccessException("400", new DataAccessException("Error: Bad Request"));
+        }
         validateRequest(request.authToken());
         gameMemoryAccess.createGame(new GameData(nextID, null, null, request.gameName(), new ChessGame()));
         return nextID ++;
