@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.GameData;
+import model.GameList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,8 +30,8 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public List<GameData> listGames() {
-        return new ArrayList<>(allGameData.values());
+    public GameList listGames() {
+        return new GameList(allGameData.values());
     }
 
     @Override

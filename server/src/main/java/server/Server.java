@@ -89,7 +89,8 @@ public class Server {
             String getResponse() throws DataAccessException{
                 var serializer = new Gson();
                 String request = ctx.header("authorization");
-                List<GameData> response = gameService.listGames(request);
+                GameList response = gameService.listGames(request);
+                var ret = serializer.toJson(response);
                 return serializer.toJson(response);
             }
         }

@@ -2,10 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.*;
-import model.AuthData;
-import model.CreateGameRequest;
-import model.GameData;
-import model.JoinGameRequest;
+import model.*;
 
 import java.util.List;
 
@@ -17,7 +14,7 @@ public class GameService {
     private final GameDAO gameMemoryAccess = new MemoryGameDAO();
     public static int nextID = 1;
 
-    public List<GameData> listGames(String authToken) throws DataAccessException{
+    public GameList listGames(String authToken) throws DataAccessException{
         validateRequest(authToken);
         return gameMemoryAccess.listGames();
     }
