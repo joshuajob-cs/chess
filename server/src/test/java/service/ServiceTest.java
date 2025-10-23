@@ -139,7 +139,7 @@ public class ServiceTest {
     void createGameNeg() throws DataAccessException{
         var userService = new UserService();
         var gameService = new GameService();
-        var credentials = userService.register(new UserData("master", "12345", "j@j"));
+        var credentials = userService.register(new UserData("number_one", "12345", "j@j"));
         assertThrows(DataAccessException.class, () -> gameService.createGame(new CreateGameRequest(credentials.authToken(), null)));
     }
 
