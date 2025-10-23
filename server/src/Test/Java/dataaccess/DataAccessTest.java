@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class DataAccessTest {
     @Test
-    void clearUser() throws DataAccessException{
+    void clearUser() throws DataAccessException {
         var user = new UserData("joe", "12345", "j@j");
         UserDAO userMemory = new MemoryUserDAO();
         assertNull(userMemory.getUser(user.username()));
