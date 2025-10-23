@@ -1,16 +1,14 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
 import io.javalin.*;
-
 import io.javalin.http.Context;
 import model.*;
+import dataaccess.DataAccessException;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
 
-import java.util.List;
 import java.util.Map;
 
 public class Server {
@@ -30,7 +28,6 @@ public class Server {
         server.get("game", this::listGames);
         server.post("game", this::createGame);
         server.put("game", this::joinGame);
-        // Register your endpoints and exception handlers here.
 
     }
 
@@ -42,7 +39,7 @@ public class Server {
     private void register(Context ctx){
         class RegisterRequest extends ServiceRequest{
 
-            String getResponse() throws DataAccessException{
+            String send() throws DataAccessException{
                 var serializer = new Gson();
                 var request = serializer.fromJson(ctx.body(), UserData.class);
                 LoginResponse response = userService.register(request);
@@ -51,13 +48,13 @@ public class Server {
         }
 
         RegisterRequest requester = new RegisterRequest();
-        requester.sendServiceRequest(ctx);
+        requester.process(ctx);
     }
 
     private void login(Context ctx){
         class LoginRequest extends ServiceRequest{
 
-            String getResponse() throws DataAccessException{
+            String send() throws DataAccessException{
                 var serializer = new Gson();
                 var request = serializer.fromJson(ctx.body(), LoginData.class);
                 LoginResponse response = userService.login(request);
@@ -66,13 +63,13 @@ public class Server {
         }
 
         LoginRequest requester = new LoginRequest();
-        requester.sendServiceRequest(ctx);
+        requester.process(ctx);
     }
 
     private void logout(Context ctx){
         class LogoutRequest extends ServiceRequest{
 
-            String getResponse() throws DataAccessException{
+            String send() throws DataAccessException{
                 String request = ctx.header("authorization");
                 userService.logout(request);
                 return "{}";
@@ -80,57 +77,56 @@ public class Server {
         }
 
         LogoutRequest requester = new LogoutRequest();
-        requester.sendServiceRequest(ctx);
+        requester.process(ctx);
     }
 
     private void listGames(Context ctx){
         class ListRequest extends ServiceRequest{
 
-            String getResponse() throws DataAccessException{
+            String send() throws DataAccessException{
                 var serializer = new Gson();
                 String request = ctx.header("authorization");
                 GameList response = gameService.listGames(request);
-                var ret = serializer.toJson(response);
                 return serializer.toJson(response);
             }
         }
 
         ListRequest requester = new ListRequest();
-        requester.sendServiceRequest(ctx);
+        requester.process(ctx);
     }
 
     private void createGame(Context ctx){
         class CreationRequest extends ServiceRequest{
 
-            String getResponse() throws DataAccessException{
+            String send() throws DataAccessException{
                 var serializer = new Gson();
                 String auth = ctx.header("authorization");
                 var gameName = serializer.fromJson(ctx.body(), GameName.class);
-                var request = new CreateGameRequest(auth, gameName.gameName());
+                var request = new CreateGameRequest(auth, gameName.str());
                 int response = gameService.createGame(request);
                 return serializer.toJson(Map.of("gameID",response));
             }
         }
 
         CreationRequest requester = new CreationRequest();
-        requester.sendServiceRequest(ctx);
+        requester.process(ctx);
     }
 
     private void joinGame(Context ctx){
         class JoinRequest extends ServiceRequest{
 
-            String getResponse() throws DataAccessException{
+            String send() throws DataAccessException{
                 var serializer = new Gson();
                 String auth = ctx.header("authorization");
-                var colorAndID = serializer.fromJson(ctx.body(), JoinRequestNoAuth.class);
-                var request = new JoinGameRequest(auth, colorAndID.playerColor(), colorAndID.gameID());
+                var attributes = serializer.fromJson(ctx.body(), ColorAndId.class);
+                var request = new JoinGameRequest(auth, attributes.playerColor(), attributes.gameID());
                 gameService.joinGame(request);
                 return "{}";
             }
         }
 
         JoinRequest requester = new JoinRequest();
-        requester.sendServiceRequest(ctx);
+        requester.process(ctx);
     }
 
     public int run(int desiredPort) {
@@ -141,11 +137,11 @@ public class Server {
     public void stop() {server.stop();}
 
     public static abstract class ServiceRequest{
-        void sendServiceRequest(Context ctx){
+        void process(Context ctx){
             var serializer = new Gson();
             String response;
             try {
-                response = getResponse();
+                response = send();
             } catch (dataaccess.DataAccessException ex) {
                 ctx.status(Integer.parseInt(ex.getMessage()));
                 ctx.result(serializer.toJson(Map.of("message", ex.getCause().getMessage())));
@@ -154,6 +150,6 @@ public class Server {
             ctx.result(response);
         }
 
-        abstract String getResponse() throws DataAccessException;
+        abstract String send() throws DataAccessException;
     }
 }
