@@ -6,31 +6,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryAuthDAO implements AuthDAO{
-    public static Map<String, AuthData> allAuthData = new HashMap<>();
+    public static Map<String, AuthData> data = new HashMap<>();
 
     @Override
     public void clear() {
-        allAuthData.clear();
+        data.clear();
     }
 
     @Override
-    public void createAuth(AuthData data) throws DataAccessException {
-        if (allAuthData.containsKey(data.authToken())){
+    public void createAuth(AuthData newData) throws DataAccessException {
+        if (data.containsKey(newData.authToken())){
             throw new DataAccessException("403", new DataAccessException("Error: already taken"));
         }
-        allAuthData.put(data.authToken(), data);
+        data.put(newData.authToken(), newData);
     }
 
     @Override
     public AuthData getAuth(String authToken) {
-        return allAuthData.get(authToken);
+        return data.get(authToken);
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException{
-        if (!allAuthData.containsKey(authToken)){
+        if (!data.containsKey(authToken)){
             throw new DataAccessException("401", new DataAccessException("Error: unauthorized"));
         }
-        allAuthData.remove(authToken);
+        data.remove(authToken);
     }
 }

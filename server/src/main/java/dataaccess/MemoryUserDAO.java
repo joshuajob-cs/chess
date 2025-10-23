@@ -6,23 +6,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryUserDAO implements UserDAO{
-    public static Map<String, UserData> allUserData = new HashMap<>();
+    public static Map<String, UserData> data = new HashMap<>();
 
     @Override
     public void clear() {
-        allUserData.clear();
+        data.clear();
     }
 
     @Override
-    public void createUser(UserData data) throws DataAccessException {
-        if (allUserData.containsKey(data.username())){
+    public void createUser(UserData newData) throws DataAccessException {
+        if (data.containsKey(newData.username())){
             throw new DataAccessException("403", new DataAccessException("Error: already taken"));
         }
-        allUserData.put(data.username(), data);
+        data.put(newData.username(), newData);
     }
 
     @Override
     public UserData getUser(String username) {
-        return allUserData.get(username);
+        return data.get(username);
     }
 }
