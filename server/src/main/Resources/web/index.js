@@ -9,7 +9,6 @@ function scrollToId(id) {
   });
 }
 
-
 //HTTP
 function submit() {
   document.getElementById('response').value = '';

@@ -11,3 +11,4 @@ out/
 
 ### Chess project ###
 server/**/db.properties
+!server/src/main/Resources/web/
