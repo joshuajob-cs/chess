@@ -4,19 +4,17 @@ import chess.ChessGame;
 import dataaccess.*;
 import model.*;
 
-import java.util.List;
-
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
 
 public class GameService {
-    private final AuthDAO authMemoryAccess = new MemoryAuthDAO();
-    private final GameDAO gameMemoryAccess = new MemoryGameDAO();
+    private final AuthDAO authMemory = new MemoryAuthDAO();
+    private final GameDAO gameMemory = new MemoryGameDAO();
     public static int nextID = 1;
 
     public GameList listGames(String authToken) throws DataAccessException{
         validateRequest(authToken);
-        return gameMemoryAccess.listGames();
+        return gameMemory.listGames();
     }
 
     public int createGame(CreateGameRequest request) throws DataAccessException{
@@ -24,7 +22,7 @@ public class GameService {
             throw new DataAccessException("400", new DataAccessException("Error: Bad Request"));
         }
         validateRequest(request.authToken());
-        gameMemoryAccess.createGame(new GameData(nextID, null, null, request.gameName(), new ChessGame()));
+        gameMemory.createGame(new GameData(nextID, null, null, request.gameName(), new ChessGame()));
         return nextID ++;
     }
 
@@ -33,11 +31,11 @@ public class GameService {
             throw new DataAccessException("400", new DataAccessException("Error: Bad Request"));
         }
         AuthData auth = validateRequest(request.authToken());
-        GameData gameData = gameMemoryAccess.getGame(request.gameID());
+        GameData gameData = gameMemory.getGame(request.gameID());
         if (request.playerColor() == WHITE && gameData.whiteUsername() == null){
-            gameMemoryAccess.updateGame(new GameData(gameData.gameID(), auth.username(), gameData.blackUsername(), gameData.gameName(), gameData.game()));
+            gameMemory.updateGame(new GameData(gameData.gameID(), auth.username(), gameData.blackUsername(), gameData.gameName(), gameData.game()));
         } else if (request.playerColor() == BLACK && gameData.blackUsername() == null) {
-            gameMemoryAccess.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(), auth.username(), gameData.gameName(), gameData.game()));
+            gameMemory.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(), auth.username(), gameData.gameName(), gameData.game()));
         }
         else{
             throw new DataAccessException("403", new DataAccessException("Error: already taken"));
@@ -45,7 +43,7 @@ public class GameService {
     }
 
     private AuthData validateRequest(String authToken) throws DataAccessException{
-        AuthData data = authMemoryAccess.getAuth(authToken);
+        AuthData data = authMemory.getAuth(authToken);
         if (data == null){
             throw new DataAccessException("401", new DataAccessException("Error: unauthorized"));
         }
