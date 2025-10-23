@@ -1,0 +1,28 @@
+package server;
+
+import java.sql.SQLException;
+
+import static java.sql.DriverManager.getConnection;
+
+public class SimpleExample {
+    private static void simpleSelect() throws SQLException {
+        // Try with a resource in it closes the resource when it is done with it
+        // Try with resources
+        try(var conn = getConnection("jdbc:mysql:/")){
+            try(var preparedStatement = conn.prepareStatement("SELECT ?+1")){
+                int num = 5;
+                preparedStatement.setInt(1, num);
+
+                var rs = preparedStatement.executeQuery();
+                rs.next();
+                System.out.println(rs.getInt(1));
+            }
+        }
+    }
+
+    private static void password(){
+        String secret = "12345";
+        //String hash = BCrypt.hashpw(secret, BCrypt.gensalt());
+
+    }
+}
