@@ -1,4 +1,4 @@
-/*package server;
+package server;
 
 import java.sql.SQLException;
 
@@ -26,4 +26,3 @@ public class SimpleExample {
 
     }
 }
-*/
