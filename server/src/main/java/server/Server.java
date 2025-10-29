@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DatabaseManager;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.*;
@@ -18,7 +19,8 @@ public class Server {
     private final GameService gameService = new GameService();
     private final ClearService clearService = new ClearService();
 
-    public Server() {
+    public Server(){
+        initialize();
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         server.delete("db", this::clear);
@@ -135,6 +137,15 @@ public class Server {
     }
 
     public void stop() {server.stop();}
+
+    public static void initialize(){
+        try {
+            DatabaseManager.createDatabase();
+        } catch (dataaccess.DataAccessException ex) {
+            System.out.println(ex.getCause().getMessage());
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
 
     public static abstract class ServiceRequest{
         void process(Context ctx){
