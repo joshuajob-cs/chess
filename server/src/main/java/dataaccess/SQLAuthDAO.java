@@ -10,7 +10,7 @@ import static dataaccess.SQLUtilities.*;
 public class SQLAuthDAO implements AuthDAO{
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException{
         SQLClear("auth");
     }
 
@@ -23,7 +23,7 @@ public class SQLAuthDAO implements AuthDAO{
     }
 
     @Override
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken) throws DataAccessException{
         ArrayList<String> data = find(authToken, "authToken", "auth", 2);
         if (data == null){
             return null;

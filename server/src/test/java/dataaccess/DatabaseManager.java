@@ -41,14 +41,14 @@ public class DatabaseManager {
      * }
      * </code>
      */
-    static public Connection getConnection() throws SQLException {
+    static public Connection getConnection() throws DataAccessException {
         try {
             //do not wrap the following line with a try-with-resources
             var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
             conn.setCatalog(databaseName);
             return conn;
         } catch (SQLException ex) {
-            throw new SQLException("failed to get connection", ex);
+            throw new DataAccessException("500", new DataAccessException("Error: failed to get connection"));
         }
     }
 

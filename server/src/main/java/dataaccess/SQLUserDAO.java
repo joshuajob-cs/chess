@@ -9,7 +9,7 @@ import static dataaccess.SQLUtilities.*;
 public class SQLUserDAO implements UserDAO{
 
     @Override
-    public void clear(){
+    public void clear() throws DataAccessException{
         SQLClear("user");
     }
 
@@ -22,7 +22,7 @@ public class SQLUserDAO implements UserDAO{
     }
 
     @Override
-    public UserData getUser(String username) {
+    public UserData getUser(String username) throws DataAccessException{
         ArrayList<String> data = find(username, "username", "user", 3);
         if (data == null){
             return null;

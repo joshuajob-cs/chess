@@ -35,8 +35,15 @@ public class Server {
     }
 
     private void clear(Context ctx){
-        clearService.clearAll();
-        ctx.result("{}");
+        class ClearRequest extends ServiceRequest{
+            String send() throws DataAccessException{
+                clearService.clearAll();
+                return "{}";
+            }
+        }
+
+        ClearRequest requester = new ClearRequest();
+        requester.process(ctx);
     }
 
     private void register(Context ctx){
@@ -169,7 +176,7 @@ public class Server {
                     statement.executeUpdate();
                 }
             }
-        } catch (SQLException e) {
+        } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
         }
     }

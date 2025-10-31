@@ -7,7 +7,7 @@ public class ClearService {
     private final AuthDAO authMemoryAccess = new SQLAuthDAO();
     private final GameDAO gameMemoryAccess = new SQLGameDAO();
 
-    public void clearAll(){
+    public void clearAll() throws DataAccessException{
         userMemoryAccess.clear();
         authMemoryAccess.clear();
         gameMemoryAccess.clear();

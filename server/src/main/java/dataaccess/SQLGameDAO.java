@@ -13,7 +13,7 @@ import static dataaccess.SQLUtilities.*;
 public class SQLGameDAO implements GameDAO{
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException{
         SQLClear("game");
     }
 
@@ -26,7 +26,7 @@ public class SQLGameDAO implements GameDAO{
     }
 
     @Override
-    public GameData getGame(int gameID) {
+    public GameData getGame(int gameID) throws DataAccessException{
         ArrayList<String> data = find(String.valueOf(gameID), "gameID", "game", 5);
         if (data == null){
             return null;
@@ -36,7 +36,7 @@ public class SQLGameDAO implements GameDAO{
     }
 
     @Override
-    public GameList listGames() {
+    public GameList listGames() throws DataAccessException {
         var games = new ArrayList<GameData>();
         var serializer = new Gson();
         try(var conn = DatabaseManager.getConnection()) {

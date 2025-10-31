@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class SQLUtilities {
-    static void SQLClear(String table) {
+    static void SQLClear(String table) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
             try (var statement = conn.prepareStatement("DELETE FROM " + table + ";")) {
                 statement.executeUpdate();
@@ -16,7 +16,7 @@ public class SQLUtilities {
         }
     }
 
-    static boolean exists(String value, String col, String table) {
+    static boolean exists(String value, String col, String table) throws DataAccessException{
         try (var conn = DatabaseManager.getConnection()) {
             try (var statement = conn.prepareStatement(
                     "SELECT " + col +
@@ -32,7 +32,7 @@ public class SQLUtilities {
         }
     }
 
-    static void insert(SQLData data, String table){
+    static void insert(SQLData data, String table) throws DataAccessException{
         try(var conn = DatabaseManager.getConnection()) {
             var translation = data.toSQL();
             String placeholders = "(";
@@ -53,7 +53,7 @@ public class SQLUtilities {
         }
     }
 
-    static ArrayList<String> find(String key, String keyCol, String table, int argCount) {
+    static ArrayList<String> find(String key, String keyCol, String table, int argCount) throws DataAccessException{
         try(var conn = DatabaseManager.getConnection()) {
             try(var statement = conn.prepareStatement(
                     "SELECT * " +
