@@ -13,8 +13,6 @@ import service.UserService;
 import java.sql.SQLException;
 import java.util.Map;
 
-import static dataaccess.DatabaseManager.getConnection;
-
 public class Server {
 
     private final Javalin server;
@@ -145,16 +143,6 @@ public class Server {
         try {
             DatabaseManager.createDatabase();
             try(var conn = DatabaseManager.getConnection()){
-                /*
-                try(var preparedStatement = conn.prepareStatement("SELECT ?+1")){
-                    int num = 5;
-                    preparedStatement.setInt(1, num);
-
-                    var rs = preparedStatement.executeQuery();
-                    rs.next();
-                    System.out.println(rs.getInt(1));
-                }
-                */
                 try(var statement = conn.prepareStatement(
                         "CREATE TABLE IF NOT EXISTS user (" +
                             "username VARCHAR(15) PRIMARY KEY," +
