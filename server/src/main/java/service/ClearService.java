@@ -3,9 +3,9 @@ package service;
 import dataaccess.*;
 
 public class ClearService {
-    private final UserDAO userMemoryAccess = new MemoryUserDAO();
-    private final AuthDAO authMemoryAccess = new MemoryAuthDAO();
-    private final GameDAO gameMemoryAccess = new MemoryGameDAO();
+    private final UserDAO userMemoryAccess = new SQLUserDAO();
+    private final AuthDAO authMemoryAccess = new SQLAuthDAO();
+    private final GameDAO gameMemoryAccess = new SQLGameDAO();
 
     public void clearAll(){
         userMemoryAccess.clear();

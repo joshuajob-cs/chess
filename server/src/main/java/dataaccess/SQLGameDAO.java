@@ -62,16 +62,16 @@ public class SQLGameDAO implements GameDAO{
         try(var conn = DatabaseManager.getConnection()) {
             try(var statement = conn.prepareStatement(
                     "UPDATE game " +
-                            "SET whiteUsername = ? " +
-                            "blackUsername = ? " +
-                            "gameName = ? " +
+                            "SET whiteUsername = ?, " +
+                            "blackUsername = ?, " +
+                            "gameName = ?, " +
                             "game = ? " +
                             "WHERE gameID = ?;")){
                 var translation = data.toSQL();
                 for(int i = 1; i < 5; i++){
                     statement.setString(i, translation.get(i));
                 }
-                statement.setInt(6, data.gameID());
+                statement.setInt(5, data.gameID());
                 statement.executeUpdate();
             }
         } catch (SQLException e){

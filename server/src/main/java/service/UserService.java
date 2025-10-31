@@ -9,8 +9,8 @@ import model.UserData;
 import java.util.UUID;
 
 public class UserService {
-    private final UserDAO userMemory = new MemoryUserDAO();
-    private final AuthDAO authMemory = new MemoryAuthDAO();
+    private final UserDAO userMemory = new SQLUserDAO();
+    private final AuthDAO authMemory = new SQLAuthDAO();
 
     public LoginResponse register(UserData data) throws DataAccessException {
         if(data.username() == null || data.password() == null || data.email() == null){

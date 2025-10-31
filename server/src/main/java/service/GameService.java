@@ -8,8 +8,8 @@ import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
 
 public class GameService {
-    private final AuthDAO authMemory = new MemoryAuthDAO();
-    private final GameDAO gameMemory = new MemoryGameDAO();
+    private final AuthDAO authMemory = new SQLAuthDAO();
+    private final GameDAO gameMemory = new SQLGameDAO();
     public static int nextID = 1;
 
     public GameList listGames(String authToken) throws DataAccessException{
