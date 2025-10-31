@@ -5,6 +5,7 @@ import model.AuthData;
 import model.LoginData;
 import model.LoginResponse;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ public class UserService {
         if(data.username() == null || data.password() == null || data.email() == null){
             throw new DataAccessException("400", new DataAccessException("Error: Bad Request"));
         }
+        data = new UserData(data.username(), hashPassword(data.password()), data.email());
         userMemory.createUser(data);
         var authToken = generateToken();
         authMemory.createAuth(new AuthData(authToken, data.username()));
@@ -27,7 +29,7 @@ public class UserService {
             throw new DataAccessException("400", new DataAccessException("Error: Bad Request"));
         }
         var userData = userMemory.getUser(loginData.username());
-        if (userData == null || !loginData.password().equals(userData.password())){
+        if (userData == null || !BCrypt.checkpw(loginData.password(), userData.password())){
             throw new DataAccessException("401", new DataAccessException("Error: unauthorized"));
         }
         var authToken = generateToken();
@@ -41,5 +43,9 @@ public class UserService {
 
     private static String generateToken() {
         return UUID.randomUUID().toString();
+    }
+
+    private static String hashPassword(String unhashedPassword){
+        return BCrypt.hashpw(unhashedPassword, BCrypt.gensalt());
     }
 }
