@@ -10,7 +10,6 @@ import service.ClearService;
 import service.GameService;
 import service.UserService;
 
-import java.sql.SQLException;
 import java.util.Map;
 
 public class Server {
@@ -21,7 +20,7 @@ public class Server {
     private final ClearService clearService = new ClearService();
 
     public Server(){
-        initialize();
+        DatabaseManager.initialize();
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         server.delete("db", this::clear);
@@ -145,41 +144,6 @@ public class Server {
     }
 
     public void stop() {server.stop();}
-
-    public static void initialize(){
-        try {
-            DatabaseManager.createDatabase();
-            try(var conn = DatabaseManager.getConnection()){
-                try(var statement = conn.prepareStatement(
-                        "CREATE TABLE IF NOT EXISTS user (" +
-                            "username VARCHAR(15) PRIMARY KEY," +
-                            "password VARCHAR(128) NOT NULL," +
-                            "email VARCHAR(128) NOT NULL" +
-                            ");")){
-                    statement.executeUpdate();
-                }
-                try(var statement = conn.prepareStatement(
-                        "CREATE TABLE IF NOT EXISTS auth (" +
-                            "authToken VARCHAR(128) PRIMARY KEY," +
-                            "username VARCHAR(15) NOT NULL" +
-                            ");")){
-                    statement.executeUpdate();
-                }
-                try(var statement = conn.prepareStatement(
-                        "CREATE TABLE IF NOT EXISTS game (" +
-                            "gameID INT PRIMARY KEY," +
-                            "whiteUsername VARCHAR(15)," +
-                            "blackUsername VARCHAR(15)," +
-                            "gameName VARCHAR(15) NOT NULL," +
-                            "game VARCHAR(2048) NOT NULL" +
-                            ");")){
-                    statement.executeUpdate();
-                }
-            }
-        } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     public static abstract class ServiceRequest{
         void process(Context ctx){

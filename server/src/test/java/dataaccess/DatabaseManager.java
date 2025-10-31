@@ -52,6 +52,41 @@ public class DatabaseManager {
         }
     }
 
+    public static void initialize(){
+        try {
+            DatabaseManager.createDatabase();
+            try(var conn = DatabaseManager.getConnection()){
+                try(var statement = conn.prepareStatement(
+                        "CREATE TABLE IF NOT EXISTS user (" +
+                                "username VARCHAR(15) PRIMARY KEY," +
+                                "password VARCHAR(128) NOT NULL," +
+                                "email VARCHAR(128) NOT NULL" +
+                                ");")){
+                    statement.executeUpdate();
+                }
+                try(var statement = conn.prepareStatement(
+                        "CREATE TABLE IF NOT EXISTS auth (" +
+                                "authToken VARCHAR(128) PRIMARY KEY," +
+                                "username VARCHAR(15) NOT NULL" +
+                                ");")){
+                    statement.executeUpdate();
+                }
+                try(var statement = conn.prepareStatement(
+                        "CREATE TABLE IF NOT EXISTS game (" +
+                                "gameID INT PRIMARY KEY," +
+                                "whiteUsername VARCHAR(15)," +
+                                "blackUsername VARCHAR(15)," +
+                                "gameName VARCHAR(15) NOT NULL," +
+                                "game VARCHAR(2048) NOT NULL" +
+                                ");")){
+                    statement.executeUpdate();
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static void loadPropertiesFromResources() {
         try (var propStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("db.properties")) {
             if (propStream == null) {
