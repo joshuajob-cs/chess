@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import model.GameData;
 import model.GameList;
 
-import java.sql.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -57,6 +56,26 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public void updateGame(GameData data) throws DataAccessException {
-
+        if(!exists(String.valueOf(data.gameID()), "gameID", "game")){
+            throw new DataAccessException("400", new DataAccessException("Error: Bad Request"));
+        }
+        try(var conn = DatabaseManager.getConnection()) {
+            try(var statement = conn.prepareStatement(
+                    "UPDATE game " +
+                            "SET whiteUsername = ? " +
+                            "blackUsername = ? " +
+                            "gameName = ? " +
+                            "game = ? " +
+                            "WHERE gameID = ?;")){
+                var translation = data.toSQL();
+                for(int i = 1; i < 5; i++){
+                    statement.setString(i, translation.get(i));
+                }
+                statement.setInt(6, data.gameID());
+                statement.executeUpdate();
+            }
+        } catch (SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 }
