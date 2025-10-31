@@ -4,32 +4,21 @@ import model.UserData;
 
 import java.sql.SQLException;
 
+import static dataaccess.SQLUtilities.*;
+
 public class SQLUserDAO implements UserDAO{
 
     @Override
     public void clear(){
-        try(var conn = DatabaseManager.getConnection()) {
-            try(var statement = conn.prepareStatement("TRUNCATE TABLE user;")){
-                statement.executeUpdate();
-            }
-        } catch (SQLException e){
-            throw new RuntimeException(e);
-        }
+        SQLClear("user");
     }
 
     @Override
     public void createUser(UserData data) throws DataAccessException {
+        if(exists(data.username(), "username", "user")){
+            throw new DataAccessException("403", new DataAccessException("Error: already taken"));
+        }
         try(var conn = DatabaseManager.getConnection()) {
-            try(var statement = conn.prepareStatement(
-                    "SELECT username " +
-                        "FROM user " +
-                        "WHERE username = ?;")){
-                statement.setString(1, data.username());
-                var matches = statement.executeQuery();
-                if (matches.next()){
-                    throw new DataAccessException("403", new DataAccessException("Error: already taken"));
-                }
-            }
             try(var statement = conn.prepareStatement(
                     "INSERT INTO user " +
                             "VALUES (?, ?, ?);")){

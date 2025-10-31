@@ -4,17 +4,13 @@ import model.AuthData;
 
 import java.sql.SQLException;
 
+import static dataaccess.SQLUtilities.SQLClear;
+
 public class SQLAuthDAO implements AuthDAO{
 
     @Override
     public void clear() {
-        try(var conn = DatabaseManager.getConnection()) {
-            try(var statement = conn.prepareStatement("TRUNCATE TABLE auth;")){
-                statement.executeUpdate();
-            }
-        } catch (SQLException e){
-            throw new RuntimeException(e);
-        }
+        SQLClear("auth");
     }
 
     @Override
