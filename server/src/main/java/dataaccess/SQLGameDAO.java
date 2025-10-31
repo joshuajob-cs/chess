@@ -13,7 +13,7 @@ public class SQLGameDAO implements GameDAO{
             try(var statement = conn.prepareStatement("TRUNCATE TABLE game;")){
                 statement.executeUpdate();
             }
-        } catch (SQLException | DataAccessException e){
+        } catch (SQLException e){
             throw new RuntimeException(e);
         }
     }

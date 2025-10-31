@@ -169,9 +169,6 @@ public class Server {
                     statement.executeUpdate();
                 }
             }
-        } catch (dataaccess.DataAccessException ex) {
-            System.out.println(ex.getCause().getMessage());
-            throw new RuntimeException(ex.getMessage());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

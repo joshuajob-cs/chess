@@ -12,7 +12,7 @@ public class SQLAuthDAO implements AuthDAO{
             try(var statement = conn.prepareStatement("TRUNCATE TABLE auth;")){
                 statement.executeUpdate();
             }
-        } catch (SQLException | DataAccessException e){
+        } catch (SQLException e){
             throw new RuntimeException(e);
         }
     }
