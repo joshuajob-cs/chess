@@ -1,8 +1,11 @@
 package dataaccess;
 
 import model.SQLData;
+import model.UserData;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class SQLUtilities {
     static void SQLClear(String table) {
@@ -52,6 +55,27 @@ public class SQLUtilities {
         }
     }
 
-    static public <T> void lookUp(Class<T> type, String key, String keyCol, String table) {
+    static ArrayList<String> find(String key, String keyCol, String table, int argCount) {
+        try(var conn = DatabaseManager.getConnection()) {
+            try(var statement = conn.prepareStatement(
+                    "SELECT * " +
+                            "FROM " + table +
+                            " WHERE " + keyCol +
+                            " = ?;")) {
+                statement.setString(1, key);
+                var matches = statement.executeQuery();
+                if (matches.next()) {
+                    var data = new ArrayList<String>();
+                    for (int i = 1; i < argCount + 1; i++) {
+                        data.add(matches.getString(i));
+                    }
+                    return data;
+                } else {
+                    return null;
+                }
+            }
+        } catch (SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 }

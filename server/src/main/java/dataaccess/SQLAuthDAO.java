@@ -2,6 +2,8 @@ package dataaccess;
 
 import model.AuthData;
 
+import java.util.ArrayList;
+
 import static dataaccess.SQLUtilities.*;
 
 public class SQLAuthDAO implements AuthDAO{
@@ -21,7 +23,11 @@ public class SQLAuthDAO implements AuthDAO{
 
     @Override
     public AuthData getAuth(String authToken) {
-        return null;
+        ArrayList<String> data = find(authToken, "authToken", "auth", 2);
+        if (data == null){
+            return null;
+        }
+        return new AuthData(data.get(0), data.get(1));
     }
 
     @Override

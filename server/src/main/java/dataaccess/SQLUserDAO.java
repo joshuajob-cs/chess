@@ -2,7 +2,7 @@ package dataaccess;
 
 import model.UserData;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
 
 import static dataaccess.SQLUtilities.*;
 
@@ -23,22 +23,10 @@ public class SQLUserDAO implements UserDAO{
 
     @Override
     public UserData getUser(String username) {
-        try(var conn = DatabaseManager.getConnection()) {
-            try(var statement = conn.prepareStatement(
-                    "SELECT * " +
-                        "FROM user " +
-                        "WHERE username = ?;")){
-                statement.setString(1, username);
-                var matches = statement.executeQuery();
-                if (matches.next()){
-                    return new UserData(username, matches.getString(2), matches.getString(3));
-                }
-                else{
-                    return null;
-                }
-            }
-        } catch (SQLException e){
-            throw new RuntimeException(e);
+        ArrayList<String> data = find(username, "username", "user", 3);
+        if (data == null){
+            return null;
         }
+        return new UserData(data.get(0), data.get(1), data.get(2));
     }
 }

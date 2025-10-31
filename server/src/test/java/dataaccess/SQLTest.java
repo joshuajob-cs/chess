@@ -34,6 +34,7 @@ public class SQLTest {
     void clearAuth() throws DataAccessException{
         var auth = new AuthData("nonsense", "joe");
         AuthDAO authMemory = new SQLAuthDAO();
+        authMemory.clear();
         assertNull(authMemory.getAuth(auth.authToken()));
         authMemory.createAuth(auth);
         assertNotNull(authMemory.getAuth(auth.authToken()));
