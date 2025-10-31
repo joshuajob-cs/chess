@@ -18,18 +18,7 @@ public class SQLUserDAO implements UserDAO{
         if(exists(data.username(), "username", "user")){
             throw new DataAccessException("403", new DataAccessException("Error: already taken"));
         }
-        try(var conn = DatabaseManager.getConnection()) {
-            try(var statement = conn.prepareStatement(
-                    "INSERT INTO user " +
-                            "VALUES (?, ?, ?);")){
-                statement.setString(1, data.username());
-                statement.setString(2, data.password());
-                statement.setString(3, data.email());
-                statement.executeUpdate();
-            }
-        } catch (SQLException e){
-            throw new RuntimeException(e);
-        }
+        insert(data, "user");
     }
 
     @Override

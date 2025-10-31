@@ -1,9 +1,11 @@
 package dataaccess;
 
+import model.SQLData;
+
 import java.sql.SQLException;
 
 public class SQLUtilities {
-    static public void SQLClear(String table) {
+    static void SQLClear(String table) {
         try (var conn = DatabaseManager.getConnection()) {
             try (var statement = conn.prepareStatement("TRUNCATE TABLE " + table + ";")) {
                 statement.executeUpdate();
@@ -13,7 +15,7 @@ public class SQLUtilities {
         }
     }
 
-    static public boolean exists(String value, String col, String table) {
+    static boolean exists(String value, String col, String table) {
         try (var conn = DatabaseManager.getConnection()) {
             try (var statement = conn.prepareStatement(
                     "SELECT " + col +
@@ -25,6 +27,27 @@ public class SQLUtilities {
                 return matches.next();
             }
         } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static void insert(SQLData data, String table){
+        try(var conn = DatabaseManager.getConnection()) {
+            var translation = data.toSQL();
+            String placeholders = "(";
+            for(int i = 0; i < translation.size(); i++){
+                placeholders += "?, ";
+            }
+            placeholders = placeholders.substring(0, placeholders.length() - 2) + ")";
+            try(var statement = conn.prepareStatement(
+                    "INSERT INTO " + table +
+                            " VALUES " + placeholders + ";")){
+                for (int i = 0; i < translation.size(); i++){
+                    statement.setString(i + 1, translation.get(i));
+                }
+                statement.executeUpdate();
+            }
+        } catch (SQLException e){
             throw new RuntimeException(e);
         }
     }
