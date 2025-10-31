@@ -46,6 +46,7 @@ public class SQLTest {
     void clearGame() throws DataAccessException{
         var game = new GameData(1, "joe", "bob", "championship", new ChessGame());
         GameDAO gameMemory = new SQLGameDAO();
+        gameMemory.clear();
         assertNull(gameMemory.getGame(game.gameID()));
         gameMemory.createGame(game);
         assertNotNull(gameMemory.getGame(game.gameID()));

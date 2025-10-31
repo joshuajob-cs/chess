@@ -31,7 +31,7 @@ public class SQLGameDAO implements GameDAO{
             return null;
         }
         var serializer = new Gson();
-        return new GameData(Integer.parseInt(data.get(0)), data.get(1), data.get(3), data.get(4), serializer.fromJson(data.get(5), ChessGame.class));
+        return new GameData(Integer.parseInt(data.get(0)), data.get(1), data.get(2), data.get(3), serializer.fromJson(data.get(4), ChessGame.class));
     }
 
     @Override
