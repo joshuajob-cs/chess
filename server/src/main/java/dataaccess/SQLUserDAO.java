@@ -41,11 +41,26 @@ public class SQLUserDAO implements UserDAO{
         } catch (SQLException e){
             throw new RuntimeException(e);
         }
-
     }
 
     @Override
     public UserData getUser(String username) {
-        return null;
+        try(var conn = DatabaseManager.getConnection()) {
+            try(var statement = conn.prepareStatement(
+                    "SELECT * " +
+                        "FROM user " +
+                        "WHERE username = ?;")){
+                statement.setString(1, username);
+                var matches = statement.executeQuery();
+                if (matches.next()){
+                    return new UserData(username, matches.getString(2), matches.getString(3));
+                }
+                else{
+                    return null;
+                }
+            }
+        } catch (SQLException e){
+            throw new RuntimeException(e);
+        }
     }
 }

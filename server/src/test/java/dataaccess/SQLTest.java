@@ -6,19 +6,28 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SQLTest {
     @Test
     void clearUser() throws DataAccessException {
         var user = new UserData("joe", "12345", "j@j");
         UserDAO userMemory = new SQLUserDAO();
+        userMemory.clear();
         assertNull(userMemory.getUser(user.username()));
         userMemory.createUser(user);
         assertNotNull(userMemory.getUser(user.username()));
         userMemory.clear();
         assertNull(userMemory.getUser(user.username()));
+    }
+
+    @Test
+    void getUser() throws DataAccessException{
+        var user = new UserData("joe", "12345", "j@j");
+        UserDAO userMemory = new SQLUserDAO();
+        userMemory.clear();
+        userMemory.createUser(user);
+        assertEquals(userMemory.getUser(user.username()),user);
     }
 
     @Test
