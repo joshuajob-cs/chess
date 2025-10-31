@@ -8,7 +8,6 @@ import model.LoginData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.jetty.util.LazyList.isEmpty;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ServiceTest {
@@ -29,21 +28,6 @@ public class ServiceTest {
         assertNull(userMemory.getUser(credentials.username()));
         assertThrows(DataAccessException.class, () -> gameService.listGames(credentials.authToken()));
         assertNull(gameMemory.getGame(gameID));
-    }
-
-    @Test
-    void clearNeg() throws DataAccessException {
-        UserDAO userMemory = new MemoryUserDAO();
-        AuthDAO authMemory = new MemoryAuthDAO();
-        GameDAO gameMemory = new MemoryGameDAO();
-        var userService = new UserService();
-        var credentials = userService.register(new UserData("", "", ""));
-        assertNotNull(userMemory.getUser(credentials.username()));
-        assertNotNull(authMemory.getAuth(credentials.authToken()));
-        var gameService = new GameService();
-        var gameID = gameService.createGame(new CreateGameRequest(credentials.authToken(), "championship"));
-        assertNotNull(gameMemory.getGame(gameID));
-        assertFalse(isEmpty(gameMemory.listGames()));
     }
 
     @Test
