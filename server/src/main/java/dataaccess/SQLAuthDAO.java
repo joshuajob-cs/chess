@@ -11,7 +11,7 @@ public class SQLAuthDAO implements AuthDAO{
 
     @Override
     public void clear() throws DataAccessException{
-        SQLClear("auth");
+        sqlClear("auth");
     }
 
     @Override

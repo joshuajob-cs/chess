@@ -10,7 +10,7 @@ public class SQLUserDAO implements UserDAO{
 
     @Override
     public void clear() throws DataAccessException{
-        SQLClear("user");
+        sqlClear("user");
     }
 
     @Override

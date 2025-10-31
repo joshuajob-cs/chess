@@ -14,7 +14,7 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public void clear() throws DataAccessException{
-        SQLClear("game");
+        sqlClear("game");
     }
 
     @Override
@@ -45,7 +45,9 @@ public class SQLGameDAO implements GameDAO{
                             "FROM game;")) {
                 var matches = statement.executeQuery();
                 while (matches.next()) {
-                    games.add(new GameData(Integer.parseInt(matches.getString(1)), matches.getString(2), matches.getString(3), matches.getString(4), serializer.fromJson(matches.getString(5), ChessGame.class)));
+                    games.add(new GameData(Integer.parseInt(matches.getString(1)),
+                            matches.getString(2), matches.getString(3), matches.getString(4),
+                            serializer.fromJson(matches.getString(5), ChessGame.class)));
                 }
             }
         } catch (SQLException e){
