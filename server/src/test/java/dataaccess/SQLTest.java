@@ -38,7 +38,7 @@ public class SQLTest {
         var userMemory = new SQLUserDAO();
         userMemory.clear();
         userMemory.createUser(user);
-        assertNotNull(userMemory.getUser(user.username()));
+        assertThrows(DataAccessException.class, () -> userMemory.createUser(user));
     }
 
     @Test
@@ -52,11 +52,9 @@ public class SQLTest {
 
     @Test
     void getUserNeg() throws DataAccessException{
-        var user = new UserData("joe", "12345", "j@j");
         var userMemory = new SQLUserDAO();
         userMemory.clear();
-        userMemory.createUser(user);
-        assertEquals(user, userMemory.getUser(user.username()));
+        assertNull(userMemory.getUser("bob"));
     }
 
     @Test
@@ -86,7 +84,7 @@ public class SQLTest {
         AuthDAO authMemory = new SQLAuthDAO();
         authMemory.clear();
         authMemory.createAuth(auth);
-        assertNotNull(authMemory.getAuth(auth.authToken()));
+        assertNotEquals(new AuthData("hackerToken", "joe"), authMemory.getAuth(auth.authToken()));
     }
 
     @Test
@@ -100,11 +98,9 @@ public class SQLTest {
 
     @Test
     void getAuthNeg() throws DataAccessException{
-        var auth = new AuthData("nonsense", "bob");
         AuthDAO authMemory = new SQLAuthDAO();
         authMemory.clear();
-        authMemory.createAuth(auth);
-        assertEquals(auth, authMemory.getAuth(auth.authToken()));
+        assertNull(authMemory.getAuth("hackerToken"));
     }
 
     @Test
@@ -120,13 +116,9 @@ public class SQLTest {
 
     @Test
     void deleteAuthNeg() throws DataAccessException{
-        var auth = new AuthData("nonsense", "bob");
         AuthDAO authMemory = new SQLAuthDAO();
         authMemory.clear();
-        authMemory.createAuth(auth);
-        assertNotNull(authMemory.getAuth(auth.authToken()));
-        authMemory.deleteAuth(auth.authToken());
-        assertNull(authMemory.getAuth(auth.authToken()));
+        assertThrows(DataAccessException.class, () -> authMemory.deleteAuth("Ghost User"));
     }
 
     @Test
@@ -156,7 +148,7 @@ public class SQLTest {
         var gameMemory = new SQLGameDAO();
         gameMemory.clear();
         gameMemory.createGame(game);
-        assertNotNull(gameMemory.getGame(game.gameID()));
+        assertThrows(DataAccessException.class, () -> gameMemory.createGame(game));
     }
 
     @Test
@@ -170,11 +162,9 @@ public class SQLTest {
 
     @Test
     void getGameNeg() throws DataAccessException{
-        var game = new GameData(1, "bob", "joe", "championship", new ChessGame());
         var gameMemory = new SQLGameDAO();
         gameMemory.clear();
-        gameMemory.createGame(game);
-        assertEquals(game, gameMemory.getGame(game.gameID()));
+        assertNull(gameMemory.getGame(-1));
     }
 
     @Test
@@ -191,12 +181,15 @@ public class SQLTest {
     @Test
     void listGamesNeg() throws DataAccessException{
         var game = new GameData(1, "bob", "joe", "championship", new ChessGame());
+        var game2 = new GameData(2, "julie", "sven", "semi-final", new ChessGame());
         var gameMemory = new SQLGameDAO();
         gameMemory.clear();
         gameMemory.createGame(game);
+        gameMemory.createGame(game2);
         var list = gameMemory.listGames();
-        assertEquals(1, list.games().size());
-        assertEquals(game, new ArrayList<>(list.games()).getFirst());
+        assertNotEquals(1, list.games().size());
+        assertNotEquals(game2, new ArrayList<>(list.games()).getFirst());
+        assertNotEquals(game, new ArrayList<>(list.games()).get(1));
     }
 
     @Test
@@ -214,12 +207,8 @@ public class SQLTest {
     @Test
     void updateGameNeg() throws DataAccessException{
         var game = new GameData(1, "bob", "joe", "championship", new ChessGame());
-        var game2 = new GameData(1, "adam", "serena", "championship", new ChessGame());
         var gameMemory = new SQLGameDAO();
         gameMemory.clear();
-        gameMemory.createGame(game);
-        assertEquals(game, gameMemory.getGame(game.gameID()));
-        gameMemory.updateGame(game2);
-        assertEquals(game2, gameMemory.getGame(game.gameID()));
+        assertThrows(DataAccessException.class, () -> gameMemory.updateGame(game));
     }
 }
