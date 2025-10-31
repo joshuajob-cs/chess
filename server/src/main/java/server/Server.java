@@ -10,7 +10,10 @@ import service.ClearService;
 import service.GameService;
 import service.UserService;
 
+import java.sql.SQLException;
 import java.util.Map;
+
+import static dataaccess.DatabaseManager.getConnection;
 
 public class Server {
 
@@ -141,9 +144,48 @@ public class Server {
     public static void initialize(){
         try {
             DatabaseManager.createDatabase();
+            try(var conn = DatabaseManager.getConnection()){
+                /*
+                try(var preparedStatement = conn.prepareStatement("SELECT ?+1")){
+                    int num = 5;
+                    preparedStatement.setInt(1, num);
+
+                    var rs = preparedStatement.executeQuery();
+                    rs.next();
+                    System.out.println(rs.getInt(1));
+                }
+                */
+                try(var statement = conn.prepareStatement(
+                        "CREATE TABLE IF NOT EXISTS user (" +
+                            "username VARCHAR(15) PRIMARY KEY," +
+                            "password VARCHAR(100) NOT NULL," +
+                            "email VARCHAR(100) NOT NULL" +
+                            ");")){
+                    statement.executeUpdate();
+                }
+                try(var statement = conn.prepareStatement(
+                        "CREATE TABLE IF NOT EXISTS auth (" +
+                            "authToken VARCHAR(100) PRIMARY KEY," +
+                            "username VARCHAR(15) NOT NULL" +
+                            ");")){
+                    statement.executeUpdate();
+                }
+                try(var statement = conn.prepareStatement(
+                        "CREATE TABLE IF NOT EXISTS game (" +
+                            "gameID INT PRIMARY KEY," +
+                            "whiteUsername VARCHAR(15)," +
+                            "blackUsername VARCHAR(15)," +
+                            "gameName VARCHAR(15) NOT NULL," +
+                            "game VARCHAR(1000) NOT NULL" +
+                            ");")){
+                    statement.executeUpdate();
+                }
+            }
         } catch (dataaccess.DataAccessException ex) {
             System.out.println(ex.getCause().getMessage());
             throw new RuntimeException(ex.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
