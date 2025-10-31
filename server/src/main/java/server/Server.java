@@ -146,14 +146,14 @@ public class Server {
                 try(var statement = conn.prepareStatement(
                         "CREATE TABLE IF NOT EXISTS user (" +
                             "username VARCHAR(15) PRIMARY KEY," +
-                            "password VARCHAR(100) NOT NULL," +
-                            "email VARCHAR(100) NOT NULL" +
+                            "password VARCHAR(128) NOT NULL," +
+                            "email VARCHAR(128) NOT NULL" +
                             ");")){
                     statement.executeUpdate();
                 }
                 try(var statement = conn.prepareStatement(
                         "CREATE TABLE IF NOT EXISTS auth (" +
-                            "authToken VARCHAR(100) PRIMARY KEY," +
+                            "authToken VARCHAR(128) PRIMARY KEY," +
                             "username VARCHAR(15) NOT NULL" +
                             ");")){
                     statement.executeUpdate();
@@ -164,7 +164,7 @@ public class Server {
                             "whiteUsername VARCHAR(15)," +
                             "blackUsername VARCHAR(15)," +
                             "gameName VARCHAR(15) NOT NULL," +
-                            "game VARCHAR(1000) NOT NULL" +
+                            "game VARCHAR(2048) NOT NULL" +
                             ");")){
                     statement.executeUpdate();
                 }

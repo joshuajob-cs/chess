@@ -10,6 +10,7 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
     @Override
     public List<String> toSQL() {
         var serializer = new Gson();
+        System.out.println(serializer.toJson(game).length());
         return Arrays.asList(String.valueOf(gameID), whiteUsername, blackUsername, gameName, serializer.toJson(game));
     }
 }
