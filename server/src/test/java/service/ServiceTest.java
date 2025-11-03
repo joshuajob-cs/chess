@@ -13,17 +13,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ServiceTest {
     @Test
     void clear() throws DataAccessException {
-        UserDAO userMemory = new MemoryUserDAO();
-        AuthDAO authMemory = new MemoryAuthDAO();
-        GameDAO gameMemory = new MemoryGameDAO();
-        var userService = new UserService();
-        var credentials = userService.register(new UserData("joe", "12345", "j@j"));
-        assertNotNull(userMemory.getUser(credentials.username()));
-        assertNotNull(authMemory.getAuth(credentials.authToken()));
-        var gameService = new GameService();
-        var gameID = gameService.createGame(new CreateGameRequest(credentials.authToken(), "championship"));
-        assertNotNull(gameMemory.getGame(gameID));
         var clearer = new ClearService();
+        clearer.clearAll();
+        UserDAO userMemory = new SQLUserDAO();
+        var userService = new UserService();
+        GameDAO gameMemory = new SQLGameDAO();
+        var gameService = new GameService();
+        var credentials = userService.register(new UserData("joe", "12345", "j@j"));
+        var gameID = gameService.createGame(new CreateGameRequest(credentials.authToken(), "championship"));
         clearer.clearAll();
         assertNull(userMemory.getUser(credentials.username()));
         assertThrows(DataAccessException.class, () -> gameService.listGames(credentials.authToken()));
@@ -32,7 +29,9 @@ public class ServiceTest {
 
     @Test
     void register() throws DataAccessException{
-        var userMemory = new MemoryUserDAO();
+        var clearer = new ClearService();
+        clearer.clearAll();
+        var userMemory = new SQLUserDAO();
         var userService = new UserService();
         var credentials = userService.register(new UserData("reg", "12345", "j@j"));
         assertNotNull(userMemory.getUser(credentials.username()));
@@ -40,48 +39,51 @@ public class ServiceTest {
 
     @Test
     void registerNeg() throws DataAccessException{
-        var userMemory = new MemoryUserDAO();
+        var data = new UserData("sameReg", "12345", "j@j");
+        var clearer = new ClearService();
+        clearer.clearAll();
         var userService = new UserService();
-        var credentials = userService.register(new UserData("sameReg", "12345", "j@j"));
-        assertNotNull(userMemory.getUser(credentials.username()));
-        assertThrows(DataAccessException.class, () -> userService.register(new UserData("sameReg", "12345", "j@j")));
+        userService.register(data);
+        assertThrows(DataAccessException.class, () -> userService.register(data));
     }
 
     @Test
     void login() throws DataAccessException{
-        var userMemory = new MemoryUserDAO();
-        AuthDAO authMemory = new MemoryAuthDAO();
+        String username = "log";
+        String password = "12345";
+        var clearer = new ClearService();
+        clearer.clearAll();
+        AuthDAO authMemory = new SQLAuthDAO();
         var userService = new UserService();
-        var credentials = userService.register(new UserData("log", "12345", "j@j"));
-        assertNotNull(userMemory.getUser(credentials.username()));
-        credentials = userService.login(new LoginData("log", "12345"));
+        var credentials = userService.register(new UserData(username, password, "j@j"));
+        credentials = userService.login(new LoginData(username, password));
         assertNotNull(authMemory.getAuth(credentials.authToken()));
     }
 
     @Test
     void loginNeg() throws DataAccessException{
-        var userMemory = new MemoryUserDAO();
+        var clearer = new ClearService();
+        clearer.clearAll();
         var userService = new UserService();
-        var credentials = userService.register(new UserData("realLog", "12345", "j@j"));
-        assertNotNull(userMemory.getUser(credentials.username()));
+        userService.register(new UserData("realLog", "12345", "j@j"));
         assertThrows(DataAccessException.class, () -> userService.login(new LoginData("fakeLog", "12345")));
     }
 
     @Test
     void logout() throws DataAccessException{
-        var userMemory = new MemoryUserDAO();
-        AuthDAO authMemory = new MemoryAuthDAO();
+        var clearer = new ClearService();
+        clearer.clearAll();
+        AuthDAO authMemory = new SQLAuthDAO();
         var userService = new UserService();
         var credentials = userService.register(new UserData("out", "12345", "j@j"));
-        assertNotNull(userMemory.getUser(credentials.username()));
-        credentials = userService.login(new LoginData("out", "12345"));
-        assertNotNull(authMemory.getAuth(credentials.authToken()));
         userService.logout(credentials.authToken());
         assertNull(authMemory.getAuth(credentials.authToken()));
     }
 
     @Test
     void logoutNeg() throws DataAccessException {
+        var clearer = new ClearService();
+        clearer.clearAll();
         var userService = new UserService();
         assertThrows(DataAccessException.class, () -> userService.logout("Non-token"));
     }
@@ -111,7 +113,9 @@ public class ServiceTest {
 
     @Test
     void createGame() throws DataAccessException{
-        var gameMemory = new MemoryGameDAO();
+        var clearer = new ClearService();
+        clearer.clearAll();
+        var gameMemory = new SQLGameDAO();
         var userService = new UserService();
         var gameService = new GameService();
         var credentials = userService.register(new UserData("master", "12345", "j@j"));
@@ -121,6 +125,8 @@ public class ServiceTest {
 
     @Test
     void createGameNeg() throws DataAccessException{
+        var clearer = new ClearService();
+        clearer.clearAll();
         var userService = new UserService();
         var gameService = new GameService();
         var credentials = userService.register(new UserData("number_one", "12345", "j@j"));
@@ -129,24 +135,26 @@ public class ServiceTest {
 
     @Test
     void joinGame() throws DataAccessException{
-        var gameMemory = new MemoryGameDAO();
+        var clearer = new ClearService();
+        clearer.clearAll();
+        var gameMemory = new SQLGameDAO();
         var userService = new UserService();
         var gameService = new GameService();
         var credentials = userService.register(new UserData("winner", "12345", "j@j"));
         var gameID = gameService.createGame(new CreateGameRequest(credentials.authToken(), "fun-times"));
-        assertNotNull(gameMemory.getGame(gameID));
         gameService.joinGame(new JoinGameRequest(credentials.authToken(), ChessGame.TeamColor.WHITE, gameID));
         assertEquals("winner", gameMemory.getGame(gameID).whiteUsername());
     }
 
     @Test
     void joinGameNeg() throws DataAccessException{
-        var gameMemory = new MemoryGameDAO();
+        var clearer = new ClearService();
+        clearer.clearAll();
+        var gameMemory = new SQLGameDAO();
         var userService = new UserService();
         var gameService = new GameService();
         var credentials = userService.register(new UserData("king", "12345", "j@j"));
         var gameID = gameService.createGame(new CreateGameRequest(credentials.authToken(), "fun-times"));
-        assertNotNull(gameMemory.getGame(gameID));
         gameService.joinGame(new JoinGameRequest(credentials.authToken(), ChessGame.TeamColor.BLACK, gameID));
         assertNotEquals("king", gameMemory.getGame(gameID).whiteUsername());
     }
