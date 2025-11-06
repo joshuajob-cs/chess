@@ -14,7 +14,7 @@ public class Client {
         prelogin();
     }
 
-    public void prelogin(){
+    private void prelogin(){
         Scanner scanner = new Scanner(System.in);
         System.out.print("[LOGGED OUT]  >>> ");
         String command = scanner.nextLine();
@@ -26,23 +26,44 @@ public class Client {
                 System.out.println("help - ???");
                 prelogin();
             }
-            case "register" -> {
-                System.out.println("Registered");
-                postlogin();
-            }
-            case "login" -> {
-                System.out.println("Logged In");
-                postlogin();
-            }
             case "quit" -> System.out.println("Goodbye my friend");
             default -> {
-                System.out.println("That is not valid. Try typing in 'help'");
-                prelogin();
+                if (command.startsWith("register ")){
+                    System.out.println("Registered!");
+                    try {
+                        command = command.substring(9);
+                        String username = command.substring(0, command.indexOf(" "));
+                        command = command.substring(command.indexOf(" ") + 1);
+                        String password = command.substring(0, command.indexOf(" "));
+                        command = command.substring(command.indexOf(" ") + 1);
+                        if (!command.contains(" ")) {
+                            String email = command;
+                            postlogin();
+                        }
+                        else{
+                            System.out.print("You typed in more than was needed to register. ");
+                            prelogFail();
+                        }
+                    } catch (StringIndexOutOfBoundsException e) {
+                        System.out.print("Not enough information to register. ");
+                        prelogFail();
+                    }
+                } else if (command.startsWith("login ")) {
+                    System.out.println("Logged In");
+                    postlogin();
+                } else {
+                    prelogFail();
+                }
             }
         }
     }
 
-    public void postlogin() {
+    private void prelogFail(){
+        System.out.println("That is not valid. Try typing in 'help'");
+        prelogin();
+    }
+
+    private void postlogin() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("[LOGGED IN]  >>> ");
         String command = scanner.nextLine();
@@ -65,23 +86,27 @@ public class Client {
                 System.out.print("Listed");
                 postlogin();
             }
-            case "join" -> {
-                System.out.println("Joined");
-                postlogin();
-            }
-            case "observe" -> {
-                System.out.print("Watching");
-                postlogin();
-            }
             case "logout" -> {
                 System.out.print("Logged out");
                 prelogin();
             }
             case "quit" -> System.out.println("Goodbye my friend");
             default -> {
-                System.out.println("That is not valid. Try typing in 'help'");
-                postlogin();
+                if (command.startsWith("join ")){
+                    System.out.println("Joined");
+                    postlogin();
+                } else if(command.startsWith("observe ")){
+                    System.out.print("Watching");
+                    postlogin();
+                } else {
+                    postlogFail();
+                }
             }
         }
+    }
+
+    private void postlogFail(){
+        System.out.println("That is not valid. Try typing in 'help'");
+        postlogin();
     }
 }
