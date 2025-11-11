@@ -4,6 +4,7 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import dataaccess.DataAccessException;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -17,45 +18,43 @@ public class Client {
     private void prelogin(){
         Scanner scanner = new Scanner(System.in);
         System.out.print("[LOGGED OUT]  >>> ");
-        String command = scanner.nextLine();
-        switch (command) {
-            case "help" -> {
-                System.out.println("register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
-                System.out.println("login <USERNAME> <PASSWORD> - to play chess");
-                System.out.println("quit - i'll miss you");
-                System.out.println("help - ???");
-                prelogin();
-            }
+        String[] command = scanner.nextLine().toLowerCase().split(" ");
+        String[] parameters = Arrays.copyOfRange(command, 1, command.length);
+        switch (command[0]) {
+            case "help" -> helpLogin();
+            case "register" -> register(parameters);
+            case "login" -> login();
             case "quit" -> System.out.println("Goodbye my friend");
-            default -> {
-                if (command.startsWith("register ")){
-                    System.out.println("Registered!");
-                    try {
-                        command = command.substring(9);
-                        String username = command.substring(0, command.indexOf(" "));
-                        command = command.substring(command.indexOf(" ") + 1);
-                        String password = command.substring(0, command.indexOf(" "));
-                        command = command.substring(command.indexOf(" ") + 1);
-                        if (!command.contains(" ")) {
-                            String email = command;
-                            postlogin();
-                        }
-                        else{
-                            System.out.print("You typed in more than was needed to register. ");
-                            prelogFail();
-                        }
-                    } catch (StringIndexOutOfBoundsException e) {
-                        System.out.print("Not enough information to register. ");
-                        prelogFail();
-                    }
-                } else if (command.startsWith("login ")) {
-                    System.out.println("Logged In");
-                    postlogin();
-                } else {
-                    prelogFail();
-                }
-            }
+            default -> prelogFail();
         }
+    }
+
+    private void helpLogin(){
+        System.out.println(
+        """
+        register <USERNAME> <PASSWORD> <EMAIL> - to create an account
+        login <USERNAME> <PASSWORD> - to play chess
+        quit - i'll miss you
+        help - ???
+        """);
+        prelogin();
+    }
+
+    private void register(String[] params){
+        System.out.println("Registered!");
+        if (params.length != 3){
+            System.out.print(params.length + " arguments for register. ");
+            prelogFail();
+        }
+        String username = params[0];
+        String password = params[1];
+        String email = params[2];
+        postlogin();
+    }
+
+    private void login() {
+        System.out.println("Logged In");
+        postlogin();
     }
 
     private void prelogFail(){
