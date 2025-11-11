@@ -18,7 +18,11 @@ public class Client {
     private void prelogin(){
         Scanner scanner = new Scanner(System.in);
         System.out.print("[LOGGED OUT]  >>> ");
-        String[] command = scanner.nextLine().toLowerCase().split(" ");
+        String[] command = scanner.nextLine().toLowerCase().split("\\s+");
+        if (command.length == 0){
+            prelogFail();
+            return;
+        }
         String[] parameters = Arrays.copyOfRange(command, 1, command.length);
         switch (command[0]) {
             case "help" -> helpLogin();
@@ -45,6 +49,7 @@ public class Client {
         if (params.length != 3){
             System.out.print(params.length + " arguments for register. ");
             prelogFail();
+            return;
         }
         String username = params[0];
         String password = params[1];
@@ -65,43 +70,60 @@ public class Client {
     private void postlogin() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("[LOGGED IN]  >>> ");
-        String command = scanner.nextLine();
-        switch (command) {
-            case "help" -> {
-                System.out.println("create <Name> - to start a new game");
-                System.out.println("list - to list games");
-                System.out.println("join <ID> <WHITE|BLACK> - to join a game");
-                System.out.println("observe <ID> - to watch a game");
-                System.out.println("logout - if you are finished");
-                System.out.println("quit - i'll miss you");
-                System.out.println("help - ???");
-                prelogin();
-            }
-            case "create" -> {
-                System.out.print("Made it");
-                postlogin();
-            }
-            case "list" -> {
-                System.out.print("Listed");
-                postlogin();
-            }
-            case "logout" -> {
-                System.out.print("Logged out");
-                prelogin();
-            }
-            case "quit" -> System.out.println("Goodbye my friend");
-            default -> {
-                if (command.startsWith("join ")){
-                    System.out.println("Joined");
-                    postlogin();
-                } else if(command.startsWith("observe ")){
-                    System.out.print("Watching");
-                    postlogin();
-                } else {
-                    postlogFail();
-                }
-            }
+        String[] command = scanner.nextLine().toLowerCase().split("\\s+");
+        if (command.length == 0){
+            postlogFail();
+            return;
         }
+        switch (command[0]) {
+            case "help" -> helpLogout();
+            case "create" -> create();
+            case "list" -> list();
+            case "join" -> join();
+            case "observe" -> observe();
+            case "logout" -> logout();
+            case "quit" -> System.out.println("Goodbye my friend");
+            default -> postlogFail();
+        }
+    }
+
+    private void helpLogout(){
+        System.out.println(
+                """
+                create <Name> - to start a new game
+                list - to list games
+                join <ID> <WHITE|BLACK> - to join a game
+                observe <ID> - to watch a game
+                logout - if you are finished
+                quit - i'll miss you
+                help - ???
+                """);
+        postlogin();
+    }
+
+    private void create(){
+        System.out.println("Made it");
+        postlogin();
+    }
+
+    private void list(){
+        System.out.println("Listed");
+        postlogin();
+    }
+
+    private void join(){
+        System.out.println("Joined");
+        postlogin();
+    }
+
+    private void observe(){
+        System.out.println("We are always watching");
+        postlogin();
+    }
+
+    private void logout(){
+        System.out.println("logged Out");
+        prelogin();
     }
 
     private void postlogFail(){
