@@ -7,7 +7,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Map;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
@@ -48,11 +47,10 @@ public class ServerFacade {
         return handleResponse(response, GameList.class);
     }
 
-    public Map<String, Integer> createGame(GameName body){
+    public GameID createGame(GameName body){
         var request = buildRequest("POST", "game", new HTTPData(body, "authorization", authToken));
         var response = sendRequest(request);
-        // How do I grab a map instead of a class that I made?
-        return handleResponse(response, Map.class);
+        return handleResponse(response, GameID.class);
     }
 
     public void joinGame(ColorAndId body){

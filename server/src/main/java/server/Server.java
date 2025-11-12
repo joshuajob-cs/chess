@@ -112,8 +112,8 @@ public class Server {
                 String auth = ctx.header("authorization");
                 var gameName = serializer.fromJson(ctx.body(), GameName.class);
                 var request = new CreateGameRequest(auth, gameName.str());
-                int response = gameService.createGame(request);
-                return serializer.toJson(Map.of("gameID",response));
+                GameID response = gameService.createGame(request);
+                return serializer.toJson(response);
             }
         }
 

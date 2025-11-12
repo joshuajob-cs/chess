@@ -24,7 +24,7 @@ public class ServiceTest {
         clearer.clearAll();
         assertNull(userMemory.getUser(credentials.username()));
         assertThrows(DataAccessException.class, () -> gameService.listGames(credentials.authToken()));
-        assertNull(gameMemory.getGame(gameID));
+        assertNull(gameMemory.getGame(gameID.num()));
     }
 
     @Test
@@ -120,7 +120,7 @@ public class ServiceTest {
         var gameService = new GameService();
         var credentials = userService.register(new UserData("master", "12345", "j@j"));
         var gameID = gameService.createGame(new CreateGameRequest(credentials.authToken(), "fun-times"));
-        assertNotNull(gameMemory.getGame(gameID));
+        assertNotNull(gameMemory.getGame(gameID.num()));
     }
 
     @Test
@@ -142,8 +142,8 @@ public class ServiceTest {
         var gameService = new GameService();
         var credentials = userService.register(new UserData("winner", "12345", "j@j"));
         var gameID = gameService.createGame(new CreateGameRequest(credentials.authToken(), "fun-times"));
-        gameService.joinGame(new JoinGameRequest(credentials.authToken(), ChessGame.TeamColor.WHITE, gameID));
-        assertEquals("winner", gameMemory.getGame(gameID).whiteUsername());
+        gameService.joinGame(new JoinGameRequest(credentials.authToken(), ChessGame.TeamColor.WHITE, gameID.num()));
+        assertEquals("winner", gameMemory.getGame(gameID.num()).whiteUsername());
     }
 
     @Test
@@ -155,7 +155,7 @@ public class ServiceTest {
         var gameService = new GameService();
         var credentials = userService.register(new UserData("king", "12345", "j@j"));
         var gameID = gameService.createGame(new CreateGameRequest(credentials.authToken(), "fun-times"));
-        gameService.joinGame(new JoinGameRequest(credentials.authToken(), ChessGame.TeamColor.BLACK, gameID));
-        assertNotEquals("king", gameMemory.getGame(gameID).whiteUsername());
+        gameService.joinGame(new JoinGameRequest(credentials.authToken(), ChessGame.TeamColor.BLACK, gameID.num()));
+        assertNotEquals("king", gameMemory.getGame(gameID.num()).whiteUsername());
     }
 }

@@ -17,13 +17,13 @@ public class GameService {
         return gameMemory.listGames();
     }
 
-    public int createGame(CreateGameRequest request) throws DataAccessException{
+    public GameID createGame(CreateGameRequest request) throws DataAccessException{
         if(request.authToken() == null || request.gameName() == null){
             throw new DataAccessException("400", new DataAccessException("Error: Bad Request"));
         }
         validateRequest(request.authToken());
         gameMemory.createGame(new GameData(nextID, null, null, request.gameName(), new ChessGame()));
-        return nextID ++;
+        return new GameID(nextID ++);
     }
 
     public void joinGame(JoinGameRequest request) throws DataAccessException{

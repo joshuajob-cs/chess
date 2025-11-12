@@ -1,4 +1,4 @@
 package model;
 
-public record GameID(String str) {
+public record GameID(int num) {
 }
