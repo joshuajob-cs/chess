@@ -19,10 +19,35 @@ public class ServerFacade {
         serverUrl = url;
     }
 
+    public void clear() throws DataAccessException{
+        var request = buildRequest("DELETE", "db", "");
+        sendRequest(request);
+    }
+
     public UserData register(UserData data) throws DataAccessException {
         var request = buildRequest("POST", "user", data);
         var response = sendRequest(request);
         return handleResponse(response, UserData.class);
+    }
+
+    public void login(){
+
+    }
+
+    public void logout(){
+
+    }
+
+    public void listGames(){
+
+    }
+
+    public void createGame(){
+
+    }
+
+    public void joinGame(){
+
     }
 
     private HttpRequest buildRequest(String method, String path, Object body) {
