@@ -1,8 +1,4 @@
 package model;
 
-public record GameName(String gameName) {
-
-    public String str() {
-        return gameName;
-    }
+public record GameName(String str) {
 }

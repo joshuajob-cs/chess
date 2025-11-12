@@ -12,6 +12,7 @@ import java.util.Map;
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
+    private String authToken;
 
     public ServerFacade(String url) {
         Server server = new Server();
@@ -25,39 +26,37 @@ public class ServerFacade {
     }
 
     public UserData register(UserData body){
-        var request = buildRequest("POST", "user", new HTTPData("", "",""));
+        var request = buildRequest("POST", "user", new HTTPData(body, "",""));
         var response = sendRequest(request);
         return handleResponse(response, UserData.class);
     }
 
-    public LoginResponse login(LoginData data){
-        var request = buildRequest("POST", "session", new HTTPData("", "",""));
+    public LoginResponse login(LoginData body){
+        var request = buildRequest("POST", "session", new HTTPData(body, "",""));
         var response = sendRequest(request);
         return handleResponse(response, LoginResponse.class);
     }
 
     public void logout(){
-        var request = buildRequest("DELETE", "session", new HTTPData("", "",""));
-        // How do I set header?
+        var request = buildRequest("DELETE", "session", new HTTPData("", "authorization", authToken));
         sendRequest(request);
     }
 
     public GameList listGames(){
-        var request = buildRequest("GET", "GAME", new HTTPData("", "",""));
+        var request = buildRequest("GET", "GAME", new HTTPData("", "authorization", authToken));
         var response = sendRequest(request);
         return handleResponse(response, GameList.class);
     }
 
-    public Map<String, Integer> createGame(GameName data){
-        var request = buildRequest("POST", "game", new HTTPData("", "",""));
+    public Map<String, Integer> createGame(GameName body){
+        var request = buildRequest("POST", "game", new HTTPData(body, "authorization", authToken));
         var response = sendRequest(request);
         // How do I grab a map instead of a class that I made?
         return handleResponse(response, Map.class);
     }
 
-    public void joinGame(ColorAndId data){
-        // How do I set header?
-        var request = buildRequest("PUT", "game", new HTTPData("", "",""));
+    public void joinGame(ColorAndId body){
+        var request = buildRequest("PUT", "game", new HTTPData(body, "authorization", authToken));
         sendRequest(request);
     }
 
@@ -65,7 +64,7 @@ public class ServerFacade {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(data.body()));
-        if (data.header() != null) {
+        if (!data.header().isEmpty()) {
             request.setHeader(data.header(), data.headerValue());
         }
         return request.build();
