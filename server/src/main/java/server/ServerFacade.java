@@ -20,36 +20,36 @@ public class ServerFacade {
     }
 
     public void clear(){
-        var request = buildRequest("DELETE", "db", "");
+        var request = buildRequest("DELETE", "db", new HTTPData("", "",""));
         sendRequest(request);
     }
 
-    public UserData register(UserData data){
-        var request = buildRequest("POST", "user", data);
+    public UserData register(UserData body){
+        var request = buildRequest("POST", "user", new HTTPData("", "",""));
         var response = sendRequest(request);
         return handleResponse(response, UserData.class);
     }
 
     public LoginResponse login(LoginData data){
-        var request = buildRequest("POST", "session", data);
+        var request = buildRequest("POST", "session", new HTTPData("", "",""));
         var response = sendRequest(request);
         return handleResponse(response, LoginResponse.class);
     }
 
     public void logout(){
-        var request = buildRequest("DELETE", "session", "");
+        var request = buildRequest("DELETE", "session", new HTTPData("", "",""));
         // How do I set header?
         sendRequest(request);
     }
 
     public GameList listGames(){
-        var request = buildRequest("GET", "GAME", "");
+        var request = buildRequest("GET", "GAME", new HTTPData("", "",""));
         var response = sendRequest(request);
         return handleResponse(response, GameList.class);
     }
 
     public Map<String, Integer> createGame(GameName data){
-        var request = buildRequest("POST", "game", data);
+        var request = buildRequest("POST", "game", new HTTPData("", "",""));
         var response = sendRequest(request);
         // How do I grab a map instead of a class that I made?
         return handleResponse(response, Map.class);
@@ -57,16 +57,16 @@ public class ServerFacade {
 
     public void joinGame(ColorAndId data){
         // How do I set header?
-        var request = buildRequest("PUT", "game", data);
+        var request = buildRequest("PUT", "game", new HTTPData("", "",""));
         sendRequest(request);
     }
 
-    private HttpRequest buildRequest(String method, String path, Object body) {
+    private HttpRequest buildRequest(String method, String path, HTTPData data) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
-                .method(method, makeRequestBody(body));
-        if (body != null) {
-            request.setHeader("Content-Type", "application/json");
+                .method(method, makeRequestBody(data.body()));
+        if (data.header() != null) {
+            request.setHeader(data.header(), data.headerValue());
         }
         return request.build();
     }
