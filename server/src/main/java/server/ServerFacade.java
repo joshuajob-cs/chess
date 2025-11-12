@@ -1,13 +1,13 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import model.UserData;
+import model.*;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Map;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
@@ -19,35 +19,46 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public void clear() throws DataAccessException{
+    public void clear(){
         var request = buildRequest("DELETE", "db", "");
         sendRequest(request);
     }
 
-    public UserData register(UserData data) throws DataAccessException {
+    public UserData register(UserData data){
         var request = buildRequest("POST", "user", data);
         var response = sendRequest(request);
         return handleResponse(response, UserData.class);
     }
 
-    public void login(){
-
+    public LoginResponse login(LoginData data){
+        var request = buildRequest("POST", "session", data);
+        var response = sendRequest(request);
+        return handleResponse(response, LoginResponse.class);
     }
 
     public void logout(){
-
+        var request = buildRequest("DELETE", "session", "");
+        // How do I set header?
+        sendRequest(request);
     }
 
-    public void listGames(){
-
+    public GameList listGames(){
+        var request = buildRequest("GET", "GAME", "");
+        var response = sendRequest(request);
+        return handleResponse(response, GameList.class);
     }
 
-    public void createGame(){
-
+    public Map<String, Integer> createGame(GameName data){
+        var request = buildRequest("POST", "game", data);
+        var response = sendRequest(request);
+        // How do I grab a map instead of a class that I made?
+        return handleResponse(response, Map.class);
     }
 
-    public void joinGame(){
-
+    public void joinGame(ColorAndId data){
+        // How do I set header?
+        var request = buildRequest("PUT", "game", data);
+        sendRequest(request);
     }
 
     private HttpRequest buildRequest(String method, String path, Object body) {
@@ -68,11 +79,11 @@ public class ServerFacade {
         }
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest request) throws DataAccessException{
+    private HttpResponse<String> sendRequest(HttpRequest request){
         try {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception ex) {
-            throw new DataAccessException(ex.getMessage());
+            throw new RuntimeException(ex.getMessage());
         }
     }
 
