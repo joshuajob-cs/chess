@@ -24,16 +24,22 @@ public class ServerFacade {
         sendRequest(request);
     }
 
-    public UserData register(UserData body){
+    public LoginResponse register(UserData body){
         var request = buildRequest("POST", "user", new HTTPData(body, "",""));
         var response = sendRequest(request);
-        return handleResponse(response, UserData.class);
+        var ret = handleResponse(response, LoginResponse.class);
+        assert ret != null;
+        authToken = ret.authToken();
+        return ret;
     }
 
     public LoginResponse login(LoginData body){
         var request = buildRequest("POST", "session", new HTTPData(body, "",""));
         var response = sendRequest(request);
-        return handleResponse(response, LoginResponse.class);
+        var ret = handleResponse(response, LoginResponse.class);
+        assert ret != null;
+        authToken = ret.authToken();
+        return ret;
     }
 
     public void logout(){

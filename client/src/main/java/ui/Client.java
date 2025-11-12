@@ -1,6 +1,7 @@
 package ui;
 
 import dataaccess.DataAccessException;
+import model.LoginData;
 import model.UserData;
 import server.ServerFacade;
 
@@ -34,7 +35,7 @@ public class Client {
         switch (command[0]) {
             case "help" -> helpLogin();
             case "register" -> register(parameters);
-            case "login" -> login();
+            case "login" -> login(parameters);
             case "quit" -> System.out.println("Goodbye my friend");
             default -> prelogFail();
         }
@@ -59,14 +60,17 @@ public class Client {
             return;
         }
         server.register(new UserData(params[0], params[1], params[2]));
-        String username = params[0];
-        String password = params[1];
-        String email = params[2];
         postlogin();
     }
 
-    private void login() throws DataAccessException{
+    private void login(String[] params) throws DataAccessException{
         System.out.println("Logged In");
+        if (params.length != 2){
+            System.out.print(params.length + " arguments for register. ");
+            prelogFail();
+            return;
+        }
+        server.login(new LoginData(params[0], params[1]));
         postlogin();
     }
 
@@ -131,6 +135,7 @@ public class Client {
 
     private void logout() throws DataAccessException{
         System.out.println("logged Out");
+        server.logout();
         prelogin();
     }
 
