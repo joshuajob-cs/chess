@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import model.*;
 
 import java.net.URI;
@@ -24,7 +25,7 @@ public class ServerFacade {
         sendRequest(request);
     }
 
-    public LoginResponse register(UserData body){
+    public LoginResponse register(UserData body)  throws DataAccessException{
         var request = buildRequest("POST", "user", new HTTPData(body, "",""));
         var response = sendRequest(request);
         var ret = handleResponse(response, LoginResponse.class);
@@ -33,7 +34,7 @@ public class ServerFacade {
         return ret;
     }
 
-    public LoginResponse login(LoginData body){
+    public LoginResponse login(LoginData body)  throws DataAccessException{
         var request = buildRequest("POST", "session", new HTTPData(body, "",""));
         var response = sendRequest(request);
         var ret = handleResponse(response, LoginResponse.class);
@@ -47,13 +48,13 @@ public class ServerFacade {
         sendRequest(request);
     }
 
-    public GameList listGames(){
+    public GameList listGames()  throws DataAccessException{
         var request = buildRequest("GET", "GAME", new HTTPData("", "authorization", authToken));
         var response = sendRequest(request);
         return handleResponse(response, GameList.class);
     }
 
-    public GameID createGame(GameName body){
+    public GameID createGame(GameName body) throws DataAccessException{
         var request = buildRequest("POST", "game", new HTTPData(body, "authorization", authToken));
         var response = sendRequest(request);
         return handleResponse(response, GameID.class);
@@ -90,10 +91,11 @@ public class ServerFacade {
         }
     }
 
-    private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass){
+    private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws DataAccessException{
         var status = response.statusCode();
         if (!isSuccessful(status)) {
-            var body = response.body();
+            var error = new Gson().fromJson(response.body(), ErrorMessage.class);
+            throw new DataAccessException(error.str());
         }
 
         if (responseClass != null) {

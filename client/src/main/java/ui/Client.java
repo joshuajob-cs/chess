@@ -16,14 +16,10 @@ public class Client {
     public void run(){
 
         System.out.println(WHITE_KING + "Let's play chess. Yippee!" + BLACK_KING);
-        try {
-            prelogin();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+        prelogin();
     }
 
-    private void prelogin() throws DataAccessException{
+    private void prelogin(){
         Scanner scanner = new Scanner(System.in);
         System.out.print("[LOGGED OUT]  >>> ");
         String[] command = scanner.nextLine().toLowerCase().split("\\s+");
@@ -32,12 +28,17 @@ public class Client {
             return;
         }
         String[] parameters = Arrays.copyOfRange(command, 1, command.length);
-        switch (command[0]) {
-            case "help" -> helpLogin();
-            case "register" -> register(parameters);
-            case "login" -> login(parameters);
-            case "quit" -> System.out.println("Goodbye my friend");
-            default -> prelogFail();
+        try {
+            switch (command[0]) {
+                case "help" -> helpLogin();
+                case "register" -> register(parameters);
+                case "login" -> login(parameters);
+                case "quit" -> System.exit(0);
+                default -> prelogFail();
+            }
+        } catch (DataAccessException e) {
+            System.out.println(e.getMessage());
+            prelogin();
         }
     }
 
@@ -74,7 +75,7 @@ public class Client {
         postlogin();
     }
 
-    private void prelogFail() throws DataAccessException{
+    private void prelogFail(){
         System.out.println("That is not valid. Try typing in 'help'");
         prelogin();
     }
@@ -94,7 +95,7 @@ public class Client {
             case "join" -> join();
             case "observe" -> observe();
             case "logout" -> logout();
-            case "quit" -> System.out.println("Goodbye my friend");
+            case "quit" -> System.exit(0);
             default -> postlogFail();
         }
     }

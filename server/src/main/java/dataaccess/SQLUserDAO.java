@@ -16,7 +16,7 @@ public class SQLUserDAO implements UserDAO{
     @Override
     public void createUser(UserData data) throws DataAccessException {
         if(exists(data.username(), "username", "user")){
-            throw new DataAccessException("403", new DataAccessException("Error: already taken"));
+            throw new DataAccessException("403", new DataAccessException("Error: The username you tried has already been taken"));
         }
         insert(data, "user");
     }
