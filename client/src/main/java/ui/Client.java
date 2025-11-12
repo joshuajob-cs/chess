@@ -1,8 +1,8 @@
 package ui;
 
-import chess.ChessGame;
-import chess.ChessPiece;
 import dataaccess.DataAccessException;
+import model.UserData;
+import server.ServerFacade;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -10,12 +10,19 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
 public class Client {
+    private final ServerFacade server = new ServerFacade("http://localhost:8080/");
+
     public void run(){
+
         System.out.println(WHITE_KING + "Let's play chess. Yippee!" + BLACK_KING);
-        prelogin();
+        try {
+            prelogin();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private void prelogin(){
+    private void prelogin() throws DataAccessException{
         Scanner scanner = new Scanner(System.in);
         System.out.print("[LOGGED OUT]  >>> ");
         String[] command = scanner.nextLine().toLowerCase().split("\\s+");
@@ -33,7 +40,7 @@ public class Client {
         }
     }
 
-    private void helpLogin(){
+    private void helpLogin() throws DataAccessException{
         System.out.println(
         """
         register <USERNAME> <PASSWORD> <EMAIL> - to create an account
@@ -44,30 +51,31 @@ public class Client {
         prelogin();
     }
 
-    private void register(String[] params){
+    private void register(String[] params) throws DataAccessException{
         System.out.println("Registered!");
         if (params.length != 3){
             System.out.print(params.length + " arguments for register. ");
             prelogFail();
             return;
         }
+        server.register(new UserData(params[0], params[1], params[2]));
         String username = params[0];
         String password = params[1];
         String email = params[2];
         postlogin();
     }
 
-    private void login() {
+    private void login() throws DataAccessException{
         System.out.println("Logged In");
         postlogin();
     }
 
-    private void prelogFail(){
+    private void prelogFail() throws DataAccessException{
         System.out.println("That is not valid. Try typing in 'help'");
         prelogin();
     }
 
-    private void postlogin() {
+    private void postlogin()  throws DataAccessException{
         Scanner scanner = new Scanner(System.in);
         System.out.print("[LOGGED IN]  >>> ");
         String[] command = scanner.nextLine().toLowerCase().split("\\s+");
@@ -87,7 +95,7 @@ public class Client {
         }
     }
 
-    private void helpLogout(){
+    private void helpLogout() throws DataAccessException{
         System.out.println(
                 """
                 create <Name> - to start a new game
@@ -101,32 +109,32 @@ public class Client {
         postlogin();
     }
 
-    private void create(){
+    private void create() throws DataAccessException{
         System.out.println("Made it");
         postlogin();
     }
 
-    private void list(){
+    private void list() throws DataAccessException{
         System.out.println("Listed");
         postlogin();
     }
 
-    private void join(){
+    private void join() throws DataAccessException{
         System.out.println("Joined");
         postlogin();
     }
 
-    private void observe(){
+    private void observe() throws DataAccessException{
         System.out.println("We are always watching");
         postlogin();
     }
 
-    private void logout(){
+    private void logout() throws DataAccessException{
         System.out.println("logged Out");
         prelogin();
     }
 
-    private void postlogFail(){
+    private void postlogFail() throws DataAccessException{
         System.out.println("That is not valid. Try typing in 'help'");
         postlogin();
     }
