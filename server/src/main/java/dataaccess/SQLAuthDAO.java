@@ -17,7 +17,7 @@ public class SQLAuthDAO implements AuthDAO{
     @Override
     public void createAuth(AuthData data) throws DataAccessException {
         if(exists(data.authToken(), "authToken", "auth")){
-            throw new DataAccessException("403", new DataAccessException("Error: already taken"));
+            throw new DataAccessException("403", new DataAccessException("Error: The authentication token you tried has already been taken"));
         }
         insert(data, "auth");
     }
@@ -34,7 +34,7 @@ public class SQLAuthDAO implements AuthDAO{
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
         if(!exists(authToken, "authToken", "auth")){
-            throw new DataAccessException("401", new DataAccessException("Error: unauthorized"));
+            throw new DataAccessException("401", new DataAccessException("Error: You are not authorized. Please log in."));
         }
         try (var conn = DatabaseManager.getConnection()) {
             try (var statement = conn.prepareStatement(

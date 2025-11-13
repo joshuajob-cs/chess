@@ -17,7 +17,7 @@ public class MemoryGameDAO implements GameDAO{
     @Override
     public void createGame(GameData newData) throws DataAccessException {
         if (data.containsKey(newData.gameID())){
-            throw new DataAccessException("403", new DataAccessException("Error: already taken"));
+            throw new DataAccessException("403", new DataAccessException("Error: The gameID you tried has already been taken"));
         }
         data.put(newData.gameID(), newData);
     }
@@ -35,7 +35,7 @@ public class MemoryGameDAO implements GameDAO{
     @Override
     public void updateGame(GameData newData) throws DataAccessException{
         if (!data.containsKey(newData.gameID())){
-            throw new DataAccessException("400", new DataAccessException("Error: Bad Request"));
+            throw new DataAccessException("400", new DataAccessException("Error: There are no games with the gameID you tried"));
         }
         data.put(newData.gameID(), newData);
     }

@@ -15,7 +15,7 @@ public class UserService {
 
     public LoginResponse register(UserData data) throws DataAccessException {
         if(data.username() == null || data.password() == null || data.email() == null){
-            throw new DataAccessException("400", new DataAccessException("Error: Bad Request"));
+            throw new DataAccessException("400", new DataAccessException("Error: Missing username, password, or email"));
         }
         data = new UserData(data.username(), hashPassword(data.password()), data.email());
         userMemory.createUser(data);
@@ -26,11 +26,11 @@ public class UserService {
 
     public LoginResponse login(LoginData loginData) throws DataAccessException {
         if(loginData.username() == null || loginData.password() == null){
-            throw new DataAccessException("400", new DataAccessException("Error: Bad Request"));
+            throw new DataAccessException("400", new DataAccessException("Error: Missing username or password"));
         }
         var userData = userMemory.getUser(loginData.username());
         if (userData == null || !BCrypt.checkpw(loginData.password(), userData.password())){
-            throw new DataAccessException("401", new DataAccessException("Error: unauthorized"));
+            throw new DataAccessException("401", new DataAccessException("Error: Incorrect username or password"));
         }
         var authToken = generateToken();
         authMemory.createAuth(new AuthData(authToken, loginData.username()));
