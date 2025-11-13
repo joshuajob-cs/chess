@@ -14,10 +14,14 @@ public class ServerFacade {
     private final String serverUrl;
     private String authToken;
 
-    public ServerFacade(String url) {
+    public ServerFacade() {
         Server server = new Server();
         server.run(8080);
-        serverUrl = url;
+        serverUrl = "http://localhost:8080/";
+    }
+
+    public ServerFacade(int port){
+        serverUrl = "http://localhost:" + port + "/";
     }
 
     public void clear(){

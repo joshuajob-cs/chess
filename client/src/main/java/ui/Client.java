@@ -11,7 +11,7 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
 public class Client {
-    private final ServerFacade server = new ServerFacade("http://localhost:8080/");
+    private final ServerFacade server = new ServerFacade();
     private State state = Client.State.PRELOGIN;
 
     private enum State{

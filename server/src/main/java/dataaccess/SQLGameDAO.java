@@ -59,7 +59,7 @@ public class SQLGameDAO implements GameDAO{
     @Override
     public void updateGame(GameData data) throws DataAccessException {
         if(!exists(String.valueOf(data.gameID()), "gameID", "game")){
-            throw new DataAccessException("400", new DataAccessException("Error: There are no games with the gameID you tried"));
+            throw new DataAccessException("400", new DataAccessException("Error: There are no games with the game number you tried"));
         }
         try(var conn = DatabaseManager.getConnection()) {
             try(var statement = conn.prepareStatement(

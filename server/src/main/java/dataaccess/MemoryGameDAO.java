@@ -35,7 +35,7 @@ public class MemoryGameDAO implements GameDAO{
     @Override
     public void updateGame(GameData newData) throws DataAccessException{
         if (!data.containsKey(newData.gameID())){
-            throw new DataAccessException("400", new DataAccessException("Error: There are no games with the gameID you tried"));
+            throw new DataAccessException("400", new DataAccessException("Error: There are no games with the game number you tried"));
         }
         data.put(newData.gameID(), newData);
     }
