@@ -12,96 +12,105 @@ import static ui.EscapeSequences.*;
 
 public class Client {
     private final ServerFacade server = new ServerFacade("http://localhost:8080/");
+    private State state = Client.State.PRELOGIN;
 
-    public void run(){
-
-        System.out.println(WHITE_KING + "Let's play chess. Yippee!" + BLACK_KING);
-        prelogin();
+    private enum State{
+        PRELOGIN,
+        POSTLOGIN
     }
 
-    private void prelogin(){
+    public void run(){
         Scanner scanner = new Scanner(System.in);
-        System.out.print("[LOGGED OUT]  >>> ");
+        if (state == State.PRELOGIN) {
+            System.out.print("[LOGGED OUT]  >>> ");
+        }
+        else if (state == State.POSTLOGIN){
+            System.out.print("[LOGGED IN]  >>> ");
+        }
         String[] command = scanner.nextLine().toLowerCase().split("\\s+");
         if (command.length == 0){
-            prelogFail();
+            fail();
             return;
         }
         String[] parameters = Arrays.copyOfRange(command, 1, command.length);
         try {
-            switch (command[0]) {
-                case "help" -> helpLogin();
-                case "register" -> register(parameters);
-                case "login" -> login(parameters);
-                case "quit" -> System.exit(0);
-                default -> prelogFail();
+            if (state == State.PRELOGIN) {
+                prelogin(command[0], parameters);
+            }
+            else if (state == State.POSTLOGIN){
+                postlogin(command[0], parameters);
             }
         } catch (DataAccessException e) {
             System.out.println(e.getMessage());
-            prelogin();
+            run();
         }
     }
 
-    private void helpLogin() throws DataAccessException{
-        System.out.println(
+    private void prelogin(String command, String[] parameters) throws DataAccessException{
+        switch (command) {
+            case "help" -> helpLogin();
+            case "register" -> register(parameters);
+            case "login" -> login(parameters);
+            case "quit" -> System.exit(0);
+            default -> fail();
+        }
+    }
+
+    private void helpLogin(){
+        System.out.print(
         """
         register <USERNAME> <PASSWORD> <EMAIL> - to create an account
         login <USERNAME> <PASSWORD> - to play chess
         quit - i'll miss you
         help - ???
         """);
-        prelogin();
+        run();
     }
 
     private void register(String[] params) throws DataAccessException{
         System.out.println("Registered!");
         if (params.length != 3){
             System.out.print(params.length + " arguments for register. ");
-            prelogFail();
+            fail();
             return;
         }
         server.register(new UserData(params[0], params[1], params[2]));
-        postlogin();
+        state = State.POSTLOGIN;
+        run();
     }
 
     private void login(String[] params) throws DataAccessException{
         System.out.println("Logged In");
         if (params.length != 2){
             System.out.print(params.length + " arguments for register. ");
-            prelogFail();
+            fail();
             return;
         }
         server.login(new LoginData(params[0], params[1]));
-        postlogin();
+        state = State.POSTLOGIN;
+        run();
     }
 
-    private void prelogFail(){
+    private void fail(){
         System.out.println("That is not valid. Try typing in 'help'");
-        prelogin();
+        run();
     }
 
-    private void postlogin()  throws DataAccessException{
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("[LOGGED IN]  >>> ");
-        String[] command = scanner.nextLine().toLowerCase().split("\\s+");
-        if (command.length == 0){
-            postlogFail();
-            return;
-        }
-        switch (command[0]) {
-            case "help" -> helpLogout();
+    private void postlogin(String command, String[] parameters) throws DataAccessException{
+        switch (command) {
+            case "help" -> helpPostlog();
             case "create" -> create();
             case "list" -> list();
             case "join" -> join();
             case "observe" -> observe();
             case "logout" -> logout();
             case "quit" -> System.exit(0);
-            default -> postlogFail();
+            default -> fail();
         }
     }
 
-    private void helpLogout() throws DataAccessException{
-        System.out.println(
+    private void helpPostlog() throws DataAccessException{
+        System.out.print(
                 """
                 create <Name> - to start a new game
                 list - to list games
@@ -111,37 +120,33 @@ public class Client {
                 quit - i'll miss you
                 help - ???
                 """);
-        postlogin();
+        run();
     }
 
     private void create() throws DataAccessException{
         System.out.println("Made it");
-        postlogin();
+        run();
     }
 
     private void list() throws DataAccessException{
         System.out.println("Listed");
-        postlogin();
+        run();
     }
 
     private void join() throws DataAccessException{
         System.out.println("Joined");
-        postlogin();
+        run();
     }
 
     private void observe() throws DataAccessException{
         System.out.println("We are always watching");
-        postlogin();
+        run();
     }
 
     private void logout() throws DataAccessException{
         System.out.println("logged Out");
         server.logout();
-        prelogin();
-    }
-
-    private void postlogFail() throws DataAccessException{
-        System.out.println("That is not valid. Try typing in 'help'");
-        postlogin();
+        state = State.PRELOGIN;
+        run();
     }
 }
