@@ -2,10 +2,6 @@ package ui;
 
 import chess.ChessGame;
 import dataaccess.DataAccessException;
-import model.ColorAndId;
-import model.GameName;
-import model.LoginData;
-import model.UserData;
 import server.ServerFacade;
 
 import java.util.Arrays;
@@ -81,7 +77,7 @@ public class Client {
             fail();
             return;
         }
-        server.register(new UserData(params[0], params[1], params[2]));
+        server.register(params[0], params[1], params[2]);
         System.out.println("Registered!");
         state = State.POSTLOGIN;
         run();
@@ -93,7 +89,7 @@ public class Client {
             fail();
             return;
         }
-        server.login(new LoginData(params[0], params[1]));
+        server.login(params[0], params[1]);
         System.out.println("Logged In!");
         state = State.POSTLOGIN;
         run();
@@ -142,7 +138,7 @@ public class Client {
             fail();
             return;
         }
-        server.createGame(new GameName(params[0]));
+        server.createGame(params[0]);
         System.out.println("New game created!");
         run();
     }
@@ -177,7 +173,7 @@ public class Client {
             fail();
             return;
         }
-        server.joinGame(new ColorAndId(Enum.valueOf(ChessGame.TeamColor.class, params[1].toUpperCase()), gameNum));
+        server.joinGame(Enum.valueOf(ChessGame.TeamColor.class, params[1].toUpperCase()), gameNum);
         System.out.println("Joined game!");
         run();
     }

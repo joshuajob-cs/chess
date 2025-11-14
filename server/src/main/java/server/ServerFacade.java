@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import model.*;
@@ -30,7 +31,8 @@ public class ServerFacade {
         authToken = "";
     }
 
-    public void register(UserData body)  throws DataAccessException{
+    public void register(String username, String password, String email)  throws DataAccessException{
+        var body = new UserData(username, password, email);
         var request = buildRequest("POST", "user", new HTTPData(body, "",""));
         var response = sendRequest(request);
         var ret = handleResponse(response, LoginResponse.class);
@@ -38,7 +40,8 @@ public class ServerFacade {
         authToken = ret.authToken();
     }
 
-    public void login(LoginData body) throws DataAccessException{
+    public void login(String username, String password) throws DataAccessException{
+        var body = new LoginData(username, password);
         var request = buildRequest("POST", "session", new HTTPData(body, "",""));
         var response = sendRequest(request);
         var ret = handleResponse(response, LoginResponse.class);
@@ -59,7 +62,8 @@ public class ServerFacade {
         return handleResponse(response, GameList.class);
     }
 
-    public int createGame(GameName body) throws DataAccessException{
+    public int createGame(String name) throws DataAccessException{
+        var body = new GameName(name);
         var request = buildRequest("POST", "game", new HTTPData(body, "authorization", authToken));
         var response = sendRequest(request);
         var ret = handleResponse(response, GameID.class);
@@ -67,7 +71,8 @@ public class ServerFacade {
         return ret.num();
     }
 
-    public void joinGame(ColorAndId body) throws DataAccessException{
+    public void joinGame(ChessGame.TeamColor color, int gameID) throws DataAccessException{
+        var body = new ColorAndId(color, gameID);
         var request = buildRequest("PUT", "game", new HTTPData(body, "authorization", authToken));
         var response = sendRequest(request);
         handleResponse(response, null);
