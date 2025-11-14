@@ -1,6 +1,9 @@
 package ui;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
+import model.ColorAndId;
+import model.GameName;
 import model.LoginData;
 import model.UserData;
 import server.ServerFacade;
@@ -139,6 +142,8 @@ public class Client {
             fail();
             return;
         }
+        server.createGame(new GameName(params[0]));
+        System.out.println("New game created!");
         run();
     }
 
@@ -148,34 +153,36 @@ public class Client {
             fail();
             return;
         }
-        System.out.println("Listed");
+        var gameList = server.listGames().games();
+        System.out.println(gameList);
         run();
     }
 
     private void join(String[] params) throws DataAccessException{
-        System.out.println("Joined");
+        int gameNum;
         if (params.length != 2){
             System.out.print(params.length + " arguments for join. ");
             fail();
             return;
         }
         try {
-            int gameNum = Integer.parseInt(params[0]);
+            gameNum = Integer.parseInt(params[0]);
         } catch (NumberFormatException e) {
             System.out.print(params[0] + " is not a number. ");
             fail();
             return;
         }
-        if(!(params[1].equals("WHITE") | params[1].equals("BLACK"))){
+        if(!(params[1].equals("white") | params[1].equals("black"))){
             System.out.print(params[1] + " is not WHITE or BLACK. ");
             fail();
             return;
         }
+        server.joinGame(new ColorAndId(Enum.valueOf(ChessGame.TeamColor.class, params[1].toUpperCase()), gameNum));
+        System.out.println("Joined game!");
         run();
     }
 
     private void observe(String[] params) throws DataAccessException{
-        System.out.println("We are always watching");
         if (params.length != 1){
             System.out.print(params.length + " arguments for observe. ");
             fail();
@@ -188,6 +195,7 @@ public class Client {
             fail();
             return;
         }
+        System.out.println("We are always watching");
         run();
     }
 
