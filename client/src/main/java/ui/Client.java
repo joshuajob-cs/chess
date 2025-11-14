@@ -159,6 +159,18 @@ public class Client {
             fail();
             return;
         }
+        try {
+            int gameNum = Integer.parseInt(params[0]);
+        } catch (NumberFormatException e) {
+            System.out.print(params[0] + " is not a number. ");
+            fail();
+            return;
+        }
+        if(!(params[1].equals("WHITE") | params[1].equals("BLACK"))){
+            System.out.print(params[1] + " is not WHITE or BLACK. ");
+            fail();
+            return;
+        }
         run();
     }
 
@@ -166,6 +178,13 @@ public class Client {
         System.out.println("We are always watching");
         if (params.length != 1){
             System.out.print(params.length + " arguments for observe. ");
+            fail();
+            return;
+        }
+        try {
+            int gameNum = Integer.parseInt(params[0]);
+        } catch (NumberFormatException e) {
+            System.out.print(params[0] + " is not a number. ");
             fail();
             return;
         }
