@@ -124,10 +124,10 @@ public class ServerFacadeTests {
         String name = "yes";
         facade.clear();
         facade.register(new UserData("a", "b", "c"));
-        facade.createGame(new GameName(name));
+        int gameID = facade.createGame(new GameName(name));
         var games = facade.listGames();
 
-        assertEquals(new GameData(1, null, null, name, new ChessGame()), games.games().iterator().next());
+        assertEquals(new GameData(gameID, null, null, name, new ChessGame()), games.games().iterator().next());
     }
 
     @Test
@@ -154,8 +154,8 @@ public class ServerFacadeTests {
     public void joinGameFail() throws DataAccessException{
         facade.clear();
         facade.register(new UserData("me", "b", "c"));
-        facade.createGame(new GameName("cool"));
-        facade.joinGame(new ColorAndId(ChessGame.TeamColor.WHITE, 1));
-        assertThrows(DataAccessException.class, () -> facade.joinGame(new ColorAndId(ChessGame.TeamColor.WHITE, 1)));
+        int gameID = facade.createGame(new GameName("cool"));
+        facade.joinGame(new ColorAndId(ChessGame.TeamColor.WHITE, gameID));
+        assertThrows(DataAccessException.class, () -> facade.joinGame(new ColorAndId(ChessGame.TeamColor.WHITE, gameID)));
     }
 }
