@@ -2,7 +2,6 @@ package ui;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
 import model.*;
 import server.Server;
 
