@@ -7,6 +7,8 @@ import server.DataAccessException;
 import server.Server;
 import server.ServerFacade;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerFacadeTests {
@@ -124,10 +126,10 @@ public class ServerFacadeTests {
         String name = "yes";
         facade.clear();
         facade.register("a", "b", "c");
-        int gameID = facade.createGame(name);
-        var games = facade.listGames();
-
-        assertEquals(new GameData(gameID, null, null, name, new ChessGame()), games.games().iterator().next());
+        facade.createGame(name);
+        var games = new ArrayList<>(facade.listGames().games());
+        int gameID = games.getFirst().gameID();
+        assertEquals(new GameData(gameID, null, null, name, new ChessGame()), games.getFirst());
     }
 
     @Test

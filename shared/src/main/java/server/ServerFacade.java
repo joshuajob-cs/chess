@@ -25,6 +25,7 @@ public class ServerFacade {
         var request = buildRequest("DELETE", "db", new HTTPData("", "",""));
         sendRequest(request);
         authToken = "";
+        gameIDs = new ArrayList<>();
     }
 
     public void register(String username, String password, String email)  throws DataAccessException{
@@ -68,14 +69,17 @@ public class ServerFacade {
         var ret = handleResponse(response, GameID.class);
         assert ret != null;
         gameIDs.add(ret.num());
-        return ret.num();
+        return gameIDs.size();
     }
 
-    public void joinGame(ChessGame.TeamColor color, int gameID) throws DataAccessException{
+    public void joinGame(ChessGame.TeamColor color, int gameNum) throws DataAccessException{
         if (gameIDs == null){
             gameIDs = orderIDs(listGames());
         }
-        var body = new ColorAndId(color, gameID);
+        if (gameNum <= 0 || gameNum > gameIDs.size()){
+            throw new DataAccessException("There is not a game with that number.");
+        }
+        var body = new ColorAndId(color, gameIDs.get(gameNum - 1));
         var request = buildRequest("PUT", "game", new HTTPData(body, "authorization", authToken));
         var response = sendRequest(request);
         handleResponse(response, null);
