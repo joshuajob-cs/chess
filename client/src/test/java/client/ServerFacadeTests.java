@@ -1,12 +1,11 @@
 package client;
 
+import ServerFacade.ServerFacade;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
-import server.ServerFacade;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerFacadeTests {
@@ -34,13 +33,13 @@ public class ServerFacadeTests {
         String password = "b";
         facade.clear();
         try{
-            facade.register(new UserData(username, password, "c"));
-            facade.createGame(new GameName("yay"));
+            facade.register(username, password, "c");
+            facade.createGame("yay");
         } catch(DataAccessException e){
             Assertions.fail();
         }
         facade.clear();
-        assertThrows(DataAccessException.class, () -> facade.login(new LoginData(username, password)));
+        assertThrows(DataAccessException.class, () -> facade.login(username, password));
         assertThrows(DataAccessException.class, () -> facade.listGames());
     }
 
@@ -49,9 +48,9 @@ public class ServerFacadeTests {
         facade.clear();
         String username = "a";
         String password = "b";
-        facade.register(new UserData(username, password, "c"));
+        facade.register(username, password, "c");
         facade.logout();
-        assertDoesNotThrow(() -> facade.login(new LoginData(username, password)));
+        assertDoesNotThrow(() -> facade.login(username, password));
     }
 
     @Test
@@ -60,8 +59,8 @@ public class ServerFacadeTests {
         String username = "a";
         String password = "b";
         String email = "c";
-        facade.register(new UserData(username, password, email));
-        assertThrows(DataAccessException.class, () -> facade.register(new UserData(username, password, email)));
+        facade.register(username, password, email);
+        assertThrows(DataAccessException.class, () -> facade.register(username, password, email));
     }
 
     @Test
@@ -69,19 +68,19 @@ public class ServerFacadeTests {
         facade.clear();
         String username = "a";
         String password = "b";
-        facade.register(new UserData(username, password, "c"));
+        facade.register(username, password, "c");
         facade.logout();
-        facade.login(new LoginData(username, password));
+        facade.login(username, password);
         assertDoesNotThrow(() -> facade.listGames());
     }
 
     @Test
     public void loginFail() throws DataAccessException{
         facade.clear();
-        facade.register(new UserData("a", "b", "c"));
+        facade.register("a", "b", "c");
         facade.logout();
-        assertThrows(DataAccessException.class, () -> facade.login(new LoginData("bad", "b")));
-        assertThrows(DataAccessException.class, () -> facade.login(new LoginData("a", "bad")));
+        assertThrows(DataAccessException.class, () -> facade.login("bad", "b"));
+        assertThrows(DataAccessException.class, () -> facade.login("a", "bad"));
     }
 
     @Test
@@ -89,7 +88,7 @@ public class ServerFacadeTests {
         facade.clear();
         String username = "a";
         String password = "b";
-        facade.register(new UserData(username, password, "c"));
+        facade.register(username, password, "c");
         facade.logout();
         assertThrows(DataAccessException.class, () -> facade.listGames());
     }
@@ -103,10 +102,10 @@ public class ServerFacadeTests {
     @Test
     public void listGames() throws DataAccessException{
         facade.clear();
-        facade.register(new UserData("a", "b", "c"));
-        facade.createGame(new GameName("yes"));
-        facade.createGame(new GameName("no"));
-        facade.createGame(new GameName("maybe"));
+        facade.register("a", "b", "c");
+        facade.createGame("yes");
+        facade.createGame("no");
+        facade.createGame("maybe");
         var games = facade.listGames();
         //System.out.println(games);
         assertEquals(3, games.games().size());
@@ -123,8 +122,8 @@ public class ServerFacadeTests {
     public void createGame() throws DataAccessException{
         String name = "yes";
         facade.clear();
-        facade.register(new UserData("a", "b", "c"));
-        int gameID = facade.createGame(new GameName(name));
+        facade.register("a", "b", "c");
+        int gameID = facade.createGame(name);
         var games = facade.listGames();
 
         assertEquals(new GameData(gameID, null, null, name, new ChessGame()), games.games().iterator().next());
@@ -133,9 +132,9 @@ public class ServerFacadeTests {
     @Test
     public void createGameFail() throws DataAccessException{
         facade.clear();
-        facade.register(new UserData("a", "b", "c"));
-        facade.createGame(new GameName("cool"));
-        assertThrows(DataAccessException.class, () -> facade.createGame(new GameName(null)));
+        facade.register("a", "b", "c");
+        facade.createGame("cool");
+        assertThrows(DataAccessException.class, () -> facade.createGame(null));
     }
 
     @Test
@@ -143,9 +142,9 @@ public class ServerFacadeTests {
         String name = "cool";
         String user = "me";
         facade.clear();
-        facade.register(new UserData(user, "b", "c"));
-        facade.createGame(new GameName(name));
-        facade.joinGame(new ColorAndId(ChessGame.TeamColor.WHITE, 1));
+        facade.register(user, "b", "c");
+        facade.createGame(name);
+        facade.joinGame(ChessGame.TeamColor.WHITE, 1);
         var games = facade.listGames();
         assertEquals(new GameData(1, user, null, name, new ChessGame()), games.games().iterator().next());
     }
@@ -153,9 +152,9 @@ public class ServerFacadeTests {
     @Test
     public void joinGameFail() throws DataAccessException{
         facade.clear();
-        facade.register(new UserData("me", "b", "c"));
-        int gameID = facade.createGame(new GameName("cool"));
-        facade.joinGame(new ColorAndId(ChessGame.TeamColor.WHITE, gameID));
-        assertThrows(DataAccessException.class, () -> facade.joinGame(new ColorAndId(ChessGame.TeamColor.WHITE, gameID)));
+        facade.register("me", "b", "c");
+        int gameID = facade.createGame("cool");
+        facade.joinGame(ChessGame.TeamColor.WHITE, gameID);
+        assertThrows(DataAccessException.class, () -> facade.joinGame(ChessGame.TeamColor.WHITE, gameID));
     }
 }
