@@ -18,7 +18,7 @@ public class ServerFacade {
         serverUrl = "http://localhost:" + port + "/";
     }
 
-    public void clear(){
+    public void clear() throws DataAccessException{
         var request = buildRequest("DELETE", "db", new HTTPData("", "",""));
         sendRequest(request);
         authToken = "";
@@ -89,10 +89,12 @@ public class ServerFacade {
         }
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest request){
+    private HttpResponse<String> sendRequest(HttpRequest request) throws DataAccessException{
         try {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch(java.io.IOException | InterruptedException e){
+        } catch (java.net.ConnectException e){
+            throw new DataAccessException("You forgot to start the server.");
+        } catch (java.io.IOException | InterruptedException e){
             throw new RuntimeException(e);
         }
     }
