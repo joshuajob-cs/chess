@@ -1,9 +1,8 @@
 package client;
 
+import chess.ChessGame;
 import dataaccess.DataAccessException;
-import model.GameName;
-import model.LoginData;
-import model.UserData;
+import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
@@ -102,32 +101,61 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void listGames() {
-        assertTrue(true);
+    public void listGames() throws DataAccessException{
+        facade.clear();
+        facade.register(new UserData("a", "b", "c"));
+        facade.createGame(new GameName("yes"));
+        facade.createGame(new GameName("no"));
+        facade.createGame(new GameName("maybe"));
+        var games = facade.listGames();
+        //System.out.println(games);
+        assertEquals(3, games.games().size());
+
     }
 
     @Test
     public void listGamesFail() {
-        assertTrue(true);
+        facade.clear();
+        assertThrows(DataAccessException.class, () -> facade.listGames());
     }
 
     @Test
-    public void createGame() {
-        assertTrue(true);
+    public void createGame() throws DataAccessException{
+        String name = "yes";
+        facade.clear();
+        facade.register(new UserData("a", "b", "c"));
+        facade.createGame(new GameName(name));
+        var games = facade.listGames();
+
+        assertEquals(new GameData(1, null, null, name, new ChessGame()), games.games().iterator().next());
     }
 
     @Test
-    public void createGameFail() {
-        assertTrue(true);
+    public void createGameFail() throws DataAccessException{
+        facade.clear();
+        facade.register(new UserData("a", "b", "c"));
+        facade.createGame(new GameName("cool"));
+        assertThrows(DataAccessException.class, () -> facade.createGame(new GameName(null)));
     }
 
     @Test
-    public void joinGame() {
-        assertTrue(true);
+    public void joinGame() throws DataAccessException{
+        String name = "cool";
+        String user = "me";
+        facade.clear();
+        facade.register(new UserData(user, "b", "c"));
+        facade.createGame(new GameName(name));
+        facade.joinGame(new ColorAndId(ChessGame.TeamColor.WHITE, 1));
+        var games = facade.listGames();
+        assertEquals(new GameData(1, user, null, name, new ChessGame()), games.games().iterator().next());
     }
 
     @Test
-    public void joinGameFail() {
-        assertTrue(true);
+    public void joinGameFail() throws DataAccessException{
+        facade.clear();
+        facade.register(new UserData("me", "b", "c"));
+        facade.createGame(new GameName("cool"));
+        facade.joinGame(new ColorAndId(ChessGame.TeamColor.WHITE, 1));
+        assertThrows(DataAccessException.class, () -> facade.joinGame(new ColorAndId(ChessGame.TeamColor.WHITE, 1)));
     }
 }

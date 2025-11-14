@@ -59,10 +59,12 @@ public class ServerFacade {
         return handleResponse(response, GameList.class);
     }
 
-    public void createGame(GameName body) throws DataAccessException{
+    public int createGame(GameName body) throws DataAccessException{
         var request = buildRequest("POST", "game", new HTTPData(body, "authorization", authToken));
         var response = sendRequest(request);
-        handleResponse(response, null);
+        var ret = handleResponse(response, GameID.class);
+        assert ret != null;
+        return ret.num();
     }
 
     public void joinGame(ColorAndId body) throws DataAccessException{
