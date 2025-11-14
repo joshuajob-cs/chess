@@ -1,9 +1,11 @@
 package ui;
 
 import chess.ChessGame;
+import model.GameList;
 import server.DataAccessException;
 import server.ServerFacade;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -142,8 +144,8 @@ public class Client {
             fail();
             return;
         }
-        server.createGame(params[0]);
-        System.out.println("New game created!");
+        int gameNum = server.createGame(params[0]);
+        System.out.println("Type join " + gameNum + " <WHITE|BLACK> to join the game you created");
         run();
     }
 
@@ -153,9 +155,20 @@ public class Client {
             fail();
             return;
         }
-        var gameList = server.listGames().games();
-        System.out.println(gameList);
+        var gameList = server.listGames();
+        printGames(gameList);
         run();
+    }
+
+    private void printGames(GameList list){
+        var games = new ArrayList<>(list.games());
+        for(int i = 0; i < games.size(); i++){
+            var game = games.get(i);
+            String white = (game.whiteUsername() == null) ? "nobody": game.whiteUsername();
+            String black = (game.blackUsername() == null) ? "nobody": game.blackUsername();
+            System.out.println(i+1 + ". " + game.gameName() + ": with "
+            + white + " playing white and " + black + " playing black");
+        }
     }
 
     private void join(String[] params) throws DataAccessException{
