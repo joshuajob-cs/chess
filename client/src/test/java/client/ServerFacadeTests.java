@@ -30,7 +30,7 @@ public class ServerFacadeTests {
 
 
     @Test
-    public void clear() throws DataAccessException{
+    public void clear(){
         String username = "a";
         String password = "b";
         facade.clear();
@@ -46,13 +46,23 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void register() {
-        assertTrue(true);
+    public void register() throws DataAccessException{
+        facade.clear();
+        String username = "a";
+        String password = "b";
+        facade.register(new UserData(username, password, "c"));
+        facade.logout();
+        assertDoesNotThrow(() -> facade.login(new LoginData(username, password)));
     }
 
     @Test
-    public void registerFail() {
-        assertTrue(true);
+    public void registerFail() throws DataAccessException{
+        facade.clear();
+        String username = "a";
+        String password = "b";
+        String email = "c";
+        facade.register(new UserData(username, password, email));
+        assertThrows(DataAccessException.class, () -> facade.register(new UserData(username, password, email)));
     }
 
     @Test
@@ -67,7 +77,8 @@ public class ServerFacadeTests {
 
     @Test
     public void logout() {
-        assertTrue(true);
+        facade.clear();
+        assertThrows(DataAccessException.class, () -> facade.logout());
     }
 
     @Test

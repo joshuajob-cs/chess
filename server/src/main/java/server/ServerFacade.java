@@ -46,9 +46,11 @@ public class ServerFacade {
         authToken = ret.authToken();
     }
 
-    public void logout(){
+    public void logout() throws DataAccessException{
         var request = buildRequest("DELETE", "session", new HTTPData("", "authorization", authToken));
-        sendRequest(request);
+        var response = sendRequest(request);
+        handleResponse(response, null);
+        authToken = "";
     }
 
     public GameList listGames() throws DataAccessException{
@@ -59,12 +61,14 @@ public class ServerFacade {
 
     public void createGame(GameName body) throws DataAccessException{
         var request = buildRequest("POST", "game", new HTTPData(body, "authorization", authToken));
-        sendRequest(request);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
-    public void joinGame(ColorAndId body){
+    public void joinGame(ColorAndId body) throws DataAccessException{
         var request = buildRequest("PUT", "game", new HTTPData(body, "authorization", authToken));
-        sendRequest(request);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     private HttpRequest buildRequest(String method, String path, HTTPData data) {
