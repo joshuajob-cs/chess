@@ -66,24 +66,39 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void login() {
-        assertTrue(true);
-    }
-
-    @Test
-    public void loginFail() {
-        assertTrue(true);
-    }
-
-    @Test
-    public void logout() {
+    public void login() throws DataAccessException{
         facade.clear();
-        assertThrows(DataAccessException.class, () -> facade.logout());
+        String username = "a";
+        String password = "b";
+        facade.register(new UserData(username, password, "c"));
+        facade.logout();
+        facade.login(new LoginData(username, password));
+        assertDoesNotThrow(() -> facade.listGames());
+    }
+
+    @Test
+    public void loginFail() throws DataAccessException{
+        facade.clear();
+        facade.register(new UserData("a", "b", "c"));
+        facade.logout();
+        assertThrows(DataAccessException.class, () -> facade.login(new LoginData("bad", "b")));
+        assertThrows(DataAccessException.class, () -> facade.login(new LoginData("a", "bad")));
+    }
+
+    @Test
+    public void logout() throws DataAccessException{
+        facade.clear();
+        String username = "a";
+        String password = "b";
+        facade.register(new UserData(username, password, "c"));
+        facade.logout();
+        assertThrows(DataAccessException.class, () -> facade.listGames());
     }
 
     @Test
     public void logoutFail() {
-        assertTrue(true);
+        facade.clear();
+        assertThrows(DataAccessException.class, () -> facade.logout());
     }
 
     @Test
