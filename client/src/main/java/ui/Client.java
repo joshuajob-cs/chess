@@ -10,8 +10,12 @@ import java.util.Scanner;
 import static ui.EscapeSequences.*;
 
 public class Client {
-    private final ServerFacade server = new ServerFacade();
+    private final ServerFacade server;
     private State state = Client.State.PRELOGIN;
+
+    public Client(int port){
+        server = new ServerFacade(port);
+    }
 
     private enum State{
         PRELOGIN,

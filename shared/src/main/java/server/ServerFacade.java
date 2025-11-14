@@ -14,12 +14,6 @@ public class ServerFacade {
     private final String serverUrl;
     private String authToken = "";
 
-    public ServerFacade() {
-        Server server = new Server();
-        server.run(8080);
-        serverUrl = "http://localhost:8080/";
-    }
-
     public ServerFacade(int port){
         serverUrl = "http://localhost:" + port + "/";
     }
