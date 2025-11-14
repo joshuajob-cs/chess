@@ -1,11 +1,12 @@
 package client;
 
-import ServerFacade.ServerFacade;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.Server;
+import ui.ServerFacade;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerFacadeTests {

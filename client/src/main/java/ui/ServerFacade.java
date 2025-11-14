@@ -1,4 +1,4 @@
-package ServerFacade;
+package ui;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
@@ -100,7 +100,7 @@ public class ServerFacade {
     private HttpResponse<String> sendRequest(HttpRequest request){
         try {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch(java.io.IOException | java.lang.InterruptedException e){
+        } catch(java.io.IOException | InterruptedException e){
             throw new RuntimeException(e);
         }
     }
