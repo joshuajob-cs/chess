@@ -3,9 +3,9 @@ package client;
 import chess.ChessGame;
 import model.*;
 import org.junit.jupiter.api.*;
+import server.DataAccessException;
 import server.Server;
-import ui.DataAccessException;
-import ui.ServerFacade;
+import server.ServerFacade;
 
 import static org.junit.jupiter.api.Assertions.*;
 

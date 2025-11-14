@@ -1,9 +1,8 @@
-package ui;
+package server;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.*;
-import server.Server;
 
 import java.net.URI;
 import java.net.http.HttpClient;

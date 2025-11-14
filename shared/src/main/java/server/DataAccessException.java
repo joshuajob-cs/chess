@@ -1,4 +1,4 @@
-package ui;
+package server;
 
 /**
  * Indicates there was an error connecting to the database
