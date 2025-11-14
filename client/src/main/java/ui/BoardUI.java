@@ -1,6 +1,8 @@
 package ui;
 
 import chess.ChessBoard;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
 import static ui.EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
 import static ui.EscapeSequences.SET_TEXT_COLOR_BLACK;
@@ -18,6 +20,14 @@ public class BoardUI{
         for(int i = 0; i < 8; i++){
             ui[i+1][0] = new SquareUI(null, null, numbers[i]);
             ui[i+1][9] = new SquareUI(null, null, numbers[i]);
+        }
+        for(int i = 0; i < 8; i++){
+            for(int j = 0; j < 8; j++){
+                ChessPiece piece = board.getPiece(new ChessPosition(8-i, j+1));
+                if (piece != null) {
+                    ui[i + 1][j + 1] = new SquareUI(null, null, String.valueOf(piece.toChar()));
+                }
+            }
         }
     }
 
@@ -38,12 +48,6 @@ public class BoardUI{
         }
         return ret;
     }
-
-    private void setSpace(Pos space, SquareUI val){
-        ui[space.row()][space.col()] = val;
-    }
-
-    private record Pos(int row, int col){ }
 
     private record SquareUI(String bg, String textColor, String text){}
 }
