@@ -12,7 +12,7 @@ import java.net.http.HttpResponse;
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
-    private String authToken;
+    private String authToken = "";
 
     public ServerFacade() {
         Server server = new Server();
@@ -27,24 +27,23 @@ public class ServerFacade {
     public void clear(){
         var request = buildRequest("DELETE", "db", new HTTPData("", "",""));
         sendRequest(request);
+        authToken = "";
     }
 
-    public LoginResponse register(UserData body)  throws DataAccessException{
+    public void register(UserData body)  throws DataAccessException{
         var request = buildRequest("POST", "user", new HTTPData(body, "",""));
         var response = sendRequest(request);
         var ret = handleResponse(response, LoginResponse.class);
         assert ret != null;
         authToken = ret.authToken();
-        return ret;
     }
 
-    public LoginResponse login(LoginData body)  throws DataAccessException{
+    public void login(LoginData body) throws DataAccessException{
         var request = buildRequest("POST", "session", new HTTPData(body, "",""));
         var response = sendRequest(request);
         var ret = handleResponse(response, LoginResponse.class);
         assert ret != null;
         authToken = ret.authToken();
-        return ret;
     }
 
     public void logout(){
@@ -52,16 +51,15 @@ public class ServerFacade {
         sendRequest(request);
     }
 
-    public GameList listGames()  throws DataAccessException{
-        var request = buildRequest("GET", "GAME", new HTTPData("", "authorization", authToken));
+    public GameList listGames() throws DataAccessException{
+        var request = buildRequest("GET", "game", new HTTPData("", "authorization", authToken));
         var response = sendRequest(request);
         return handleResponse(response, GameList.class);
     }
 
-    public GameID createGame(GameName body) throws DataAccessException{
+    public void createGame(GameName body) throws DataAccessException{
         var request = buildRequest("POST", "game", new HTTPData(body, "authorization", authToken));
-        var response = sendRequest(request);
-        return handleResponse(response, GameID.class);
+        sendRequest(request);
     }
 
     public void joinGame(ColorAndId body){
@@ -90,16 +88,20 @@ public class ServerFacade {
     private HttpResponse<String> sendRequest(HttpRequest request){
         try {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (Exception ex) {
-            throw new RuntimeException(ex.getMessage());
+        } catch(java.io.IOException | java.lang.InterruptedException e){
+            throw new RuntimeException(e);
         }
     }
 
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws DataAccessException{
         var status = response.statusCode();
         if (!isSuccessful(status)) {
-            var error = new Gson().fromJson(response.body(), ErrorMessage.class);
-            throw new DataAccessException(error.str());
+            try {
+                var error = new Gson().fromJson(response.body(), ErrorMessage.class);
+                throw new DataAccessException(error.str());
+            } catch(com.google.gson.JsonSyntaxException e){
+                throw new RuntimeException(response.body());
+            }
         }
 
         if (responseClass != null) {

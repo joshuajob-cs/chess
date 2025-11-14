@@ -38,6 +38,9 @@ public class UserService {
     }
 
     public void logout(String authToken) throws DataAccessException{
+        if(authToken == null){
+            throw new DataAccessException("401", new DataAccessException("Error: Missing authToken"));
+        }
         authMemory.deleteAuth(authToken);
     }
 
