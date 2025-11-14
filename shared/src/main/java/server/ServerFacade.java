@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.*;
@@ -83,6 +84,14 @@ public class ServerFacade {
         var request = buildRequest("PUT", "game", new HTTPData(body, "authorization", authToken));
         var response = sendRequest(request);
         handleResponse(response, null);
+    }
+
+    public ChessBoard getGame(int gameNum) throws DataAccessException{
+        var games = new ArrayList<>(listGames().games());
+        if (gameNum <= 0 || gameNum > games.size()){
+            throw new DataAccessException("There is not a game with that number.");
+        }
+        return games.get(gameNum - 1).game().getBoard();
     }
 
     private List<Integer> orderIDs(GameList list){

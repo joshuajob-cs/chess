@@ -9,7 +9,7 @@ public class BoardUI{
     SquareUI[][] ui = new SquareUI[10][10];
 
     public BoardUI(ChessBoard board){
-        String[] letters = {"a, b, c, d, e, f, g, h"};
+        String[] letters = {"a", "b", "c", "d", "e", "f", "g", "h"};
         for(int i = 0; i < 8; i++){
             ui[0][i+1] = new SquareUI(null, null, letters[i]);
             ui[9][i+1] = new SquareUI(null, null, letters[i]);

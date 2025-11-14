@@ -92,7 +92,7 @@ public class Client {
 
     private void login(String[] params) throws DataAccessException{
         if (params.length != 2){
-            System.out.print(params.length + " arguments for register. ");
+            System.out.print(params.length + " arguments for login. ");
             fail();
             return;
         }
@@ -202,16 +202,16 @@ public class Client {
             fail();
             return;
         }
+        int gameNum;
         try {
-            int gameNum = Integer.parseInt(params[0]);
+            gameNum = Integer.parseInt(params[0]);
         } catch (NumberFormatException e) {
             System.out.print(params[0] + " is not a number. ");
             fail();
             return;
         }
-        //getGame
-        //getBoard
-        //printBoard
+        var board = server.getGame(gameNum);
+        printBoard(board);
         run();
     }
 
