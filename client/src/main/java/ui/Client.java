@@ -48,7 +48,7 @@ public class Client {
 
     private void prelogin(String command, String[] parameters) throws DataAccessException{
         switch (command) {
-            case "help" -> helpLogin();
+            case "help" -> helpLogin(parameters);
             case "register" -> register(parameters);
             case "login" -> login(parameters);
             case "quit" -> System.exit(0);
@@ -56,7 +56,12 @@ public class Client {
         }
     }
 
-    private void helpLogin(){
+    private void helpLogin(String[] params){
+        if (params.length > 0){
+            System.out.print("Help does not take any parameters. ");
+            fail();
+            return;
+        }
         System.out.print(
         """
         register <USERNAME> <PASSWORD> <EMAIL> - to create an account
@@ -68,25 +73,25 @@ public class Client {
     }
 
     private void register(String[] params) throws DataAccessException{
-        System.out.println("Registered!");
         if (params.length != 3){
             System.out.print(params.length + " arguments for register. ");
             fail();
             return;
         }
         server.register(new UserData(params[0], params[1], params[2]));
+        System.out.println("Registered!");
         state = State.POSTLOGIN;
         run();
     }
 
     private void login(String[] params) throws DataAccessException{
-        System.out.println("Logged In");
         if (params.length != 2){
             System.out.print(params.length + " arguments for register. ");
             fail();
             return;
         }
         server.login(new LoginData(params[0], params[1]));
+        System.out.println("Logged In!");
         state = State.POSTLOGIN;
         run();
     }
@@ -98,18 +103,23 @@ public class Client {
 
     private void postlogin(String command, String[] parameters) throws DataAccessException{
         switch (command) {
-            case "help" -> helpPostlog();
-            case "create" -> create();
-            case "list" -> list();
-            case "join" -> join();
-            case "observe" -> observe();
-            case "logout" -> logout();
+            case "help" -> helpPostlog(parameters);
+            case "create" -> create(parameters);
+            case "list" -> list(parameters);
+            case "join" -> join(parameters);
+            case "observe" -> observe(parameters);
+            case "logout" -> logout(parameters);
             case "quit" -> System.exit(0);
             default -> fail();
         }
     }
 
-    private void helpPostlog() throws DataAccessException{
+    private void helpPostlog(String[] params){
+        if (params.length > 0){
+            System.out.print("Help does not take any parameters. ");
+            fail();
+            return;
+        }
         System.out.print(
                 """
                 create <Name> - to start a new game
@@ -123,28 +133,51 @@ public class Client {
         run();
     }
 
-    private void create() throws DataAccessException{
-        System.out.println("Made it");
+    private void create(String[] params) throws DataAccessException{
+        if (params.length != 1){
+            System.out.print(params.length + " arguments for create. ");
+            fail();
+            return;
+        }
         run();
     }
 
-    private void list() throws DataAccessException{
+    private void list(String[] params) throws DataAccessException{
+        if (params.length > 0){
+            System.out.print("List does not take any parameters. ");
+            fail();
+            return;
+        }
         System.out.println("Listed");
         run();
     }
 
-    private void join() throws DataAccessException{
+    private void join(String[] params) throws DataAccessException{
         System.out.println("Joined");
+        if (params.length != 2){
+            System.out.print(params.length + " arguments for join. ");
+            fail();
+            return;
+        }
         run();
     }
 
-    private void observe() throws DataAccessException{
+    private void observe(String[] params) throws DataAccessException{
         System.out.println("We are always watching");
+        if (params.length != 1){
+            System.out.print(params.length + " arguments for observe. ");
+            fail();
+            return;
+        }
         run();
     }
 
-    private void logout() throws DataAccessException{
-        System.out.println("logged Out");
+    private void logout(String[] params) throws DataAccessException{
+        if (params.length > 0){
+            System.out.print("Logout does not take any parameters. ");
+            fail();
+            return;
+        }
         server.logout();
         state = State.PRELOGIN;
         run();
