@@ -1,9 +1,10 @@
-package server;
+package ServerFacade;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import model.*;
+import server.Server;
 
 import java.net.URI;
 import java.net.http.HttpClient;

@@ -1,9 +1,8 @@
 package ui;
 
+import ServerFacade.ServerFacade;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
-import server.ServerFacade;
-
 import java.util.Arrays;
 import java.util.Scanner;
 
