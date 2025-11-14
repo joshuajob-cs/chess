@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import model.GameList;
 import server.DataAccessException;
@@ -208,8 +209,21 @@ public class Client {
             fail();
             return;
         }
-        System.out.println("We are always watching");
+        //getGame
+        //getBoard
+        //printBoard
         run();
+    }
+
+    private void printBoard(ChessBoard board){
+        var boardUI = new BoardUI(board);
+        String[][] printable = boardUI.get();
+        for(int i = 0; i < 10; i++){
+            for(int j = 0; j < 10; j++){
+                System.out.print(printable[i][j]);
+            }
+            System.out.print("\n");
+        }
     }
 
     private void logout(String[] params) throws DataAccessException{
