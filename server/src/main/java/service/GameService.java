@@ -32,6 +32,9 @@ public class GameService {
         }
         AuthData auth = validateRequest(request.authToken());
         GameData gameData = gameMemory.getGame(request.gameID());
+        if(gameData == null){
+            throw new DataAccessException("400", new DataAccessException("Error: There is no game with that game number."));
+        }
         if (request.playerColor() == WHITE && gameData.whiteUsername() == null){
             gameMemory.updateGame(new GameData(gameData.gameID(), auth.username(), gameData.blackUsername(), gameData.gameName(), gameData.game()));
         } else if (request.playerColor() == BLACK && gameData.blackUsername() == null) {
