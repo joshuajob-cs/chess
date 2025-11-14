@@ -8,11 +8,14 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
     private String authToken = "";
+    private List<Integer> gameIDs = null;
 
     public ServerFacade(int port){
         serverUrl = "http://localhost:" + port + "/";
@@ -56,19 +59,34 @@ public class ServerFacade {
     }
 
     public int createGame(String name) throws DataAccessException{
+        if (gameIDs == null){
+            gameIDs = orderIDs(listGames());
+        }
         var body = new GameName(name);
         var request = buildRequest("POST", "game", new HTTPData(body, "authorization", authToken));
         var response = sendRequest(request);
         var ret = handleResponse(response, GameID.class);
         assert ret != null;
+        gameIDs.add(ret.num());
         return ret.num();
     }
 
     public void joinGame(ChessGame.TeamColor color, int gameID) throws DataAccessException{
+        if (gameIDs == null){
+            gameIDs = orderIDs(listGames());
+        }
         var body = new ColorAndId(color, gameID);
         var request = buildRequest("PUT", "game", new HTTPData(body, "authorization", authToken));
         var response = sendRequest(request);
         handleResponse(response, null);
+    }
+
+    private List<Integer> orderIDs(GameList list){
+        var ret = new ArrayList<Integer>();
+        for (GameData data: list.games()){
+            ret.add(data.gameID());
+        }
+        return ret;
     }
 
     private HttpRequest buildRequest(String method, String path, HTTPData data) {
