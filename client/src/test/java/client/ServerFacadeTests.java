@@ -29,7 +29,7 @@ public class ServerFacadeTests {
 
 
     @Test
-    public void clear(){
+    public void clear() throws DataAccessException{
         String username = "a";
         String password = "b";
         facade.clear();
@@ -95,7 +95,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void logoutFail() {
+    public void logoutFail() throws DataAccessException{
         facade.clear();
         assertThrows(DataAccessException.class, () -> facade.logout());
     }
@@ -114,7 +114,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void listGamesFail() {
+    public void listGamesFail() throws DataAccessException{
         facade.clear();
         assertThrows(DataAccessException.class, () -> facade.listGames());
     }
