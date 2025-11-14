@@ -222,7 +222,7 @@ public class Client {
             for(int j = 0; j < 10; j++){
                 System.out.print(printable[i][j]);
             }
-            System.out.print("\n");
+            System.out.print(RESET_BG_COLOR + RESET_TEXT_COLOR + "\n");
         }
     }
 
