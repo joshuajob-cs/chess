@@ -20,21 +20,31 @@ public class BoardUI{
             ui[i+1][0] = new SquareUI(null, null, numbers[i]);
             ui[i+1][9] = new SquareUI(null, null, numbers[i]);
         }
+        boolean isWhite;
         for(int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
                 ChessPiece piece = board.getPiece(new ChessPosition(8-i, j+1));
+                String bg;
+                String textColor = null;
+                String text = null;
+                isWhite = (i%2 == 1) == (j%2 == 1);
+                if (isWhite){
+                    bg = SET_BG_COLOR_WHITE;
+                }
+                else{
+                    bg = SET_BG_COLOR_BLACK;
+                }
                 if (piece != null) {
                     char pieceChar = piece.toChar();
-                    String pieceUI;
                     if (Character.isUpperCase(pieceChar)){
-                        pieceUI = SET_TEXT_COLOR_RED;
+                        textColor = SET_TEXT_COLOR_RED;
                     }
                     else{
-                        pieceUI = SET_TEXT_COLOR_BLUE;
+                        textColor = SET_TEXT_COLOR_BLUE;
                     }
-                    pieceUI += " " + Character.toUpperCase(pieceChar) + " ";
-                    ui[i + 1][j + 1] = new SquareUI(null, null, String.valueOf(pieceUI));
+                    text = " " + Character.toUpperCase(pieceChar) + " ";
                 }
+                ui[i + 1][j + 1] = new SquareUI(bg, textColor, text);
             }
         }
     }
