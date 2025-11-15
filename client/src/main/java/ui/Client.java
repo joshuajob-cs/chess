@@ -191,8 +191,10 @@ public class Client {
             fail();
             return;
         }
-        server.joinGame(Enum.valueOf(ChessGame.TeamColor.class, params[1].toUpperCase()), gameNum);
-        System.out.println("Joined game!");
+        ChessGame.TeamColor color = Enum.valueOf(ChessGame.TeamColor.class, params[1].toUpperCase());
+        server.joinGame(color, gameNum);
+        var board = server.getGame(gameNum);
+        printBoard(board, color);
         run();
     }
 
@@ -211,18 +213,27 @@ public class Client {
             return;
         }
         var board = server.getGame(gameNum);
-        printBoard(board);
+        printBoard(board, ChessGame.TeamColor.WHITE);
         run();
     }
 
-    private void printBoard(ChessBoard board){
+    private void printBoard(ChessBoard board, ChessGame.TeamColor color){
         var boardUI = new BoardUI(board);
         String[][] printable = boardUI.get();
-        for(int i = 0; i < 10; i++){
-            for(int j = 0; j < 10; j++){
-                System.out.print(printable[i][j]);
+        if (color == ChessGame.TeamColor.WHITE) {
+            for (int i = 0; i < 10; i++) {
+                for (int j = 0; j < 10; j++) {
+                    System.out.print(printable[i][j]);
+                }
+                System.out.print(RESET_BG_COLOR + RESET_TEXT_COLOR + "\n");
             }
-            System.out.print(RESET_BG_COLOR + RESET_TEXT_COLOR + "\n");
+        } else{
+            for (int i = 9; i >= 0; i--) {
+                for (int j = 9; j >= 0; j--) {
+                    System.out.print(printable[i][j]);
+                }
+                System.out.print(RESET_BG_COLOR + RESET_TEXT_COLOR + "\n");
+            }
         }
     }
 
