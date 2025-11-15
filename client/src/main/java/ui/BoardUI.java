@@ -4,8 +4,7 @@ import chess.ChessBoard;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
-import static ui.EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
-import static ui.EscapeSequences.SET_TEXT_COLOR_BLACK;
+import static ui.EscapeSequences.*;
 
 public class BoardUI{
     SquareUI[][] ui = new SquareUI[10][10];
@@ -25,7 +24,16 @@ public class BoardUI{
             for(int j = 0; j < 8; j++){
                 ChessPiece piece = board.getPiece(new ChessPosition(8-i, j+1));
                 if (piece != null) {
-                    ui[i + 1][j + 1] = new SquareUI(null, null, String.valueOf(piece.toChar()));
+                    char pieceChar = piece.toChar();
+                    String pieceUI;
+                    if (Character.isUpperCase(pieceChar)){
+                        pieceUI = SET_TEXT_COLOR_RED;
+                    }
+                    else{
+                        pieceUI = SET_TEXT_COLOR_BLUE;
+                    }
+                    pieceUI += " " + Character.toUpperCase(pieceChar) + " ";
+                    ui[i + 1][j + 1] = new SquareUI(null, null, String.valueOf(pieceUI));
                 }
             }
         }
