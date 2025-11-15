@@ -20,33 +20,36 @@ public class BoardUI{
             ui[i+1][0] = new SquareUI(null, null, numbers[i]);
             ui[i+1][9] = new SquareUI(null, null, numbers[i]);
         }
-        boolean isWhite;
         for(int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
-                ChessPiece piece = board.getPiece(new ChessPosition(8-i, j+1));
-                String bg;
-                String textColor = null;
-                String text = null;
-                isWhite = (i%2 == 1) == (j%2 == 1);
-                if (isWhite){
-                    bg = SET_BG_COLOR_WHITE;
-                }
-                else{
-                    bg = SET_BG_COLOR_BLACK;
-                }
-                if (piece != null) {
-                    char pieceChar = piece.toChar();
-                    if (Character.isUpperCase(pieceChar)){
-                        textColor = SET_TEXT_COLOR_RED;
-                    }
-                    else{
-                        textColor = SET_TEXT_COLOR_BLUE;
-                    }
-                    text = " " + Character.toUpperCase(pieceChar) + " ";
-                }
-                ui[i + 1][j + 1] = new SquareUI(bg, textColor, text);
+                ui[i + 1][j + 1] = readSquare(board, i, j);
             }
         }
+    }
+
+    private SquareUI readSquare(ChessBoard board, int i, int j){
+        ChessPiece piece = board.getPiece(new ChessPosition(8-i, j+1));
+        String bg;
+        boolean isWhite = (i%2 == 1) == (j%2 == 1);
+        if (isWhite){
+            bg = SET_BG_COLOR_WHITE;
+        }
+        else{
+            bg = SET_BG_COLOR_BLACK;
+        }
+        if (piece == null){
+            return new SquareUI(bg, null, null);
+        }
+        String textColor;
+        char pieceChar = piece.toChar();
+        if (Character.isUpperCase(pieceChar)){
+            textColor = SET_TEXT_COLOR_RED;
+        }
+        else{
+            textColor = SET_TEXT_COLOR_BLUE;
+        }
+        String text = " " + Character.toUpperCase(pieceChar) + " ";
+        return new SquareUI(bg, textColor, text);
     }
 
     public String[][] get(){
