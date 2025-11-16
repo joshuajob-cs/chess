@@ -97,13 +97,12 @@ public class Client {
             return;
         }
         server.login(params[0], params[1]);
-        System.out.println("Logged In!");
         state = State.POSTLOGIN;
         run();
     }
 
     private void fail(){
-        System.out.println("That is not valid. Try typing in 'help'");
+        System.out.println("That is not valid. Try typing in 'help'.");
         run();
     }
 
@@ -146,7 +145,7 @@ public class Client {
             return;
         }
         int gameNum = server.createGame(params[0]);
-        System.out.println("Type join " + gameNum + " <WHITE|BLACK> to join the game you created");
+        System.out.println("Type 'join " + gameNum + " <WHITE|BLACK>' to join the game you created.");
         run();
     }
 
@@ -182,12 +181,12 @@ public class Client {
         try {
             gameNum = Integer.parseInt(params[0]);
         } catch (NumberFormatException e) {
-            System.out.print(params[0] + " is not a number. ");
+            System.out.print(params[0] + " is not an integer. ");
             fail();
             return;
         }
         if(!(params[1].equals("white") | params[1].equals("black"))){
-            System.out.print(params[1] + " is not WHITE or BLACK. ");
+            System.out.print(params[1] + " is not 'WHITE' or 'BLACK'. ");
             fail();
             return;
         }
@@ -208,7 +207,7 @@ public class Client {
         try {
             gameNum = Integer.parseInt(params[0]);
         } catch (NumberFormatException e) {
-            System.out.print(params[0] + " is not a number. ");
+            System.out.print(params[0] + " is not an integer. ");
             fail();
             return;
         }

@@ -61,16 +61,14 @@ public class ServerFacade {
     }
 
     public int createGame(String name) throws DataAccessException{
-        if (gameIDs == null){
-            gameIDs = orderIDs(listGames());
-        }
         var body = new GameName(name);
         var request = buildRequest("POST", "game", new HTTPData(body, "authorization", authToken));
         var response = sendRequest(request);
-        var ret = handleResponse(response, GameID.class);
-        assert ret != null;
-        gameIDs.add(ret.num());
-        return gameIDs.size();
+        var gameID = handleResponse(response, GameID.class);
+        assert gameID != null;
+        var games = listGames();
+        gameIDs = orderIDs(games);
+        return gameIDs.indexOf(gameID.num()) + 1;
     }
 
     public void joinGame(ChessGame.TeamColor color, int gameNum) throws DataAccessException{
