@@ -3,6 +3,7 @@ package websocket;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
 import server.DataAccessException;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -31,6 +32,15 @@ public class WebSocketFacade extends Endpoint{
         //} catch (DeploymentException | IOException | URISyntaxException ex) {
             //throw new RuntimeException("EEK NO " + ex.getMessage());
         //}
+    }
+
+    public void join(){
+        try {
+        var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, "", 1);
+        this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        } catch (IOException ex) {
+            throw new RuntimeException(" NOOOOOOOO");
+        }
     }
 
     //Endpoint requires this method, but you don't have to do anything

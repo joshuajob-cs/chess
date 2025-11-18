@@ -1,6 +1,7 @@
 package websocket;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsCloseHandler;
 import io.javalin.websocket.WsConnectContext;
@@ -12,6 +13,8 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+
+import static websocket.messages.ServerMessage.ServerMessageType.LOAD_GAME;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
@@ -26,12 +29,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleMessage(WsMessageContext ctx) {
         try {
+            System.out.println(ctx.message());
             UserGameCommand action = new Gson().fromJson(ctx.message(), UserGameCommand.class);
             switch (action.commandType()) {
-                case CONNECT -> enter(action.authToken(), ctx.session);
+                case CONNECT -> join("you", ctx.session);
                 case LEAVE -> exit(action.authToken(), ctx.session);
             }
-        } catch (IOException ex) {
+        } catch (JsonParseException notCom) {
+            ServerMessage message = new Gson().fromJson(ctx.message(), ServerMessage.class);
+            switch (message.getServerMessageType()) {
+                case LOAD_GAME -> load();
+                default -> throw new IllegalStateException("Unexpected value: " + ctx);
+            }
+        } catch (IOException ex){
             ex.printStackTrace();
         }
     }
@@ -41,11 +51,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    private void enter(String visitorName, Session session) throws IOException {
+    private void join(String visitorName, Session session) throws IOException {
         connections.add(session);
-        var message = String.format("%s is in the shop", visitorName);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
-        connections.broadcast(session, notification);
+        var message = String.format("Entered the game", visitorName);
+        var notification = new ServerMessage(LOAD_GAME);
+        connections.broadcast(null, notification);
+        System.out.println("broadcasted");
+
     }
 
     private void exit(String visitorName, Session session) throws IOException {
@@ -53,6 +65,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         var notification = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
         connections.broadcast(session, notification);
         connections.remove(session);
+    }
+
+    private void load(){
+        System.out.println("He's Loaded");
     }
 
     public void makeNoise(String petName, String sound) {
