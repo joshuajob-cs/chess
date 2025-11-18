@@ -10,10 +10,15 @@ import java.util.Objects;
  * Note: You can add to this class, but you should not alter the existing
  * methods.
  */
-public record UserGameCommand(CommandType commandType, String authToken, Integer gameID, ChessMove move) {
+public class UserGameCommand{
+    private final CommandType commandType;
+    private final String authToken;
+    private final Integer gameID;
 
     public UserGameCommand(CommandType commandType, String authToken, Integer gameID) {
-        this(commandType, authToken, gameID, null);
+        this.commandType = commandType;
+        this.authToken = authToken;
+        this.gameID = gameID;
     }
 
     public enum CommandType {
@@ -21,6 +26,18 @@ public record UserGameCommand(CommandType commandType, String authToken, Integer
         MAKE_MOVE,
         LEAVE,
         RESIGN
+    }
+
+    public CommandType type(){
+        return commandType;
+    }
+
+    public String auth(){
+        return authToken;
+    }
+
+    public int num(){
+        return gameID;
     }
 
     @Override
@@ -31,13 +48,13 @@ public record UserGameCommand(CommandType commandType, String authToken, Integer
         if (!(o instanceof UserGameCommand that)) {
             return false;
         }
-        return commandType() == that.commandType() &&
-                Objects.equals(authToken(), that.authToken()) &&
-                Objects.equals(gameID(), that.gameID());
+        return commandType == that.type() &&
+                Objects.equals(authToken, that.auth()) &&
+                Objects.equals(gameID, that.num());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(commandType(), authToken(), gameID());
+        return Objects.hash(type(), auth(), num());
     }
 }
