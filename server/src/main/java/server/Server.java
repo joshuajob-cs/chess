@@ -9,12 +9,14 @@ import dataaccess.DataAccessException;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
+import websocket.WebSocketHandler;
 
 import java.util.Map;
 
 public class Server {
 
     private final Javalin server;
+    private final WebSocketHandler socket;
     private final UserService userService = new UserService();
     private final GameService gameService = new GameService();
     private final ClearService clearService = new ClearService();
@@ -22,6 +24,7 @@ public class Server {
     public Server(){
         DatabaseManager.initialize();
         server = Javalin.create(config -> config.staticFiles.add("web"));
+        socket = new WebSocketHandler();
 
         server.delete("db", this::clear);
         server.post("user", this::register);
@@ -30,6 +33,12 @@ public class Server {
         server.get("game", this::listGames);
         server.post("game", this::createGame);
         server.put("game", this::joinGame);
+
+        server.ws("/ws", ws -> {
+            ws.onConnect(socket);
+            ws.onMessage(socket);
+            ws.onClose(socket);
+        });
 
     }
 

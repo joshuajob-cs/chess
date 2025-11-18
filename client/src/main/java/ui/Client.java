@@ -5,6 +5,7 @@ import chess.ChessGame;
 import model.GameList;
 import server.DataAccessException;
 import server.ServerFacade;
+import websocket.WebSocketFacade;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,10 +15,12 @@ import static ui.EscapeSequences.*;
 
 public class Client {
     private final ServerFacade server;
+    private final WebSocketFacade ws;
     private State state = Client.State.PRELOGIN;
 
-    public Client(int port){
+    public Client(int port) throws Exception{
         server = new ServerFacade(port);
+        ws = new WebSocketFacade(port);
     }
 
     private enum State{
