@@ -195,7 +195,7 @@ public class Client {
         }
         ChessGame.TeamColor color = Enum.valueOf(ChessGame.TeamColor.class, params[1].toUpperCase());
         server.joinGame(color, gameNum);
-        ws.join();
+        ws.join(gameNum, color);
         var board = server.getGame(gameNum);
         printBoard(board, color);
         run();

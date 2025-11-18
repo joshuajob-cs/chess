@@ -1,5 +1,6 @@
 package websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
 import server.DataAccessException;
@@ -34,7 +35,7 @@ public class WebSocketFacade extends Endpoint{
         //}
     }
 
-    public void join(){
+    public void join(int gameNum, ChessGame.TeamColor color){
         try {
         var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, "", 1);
         this.session.getBasicRemote().sendText(new Gson().toJson(action));
