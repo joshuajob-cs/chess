@@ -1,5 +1,6 @@
 package websocket;
 
+import chess.ChessBoard;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import io.javalin.websocket.WsCloseContext;
@@ -10,6 +11,7 @@ import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.UserGameCommand;
+import websocket.messages.GameMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -54,7 +56,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private void join(String visitorName, Session session) throws IOException {
         connections.add(session);
         var message = String.format("Entered the game", visitorName);
-        var notification = new ServerMessage(LOAD_GAME);
+        var notification = new GameMessage(LOAD_GAME, new ChessBoard());
         connections.broadcast(null, notification);
         System.out.println("broadcasted");
 

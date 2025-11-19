@@ -35,9 +35,9 @@ public class WebSocketFacade extends Endpoint{
         //}
     }
 
-    public void join(int gameNum, ChessGame.TeamColor color){
+    public void join(int gameNum){
         try {
-        var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, "", 1);
+        var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, "", gameNum);
         this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new RuntimeException(" NOOOOOOOO");
