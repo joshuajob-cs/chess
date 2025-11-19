@@ -12,11 +12,13 @@ import io.javalin.websocket.WsMessageHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.UserGameCommand;
 import websocket.messages.GameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 
 import static websocket.messages.ServerMessage.ServerMessageType.LOAD_GAME;
+import static websocket.messages.ServerMessage.ServerMessageType.NOTIFICATION;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
@@ -53,11 +55,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    private void join(String visitorName, Session session) throws IOException {
+    private void join(String username, Session session) throws IOException {
         connections.add(session);
-        var message = String.format("Entered the game", visitorName);
-        var notification = new GameMessage(LOAD_GAME, new ChessBoard());
-        connections.broadcast(null, notification);
+        String message = username + " entered the game!";
+        var notification = new NotificationMessage(NOTIFICATION, message);
+        session.getRemote().sendString(new Gson().toJson(new GameMessage(LOAD_GAME, new ChessBoard())));
+        connections.broadcast(session, notification);
         System.out.println("broadcasted");
 
     }
