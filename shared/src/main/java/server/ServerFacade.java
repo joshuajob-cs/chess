@@ -4,6 +4,7 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.*;
+import websocket.WebSocketFacade;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -14,12 +15,14 @@ import java.util.List;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
+    private final WebSocketFacade ws;
     private final String serverUrl;
     private String authToken = "";
     private List<Integer> gameIDs = null;
 
     public ServerFacade(int port){
         serverUrl = "http://localhost:" + port + "/";
+        ws = new WebSocketFacade(port);
     }
 
     public void clear() throws DataAccessException{
@@ -81,6 +84,7 @@ public class ServerFacade {
         var body = new ColorAndId(color, gameIDs.get(gameNum - 1));
         var request = buildRequest("PUT", "game", new HTTPData(body, "authorization", authToken));
         var response = sendRequest(request);
+        ws.join(gameNum);
         handleResponse(response, null);
     }
 

@@ -15,12 +15,10 @@ import static ui.EscapeSequences.*;
 
 public class Client {
     private final ServerFacade server;
-    private final WebSocketFacade ws;
     private State state = Client.State.PRELOGIN;
 
     public Client(int port) throws Exception{
         server = new ServerFacade(port);
-        ws = new WebSocketFacade(port);
     }
 
     private enum State{
@@ -195,7 +193,6 @@ public class Client {
         }
         ChessGame.TeamColor color = Enum.valueOf(ChessGame.TeamColor.class, params[1].toUpperCase());
         server.joinGame(color, gameNum);
-        ws.join(gameNum);
         var board = server.getGame(gameNum);
         printBoard(board, color);
         run();

@@ -1,9 +1,7 @@
 package websocket;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
-import server.DataAccessException;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -15,10 +13,10 @@ public class WebSocketFacade extends Endpoint{
     Session session;
     private final String url;
 
-    public WebSocketFacade(int port) throws Exception{
-        //try {
+    public WebSocketFacade(int port){
+        try {
             url = "ws://localhost:" + port + "/ws";
-            URI socketURI = new URI( url);
+            URI socketURI = new URI(url);
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
@@ -30,9 +28,10 @@ public class WebSocketFacade extends Endpoint{
                     ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
                 }
             });
-        //} catch (DeploymentException | IOException | URISyntaxException ex) {
-            //throw new RuntimeException("EEK NO " + ex.getMessage());
-        //}
+        }
+        catch (DeploymentException | IOException | URISyntaxException ex) {
+            throw new RuntimeException("EEK NO " + ex.getMessage());
+        }
     }
 
     public void join(int gameNum){
