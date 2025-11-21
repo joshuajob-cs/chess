@@ -3,7 +3,6 @@ package websocket;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,23 +19,15 @@ public class WebSocketFacade extends Endpoint{
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
-
-            //set message handler
-            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-                @Override
-                public void onMessage(String message) {
-                    ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-                }
-            });
         }
         catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new RuntimeException("EEK NO " + ex.getMessage());
         }
     }
 
-    public void join(int gameNum){
+    public void join(String authToken, int gameNum){
         try {
-        var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, "", gameNum);
+        var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameNum);
         this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new RuntimeException(" NOOOOOOOO");

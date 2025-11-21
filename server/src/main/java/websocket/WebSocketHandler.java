@@ -3,6 +3,9 @@ package websocket;
 import chess.ChessBoard;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import dataaccess.SQLAuthDAO;
+import dataaccess.SQLGameDAO;
+import dataaccess.SQLUserDAO;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsCloseHandler;
 import io.javalin.websocket.WsConnectContext;
@@ -11,7 +14,6 @@ import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import server.DataAccessException;
-import service.GameService;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.GameMessage;
@@ -25,7 +27,8 @@ import static websocket.messages.ServerMessage.ServerMessageType.*;
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
-    private final GameService game = new GameService();
+    private final SQLGameDAO game = new SQLGameDAO();
+    private final SQLAuthDAO auth = new SQLAuthDAO();
 
     @Override
     public void handleConnect(WsConnectContext ctx) {
@@ -41,9 +44,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
                 switch (command.type()) {
                     case CONNECT -> join(command, ctx.session);
-                    case MAKE_MOVE -> exit("me", ctx.session);
-                    case LEAVE -> exit("me", ctx.session);
-                    case RESIGN -> exit("me", ctx.session);
+                    case MAKE_MOVE -> leave(ctx.session);
+                    case LEAVE -> leave(ctx.session);
+                    case RESIGN -> leave(ctx.session);
                 }
             } catch (JsonParseException notCom) {
                 ServerMessage message = new Gson().fromJson(ctx.message(), ServerMessage.class);
@@ -54,7 +57,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 }
 
             } catch (DataAccessException ex) {
-                var error = new ErrorMessage(ERROR, ex.getCause().getMessage());
+                var error = new ErrorMessage(ERROR, ex.getMessage());
                 ctx.session.getRemote().sendString(new Gson().toJson(error));
             }
         }
@@ -69,9 +72,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void join(UserGameCommand command, Session session) throws IOException, DataAccessException {
-        validate(command.auth(), command.num());
+        validate(command.num());
         connections.add(session);
-        String message = command.auth() + " entered the game!";
+        var authData = auth.getAuth(command.auth());
+        String username;
+        if (authData == null){
+            throw new DataAccessException("Error: You are not logged in.");
+        } else{
+            username = auth.getAuth(command.auth()).username();
+        }
+        String message = username + " entered the game!";
         var notification = new NotificationMessage(NOTIFICATION, message);
         session.getRemote().sendString(new Gson().toJson(new GameMessage(LOAD_GAME, new ChessBoard())));
         connections.broadcast(session, notification);
@@ -79,51 +89,33 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-    private void validate(String authToken, int gameNum) throws DataAccessException {
-        game.validateRequest(authToken);
-        if (gameNum < 1 || gameNum > game.listGames(authToken).size()) {
-            throw new DataAccessException("400", new DataAccessException("Error: There is no game with that game number."));
+    private void validate(int gameNum) throws DataAccessException {
+        if (gameNum < 1 || gameNum > game.listGames().size()) {
+            throw new DataAccessException("Error: There is no game with that game number.");
         }
     }
 
-    void move(){
+    private void move(){
 
     }
 
-    void leave(){
-
-    }
-
-    void resign(){
-
-    }
-
-    private void exit(String visitorName, Session session) throws IOException {
-        var message = String.format("%s left the shop", visitorName);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
-        connections.broadcast(session, notification);
+    private void leave(Session session){
         connections.remove(session);
+    }
+
+    private void resign(){
+
     }
 
     private void load(){
         System.out.println("He's Loaded");
     }
 
-    void error(){
+    private void error(){
 
     }
 
     private void message(){
 
-    }
-
-    public void makeNoise(String petName, String sound) {
-        try {
-            var message = String.format("%s says %s", petName, sound);
-            var notification = new ServerMessage(ServerMessage.ServerMessageType.ERROR);
-            connections.broadcast(null, notification);
-        } catch (Exception ex) {
-            System.out.println("WHAT" + ex);
-        }
     }
 }

@@ -84,7 +84,7 @@ public class ServerFacade {
         var body = new ColorAndId(color, gameIDs.get(gameNum - 1));
         var request = buildRequest("PUT", "game", new HTTPData(body, "authorization", authToken));
         var response = sendRequest(request);
-        ws.join(gameNum);
+        ws.join(authToken, gameNum);
         handleResponse(response, null);
     }
 
