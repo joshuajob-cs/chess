@@ -4,6 +4,8 @@ import chess.ChessBoard;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
+import java.util.ArrayList;
+
 import static ui.EscapeSequences.*;
 
 public class BoardUI{
@@ -68,6 +70,10 @@ public class BoardUI{
             }
         }
         return ret;
+    }
+
+    public void highlight(ArrayList<ChessPosition> squares){
+
     }
 
     private record SquareUI(String bg, String textColor, String text){}

@@ -46,6 +46,19 @@ public class GameService {
         }
     }
 
+    public void leave(){
+        //Calls UpdateGame
+    }
+
+    public void move(){
+        //Calls UpdateGame
+        // If player turn is null, it means the game is over
+    }
+
+    public void resign(){
+        //Calls UpdateGame, player turn is null
+    }
+
     public AuthData validateRequest(String authToken) throws DataAccessException{
         AuthData data = authMemory.getAuth(authToken);
         if (data == null){

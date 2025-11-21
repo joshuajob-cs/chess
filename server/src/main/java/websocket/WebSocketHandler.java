@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import dataaccess.SQLAuthDAO;
 import dataaccess.SQLGameDAO;
-import dataaccess.SQLUserDAO;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsCloseHandler;
 import io.javalin.websocket.WsConnectContext;
@@ -14,6 +13,7 @@ import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import server.DataAccessException;
+import service.GameService;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.GameMessage;
@@ -27,8 +27,10 @@ import static websocket.messages.ServerMessage.ServerMessageType.*;
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
+    // Call only services for consistency
     private final SQLGameDAO game = new SQLGameDAO();
     private final SQLAuthDAO auth = new SQLAuthDAO();
+    private final GameService game2 = new GameService();
 
     @Override
     public void handleConnect(WsConnectContext ctx) {
@@ -95,16 +97,21 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void move(){
-
-    }
-
     private void leave(Session session){
         connections.remove(session);
+        //Calls GameService
+        //Sends a notification to everyone
+    }
+
+    private void move(){
+        game2.move();
+        //Calls GameService
+        //Sends a load game message back to everyone
     }
 
     private void resign(){
-
+        //Calls GameService
+        //Sends a load game message back to everyone
     }
 
     private void load(){

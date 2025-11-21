@@ -96,8 +96,19 @@ public class ServerFacade {
         return data.get(gameNum - 1).game().getBoard();
     }
 
+    public void leave(){
+        ws.leave();
+        // Calls Websocket Facade
+    }
+
     public void move(){
         ws.move();
+        // Calls Websocket Facade
+    }
+
+    public void resign(){
+        ws.resign();
+        // Calls Websocket Facade
     }
 
     private List<Integer> orderIDs(GameList list){

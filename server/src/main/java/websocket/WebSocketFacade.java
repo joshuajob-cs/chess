@@ -9,8 +9,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static websocket.commands.UserGameCommand.CommandType.CONNECT;
-import static websocket.commands.UserGameCommand.CommandType.MAKE_MOVE;
+import static websocket.commands.UserGameCommand.CommandType.*;
 
 public class WebSocketFacade extends Endpoint{
     Session session;
@@ -38,13 +37,34 @@ public class WebSocketFacade extends Endpoint{
         }
     }
 
+    public void leave(){
+        try {
+            var command = new UserGameCommand(LEAVE, "", 0);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException ex) {
+            throw new RuntimeException(" NOOOOOOOO");
+        }
+        //Sends command; server redirects command to Websocket Handler
+    }
+
     public void move(){
         try {
             var command = new MoveCommand(MAKE_MOVE, "", 0, null);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new RuntimeException(" NOOOOOOOO");
+            //Sends command; server redirects command to Websocket Handler
         }
+    }
+
+    public void resign(){
+        try {
+            var command = new UserGameCommand(RESIGN, "", 0);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException ex) {
+            throw new RuntimeException(" NOOOOOOOO");
+        }
+        //Sends command; server redirects command to Websocket Handler
     }
 
     //Endpoint requires this method, but you don't have to do anything

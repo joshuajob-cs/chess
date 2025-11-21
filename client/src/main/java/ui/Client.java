@@ -248,27 +248,35 @@ public class Client {
         run();
     }
 
+    private void gamePhase(){
+
+    }
+
     private void helpGame(){
 
     }
 
     private void redraw(){
-
+        //Similar to observe, calls server.getGame()
     }
 
     private void leave(){
-
+        server.leave();
+        // Calls Server Facade
     }
 
     private void move(){
         server.move();
+        // Calls Server Facade
     }
 
     private void resign(){
-
+        server.resign();
+        // Calls Server Facade
     }
 
     private void highlight(){
-
+        // Local Operation
+        // Utilise Board UI, give board UI the board and a list of highlighted squares
     }
 }
