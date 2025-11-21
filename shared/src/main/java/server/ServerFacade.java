@@ -89,11 +89,11 @@ public class ServerFacade {
     }
 
     public ChessBoard getGame(int gameNum) throws DataAccessException{
-        var games = new ArrayList<>(listGames().games());
-        if (gameNum <= 0 || gameNum > games.size()){
+        var data = listGames();
+        if (gameNum <= 0 || gameNum > data.size()){
             throw new DataAccessException("There is not a game with that number.");
         }
-        return games.get(gameNum - 1).game().getBoard();
+        return data.get(gameNum - 1).game().getBoard();
     }
 
     private List<Integer> orderIDs(GameList list){
