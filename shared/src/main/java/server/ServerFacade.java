@@ -96,6 +96,10 @@ public class ServerFacade {
         return data.get(gameNum - 1).game().getBoard();
     }
 
+    public void move(){
+        ws.move();
+    }
+
     private List<Integer> orderIDs(GameList list){
         var ret = new ArrayList<Integer>();
         for (GameData data: list.games()){

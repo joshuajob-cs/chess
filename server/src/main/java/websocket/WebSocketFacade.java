@@ -2,11 +2,15 @@ package websocket;
 
 import com.google.gson.Gson;
 import jakarta.websocket.*;
+import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+
+import static websocket.commands.UserGameCommand.CommandType.CONNECT;
+import static websocket.commands.UserGameCommand.CommandType.MAKE_MOVE;
 
 public class WebSocketFacade extends Endpoint{
     Session session;
@@ -27,8 +31,17 @@ public class WebSocketFacade extends Endpoint{
 
     public void join(String authToken, int gameNum){
         try {
-        var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameNum);
-        this.session.getBasicRemote().sendText(new Gson().toJson(action));
+        var command = new UserGameCommand(CONNECT, authToken, gameNum);
+        this.session.getBasicRemote().sendText(new Gson().toJson(command));
+        } catch (IOException ex) {
+            throw new RuntimeException(" NOOOOOOOO");
+        }
+    }
+
+    public void move(){
+        try {
+            var command = new MoveCommand(MAKE_MOVE, "", 0, null);
+            this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new RuntimeException(" NOOOOOOOO");
         }

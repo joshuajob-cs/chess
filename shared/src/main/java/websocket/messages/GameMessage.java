@@ -7,6 +7,7 @@ public class GameMessage extends ServerMessage{
 
     public GameMessage(ServerMessageType type, ChessBoard game) {
         super(type);
+        assert (type == ServerMessageType.LOAD_GAME);
         this.game = game;
     }
 }

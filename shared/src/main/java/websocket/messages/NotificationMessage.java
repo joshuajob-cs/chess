@@ -5,6 +5,7 @@ public class NotificationMessage extends ServerMessage{
 
     public NotificationMessage(ServerMessage.ServerMessageType type, String message) {
         super(type);
+        assert (type == ServerMessageType.NOTIFICATION);
         this.message = message;
     }
 }

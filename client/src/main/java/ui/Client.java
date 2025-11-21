@@ -247,4 +247,28 @@ public class Client {
         state = State.PRELOGIN;
         run();
     }
+
+    private void helpGame(){
+
+    }
+
+    private void redraw(){
+
+    }
+
+    private void leave(){
+
+    }
+
+    private void move(){
+        server.move();
+    }
+
+    private void resign(){
+
+    }
+
+    private void highlight(){
+
+    }
 }
