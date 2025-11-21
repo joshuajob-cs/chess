@@ -5,7 +5,6 @@ import dataaccess.DatabaseManager;
 import io.javalin.*;
 import io.javalin.http.Context;
 import model.*;
-import dataaccess.DataAccessException;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -160,7 +159,7 @@ public class Server {
             String response;
             try {
                 response = send();
-            } catch (dataaccess.DataAccessException ex) {
+            } catch (DataAccessException ex) {
                 ctx.status(Integer.parseInt(ex.getMessage()));
                 ctx.result(serializer.toJson(Map.of("message", ex.getCause().getMessage())));
                 return;

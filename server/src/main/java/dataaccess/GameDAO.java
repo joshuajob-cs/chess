@@ -2,6 +2,7 @@ package dataaccess;
 
 import model.GameData;
 import model.GameList;
+import server.DataAccessException;
 
 
 public interface GameDAO {

@@ -2,7 +2,9 @@ package dataaccess;
 
 import model.GameData;
 import model.GameList;
+import server.DataAccessException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,7 +31,7 @@ public class MemoryGameDAO implements GameDAO{
 
     @Override
     public GameList listGames() {
-        return new GameList(data.values());
+        return new GameList(new ArrayList<>(data.values()));
     }
 
     @Override

@@ -1,12 +1,13 @@
 package dataaccess;
 
 import model.SQLData;
+import server.DataAccessException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class SQLUtilities {
-    static void sqlClear(String table) throws DataAccessException{
+    static void sqlClear(String table) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var statement = conn.prepareStatement("DELETE FROM " + table + ";")) {
                 statement.executeUpdate();

@@ -7,6 +7,7 @@ import model.JoinGameRequest;
 import model.LoginData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
+import server.DataAccessException;
 
 import static org.junit.jupiter.api.Assertions.*;
 

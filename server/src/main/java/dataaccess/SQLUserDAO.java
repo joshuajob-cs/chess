@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.UserData;
+import server.DataAccessException;
 
 import java.util.ArrayList;
 
@@ -9,7 +10,7 @@ import static dataaccess.SQLUtilities.*;
 public class SQLUserDAO implements UserDAO{
 
     @Override
-    public void clear() throws DataAccessException{
+    public void clear() throws DataAccessException {
         sqlClear("user");
     }
 

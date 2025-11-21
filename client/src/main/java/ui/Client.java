@@ -5,7 +5,6 @@ import chess.ChessGame;
 import model.GameList;
 import server.DataAccessException;
 import server.ServerFacade;
-import websocket.WebSocketFacade;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -195,6 +194,7 @@ public class Client {
         server.joinGame(color, gameNum);
         var board = server.getGame(gameNum);
         printBoard(board, color);
+        System.out.println("You joined the game!");
         run();
     }
 

@@ -6,6 +6,7 @@ import model.LoginData;
 import model.LoginResponse;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
+import server.DataAccessException;
 
 import java.util.UUID;
 

@@ -3,6 +3,7 @@ package service;
 import chess.ChessGame;
 import dataaccess.*;
 import model.*;
+import server.DataAccessException;
 
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
@@ -12,7 +13,7 @@ public class GameService {
     private final GameDAO gameMemory = new SQLGameDAO();
     public static int nextID = 1;
 
-    public GameList listGames(String authToken) throws DataAccessException{
+    public GameList listGames(String authToken) throws DataAccessException {
         validateRequest(authToken);
         return gameMemory.listGames();
     }
@@ -45,7 +46,7 @@ public class GameService {
         }
     }
 
-    private AuthData validateRequest(String authToken) throws DataAccessException{
+    public AuthData validateRequest(String authToken) throws DataAccessException{
         AuthData data = authMemory.getAuth(authToken);
         if (data == null){
             throw new DataAccessException("401", new DataAccessException("Error: You are not authorized. Please log in."));

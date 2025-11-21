@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
+import server.DataAccessException;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import static dataaccess.SQLUtilities.*;
 public class SQLAuthDAO implements AuthDAO{
 
     @Override
-    public void clear() throws DataAccessException{
+    public void clear() throws DataAccessException {
         sqlClear("auth");
     }
 

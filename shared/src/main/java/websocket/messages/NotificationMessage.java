@@ -1,7 +1,5 @@
 package websocket.messages;
 
-import chess.ChessBoard;
-
 public class NotificationMessage extends ServerMessage{
     String message;
 
