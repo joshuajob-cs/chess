@@ -31,9 +31,9 @@ public class WebSocketFacade extends Endpoint{
         }
     }
 
-    public void join(String authToken, int gameNum, ChessGame.TeamColor color){
+    public void join(String authToken, int gameID, ChessGame.TeamColor color){
         try {
-        var command = new JoinCommand(CONNECT, authToken, gameNum, color);
+        var command = new JoinCommand(CONNECT, authToken, gameID, color);
         this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new RuntimeException("Error: Can not join because you forgot to turn the server on.");
