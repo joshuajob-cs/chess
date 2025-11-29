@@ -64,6 +64,28 @@ public record ChessPosition (int row, int col){
         return new ChessVector(rowChange/amplitude, colChange/amplitude, amplitude);
     }
 
+    public static ChessPosition parse(String str) {
+        // parses a1, b2, c3 etc.
+        if (str.length() != 2) {
+            return null;
+        }
+        char letter = Character.toLowerCase(str.charAt(0));
+        int col;
+        if (letter >= 'a' && letter <= 'h') {
+            col = letter - 'a' + 1;
+        } else {
+            return null;
+        }
+        char number = str.charAt(1);
+        int row;
+        if (number >= '1' && number <= '8') {
+            row = number - '1' + 1;
+        } else {
+            return null;
+        }
+        return new ChessPosition(row, col);
+    }
+
     @Override
     public String toString() {
         return "(" + getRow() +

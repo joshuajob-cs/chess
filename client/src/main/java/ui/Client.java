@@ -2,6 +2,8 @@ package ui;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import model.GameList;
 import server.DataAccessException;
 import server.ServerFacade;
@@ -22,7 +24,8 @@ public class Client {
 
     private enum State{
         PRELOGIN,
-        POSTLOGIN
+        POSTLOGIN,
+        GAME
     }
 
     public void run(){
@@ -45,6 +48,9 @@ public class Client {
             }
             else if (state == State.POSTLOGIN){
                 postlogin(command[0], parameters);
+            }
+            else{
+                gamePhase(command[0], parameters);
             }
         } catch (DataAccessException e) {
             System.out.println(e.getMessage());
@@ -248,34 +254,75 @@ public class Client {
         run();
     }
 
-    private void gamePhase(){
-
+    private void gamePhase(String command, String[] parameters) throws DataAccessException{
+        switch (command) {
+            case "help" -> helpGame(parameters);
+            case "redraw" -> redraw(parameters);
+            case "leave" -> leave(parameters);
+            case "move" -> move(parameters);
+            case "resign" -> resign(parameters);
+            case "highlight_moves" -> highlight(parameters);
+            case "quit" -> System.exit(0);
+            default -> fail();
+        }
     }
 
-    private void helpGame(){
-
+    private void helpGame(String[] params){
+        if (params.length > 0){
+            System.out.print("Help does not take any parameters. ");
+            fail();
+            return;
+        }
+        System.out.print(
+                """
+                redraw - to see the game board
+                leave - to leave the game
+                move <FROM> <TO> - to make a move
+                resign - to give up
+                highlight_moves - to see all possible moves
+                quit - i'll miss you
+                help - ???
+                """);
+        run();
     }
 
-    private void redraw(){
+    private void redraw(String[] params){
         //Similar to observe, calls server.getGame()
     }
 
-    private void leave(){
+    private void leave(String[] params){
         server.leave();
         // Calls Server Facade
     }
 
-    private void move(){
-        server.move();
+    private void move(String[] params){
+        if (params.length != 2){
+            System.out.print(params.length + " arguments for move. ");
+            fail();
+            return;
+        }
+        ChessPosition startPos = ChessPosition.parse(params[0]);
+        if (startPos == null){
+            System.out.print("Incorrect format for <FROM>. a1, b2, c3 are correct formats");
+            fail();
+            return;
+        }
+        ChessPosition endPos = ChessPosition.parse(params[1]);
+        if (endPos == null){
+            System.out.print("Incorrect format for <TO>. a1, b2, c3 are correct formats");
+            fail();
+            return;
+        }
+        server.move(new ChessMove(startPos, endPos, null));
         // Calls Server Facade
     }
 
-    private void resign(){
+    private void resign(String[] params){
         server.resign();
         // Calls Server Facade
     }
 
-    private void highlight(){
+    private void highlight(String[] params){
         // Local Operation
         // Utilise Board UI, give board UI the board and a list of highlighted squares
     }

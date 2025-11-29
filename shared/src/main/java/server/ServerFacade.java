@@ -2,6 +2,7 @@ package server;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import model.*;
 import websocket.WebSocketFacade;
@@ -101,7 +102,7 @@ public class ServerFacade {
         // Calls Websocket Facade
     }
 
-    public void move(){
+    public void move(ChessMove move){
         ws.move();
         // Calls Websocket Facade
     }
