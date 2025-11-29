@@ -20,6 +20,7 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.GameMessage;
 import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 
@@ -46,34 +47,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
                     switch (command.type()) {
                         case CONNECT -> join(command, ctx.session);
-                        case MAKE_MOVE -> move();
-                        case LEAVE -> leave(ctx.session);
-                        case RESIGN -> resign();
+                        case MAKE_MOVE -> move(new Gson().fromJson(ctx.message(), MoveCommand.class), ctx.session);
+                        case LEAVE -> leave(command, ctx.session);
+                        case RESIGN -> resign(command, ctx.session);
                     }
                     return;
                 }
                 catch (JsonParseException _){}
-                try {
-                    MoveCommand command = new Gson().fromJson(ctx.message(), MoveCommand.class);
-                    move();
-                    return;
-                }
-                catch (JsonParseException _){}
                 try{
-                    GameMessage message = new Gson().fromJson(ctx.message(), GameMessage.class);
-                    load();
-                    return;
-                }
-                catch (JsonParseException _){}
-                try{
-                    NotificationMessage message = new Gson().fromJson(ctx.message(), NotificationMessage.class);
-                    message();
-                    return;
-                }
-                catch (JsonParseException _){}
-                try{
-                    ErrorMessage message = new Gson().fromJson(ctx.message(), ErrorMessage.class);
-                    error();
+                    ServerMessage message = new Gson().fromJson(ctx.message(), ServerMessage.class);
+                    switch (message.getServerMessageType()) {
+                        case LOAD_GAME -> load(new Gson().fromJson(ctx.message(), GameMessage.class));
+                        case ERROR -> error(new Gson().fromJson(ctx.message(), ErrorMessage.class));
+                        case NOTIFICATION -> message(new Gson().fromJson(ctx.message(), NotificationMessage.class));
+                    }
                 }
                 catch (JsonParseException ex){
                     throw new RuntimeException("Error: Did not recognize message");
@@ -106,32 +93,32 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-    private void leave(Session session){
+    private void leave(UserGameCommand command, Session session){
         connections.remove(session);
         //Calls GameService
         //Sends a notification to everyone
     }
 
-    private void move(){
+    private void move(UserGameCommand command, Session session){
         game.move();
         //Calls GameService
         //Sends a load game message back to everyone
     }
 
-    private void resign(){
+    private void resign(UserGameCommand command, Session session){
         //Calls GameService
         //Sends a load game message back to everyone
     }
 
-    private void load(){
+    private void load(GameMessage message){
         System.out.println("He's Loaded");
     }
 
-    private void error(){
+    private void error(ErrorMessage message){
 
     }
 
-    private void message(){
+    private void message(NotificationMessage message){
 
     }
 }
