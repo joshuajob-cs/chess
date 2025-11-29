@@ -10,6 +10,7 @@ import io.javalin.websocket.WsConnectContext;
 import io.javalin.websocket.WsConnectHandler;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
+import model.GetGameRequest;
 import org.eclipse.jetty.websocket.api.Session;
 import server.DataAccessException;
 import service.GameService;
@@ -72,22 +73,15 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void join(UserGameCommand command, Session session) throws IOException, DataAccessException {
-        validate(command.auth(), command.num());
-        String username = user.getName(command.auth());
+        game.getGame(new GetGameRequest(command.auth(), command.num()));
         connections.add(session);
+        String username = user.getName(command.auth());
         String message = username + " entered the game!";
         var notification = new NotificationMessage(NOTIFICATION, message);
         session.getRemote().sendString(new Gson().toJson(new GameMessage(LOAD_GAME, new ChessBoard())));
         connections.broadcast(session, notification);
         System.out.println("broadcasted");
 
-    }
-
-    private void validate(String authToken, int gameNum) throws DataAccessException {
-        System.out.println(game.listGames(authToken));
-        if (gameNum < 1 || gameNum > game.listGames(authToken).size()) {
-            throw new DataAccessException("400", new DataAccessException("Error: There is no game with that game number."));
-        }
     }
 
     private void leave(Session session){

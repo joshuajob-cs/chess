@@ -46,6 +46,18 @@ public class GameService {
         }
     }
 
+    public GameData getGame(GetGameRequest request) throws DataAccessException{
+        if(request.authToken() == null || request.gameID() < 1){
+            throw new DataAccessException("400", new DataAccessException("Error: Missing authentication token or GameID"));
+        }
+        validateRequest(request.authToken());
+        GameData gameData = gameMemory.getGame(request.gameID());
+        if(gameData == null){
+            throw new DataAccessException("400", new DataAccessException("Error: There is no game with that game number."));
+        }
+        return gameData;
+    }
+
     public void leave(){
         //Calls UpdateGame
     }
@@ -59,7 +71,7 @@ public class GameService {
         //Calls UpdateGame, player turn is null
     }
 
-    public AuthData validateRequest(String authToken) throws DataAccessException{
+    private AuthData validateRequest(String authToken) throws DataAccessException{
         AuthData data = authMemory.getAuth(authToken);
         if (data == null){
             throw new DataAccessException("401", new DataAccessException("Error: You are not authorized. Please log in."));
