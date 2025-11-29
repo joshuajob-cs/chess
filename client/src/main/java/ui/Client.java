@@ -7,6 +7,7 @@ import chess.ChessPosition;
 import model.GameList;
 import server.DataAccessException;
 import server.ServerFacade;
+import websocket.ServerMessageObserver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +18,7 @@ import static ui.EscapeSequences.*;
 public class Client {
     private final ServerFacade server;
     private State state = Client.State.PRELOGIN;
+    private ServerMessageObserver observer = new ServerMessageObserver();
 
     public Client(int port) throws Exception{
         server = new ServerFacade(port);
@@ -201,6 +203,7 @@ public class Client {
         var board = server.getGame(gameNum);
         printBoard(board, color);
         System.out.println("You joined the game!");
+        System.out.println(ServerMessageObserver.getCheese());
         run();
     }
 
