@@ -20,6 +20,7 @@ public class ServerFacade {
     private final String serverUrl;
     private String authToken = "";
     private List<Integer> gameIDs = null;
+    private int gameID = 0;
 
     public ServerFacade(int port){
         serverUrl = "http://localhost:" + port + "/";
@@ -82,10 +83,11 @@ public class ServerFacade {
         if (gameNum <= 0 || gameNum > gameIDs.size()){
             throw new DataAccessException("There is not a game with that number.");
         }
-        var body = new ColorAndId(color, gameIDs.get(gameNum - 1));
+        gameID = gameIDs.get(gameNum - 1);
+        var body = new ColorAndId(color, gameID);
         var request = buildRequest("PUT", "game", new HTTPData(body, "authorization", authToken));
         var response = sendRequest(request);
-        ws.join(authToken, gameIDs.get(gameNum - 1));
+        ws.join(authToken, gameID);
         handleResponse(response, null);
     }
 
@@ -103,7 +105,7 @@ public class ServerFacade {
     }
 
     public void move(ChessMove move){
-        ws.move();
+        ws.move(authToken, gameID, move);
         // Calls Websocket Facade
     }
 

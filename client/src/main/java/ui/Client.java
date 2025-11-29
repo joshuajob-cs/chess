@@ -262,7 +262,6 @@ public class Client {
             case "move" -> move(parameters);
             case "resign" -> resign(parameters);
             case "highlight_moves" -> highlight(parameters);
-            case "quit" -> System.exit(0);
             default -> fail();
         }
     }
@@ -280,7 +279,6 @@ public class Client {
                 move <FROM> <TO> - to make a move
                 resign - to give up
                 highlight_moves - to see all possible moves
-                quit - i'll miss you
                 help - ???
                 """);
         run();
@@ -314,7 +312,6 @@ public class Client {
             return;
         }
         server.move(new ChessMove(startPos, endPos, null));
-        // Calls Server Facade
     }
 
     private void resign(String[] params){

@@ -1,5 +1,6 @@
 package websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
 import websocket.commands.MoveCommand;
@@ -24,7 +25,7 @@ public class WebSocketFacade extends Endpoint{
             this.session = container.connectToServer(this, socketURI);
         }
         catch (DeploymentException | IOException | URISyntaxException ex) {
-            throw new RuntimeException("EEK NO " + ex.getMessage());
+            throw new RuntimeException("Error: You forgot to turn the server on. " + ex.getMessage());
         }
     }
 
@@ -33,7 +34,7 @@ public class WebSocketFacade extends Endpoint{
         var command = new UserGameCommand(CONNECT, authToken, gameNum);
         this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
-            throw new RuntimeException(" NOOOOOOOO");
+            throw new RuntimeException("Error: Can not join because you forgot to turn the server on.");
         }
     }
 
@@ -42,17 +43,17 @@ public class WebSocketFacade extends Endpoint{
             var command = new UserGameCommand(LEAVE, "", 0);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
-            throw new RuntimeException(" NOOOOOOOO");
+            throw new RuntimeException("Error: Can not leave because you forgot to turn the server on.");
         }
         //Sends command; server redirects command to Websocket Handler
     }
 
-    public void move(){
+    public void move(String authToken, int gameID, ChessMove move){
         try {
-            var command = new MoveCommand(MAKE_MOVE, "", 0, null);
+            var command = new MoveCommand(MAKE_MOVE, authToken, gameID, move);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
-            throw new RuntimeException(" NOOOOOOOO");
+            throw new RuntimeException("Error: Can not move the piece because you forgot to turn the server on.");
             //Sends command; server redirects command to Websocket Handler
         }
     }
@@ -62,7 +63,7 @@ public class WebSocketFacade extends Endpoint{
             var command = new UserGameCommand(RESIGN, "", 0);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
-            throw new RuntimeException(" NOOOOOOOO");
+            throw new RuntimeException("Error: Can not resign because you forgot to turn the server on.");
         }
         //Sends command; server redirects command to Websocket Handler
     }
