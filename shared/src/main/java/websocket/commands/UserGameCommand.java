@@ -55,4 +55,13 @@ public class UserGameCommand{
     public int hashCode() {
         return Objects.hash(type(), auth(), num());
     }
+
+    @Override
+    public String toString() {
+        return "UserGameCommand{" +
+                "commandType=" + commandType +
+                ", authToken='" + authToken + '\'' +
+                ", gameID=" + gameID +
+                '}';
+    }
 }

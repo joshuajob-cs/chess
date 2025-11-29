@@ -106,7 +106,6 @@ public class ServerFacade {
 
     public void move(ChessMove move){
         ws.move(authToken, gameID, move);
-        // Calls Websocket Facade
     }
 
     public void resign(){

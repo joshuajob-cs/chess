@@ -15,11 +15,11 @@ import org.eclipse.jetty.websocket.api.Session;
 import server.DataAccessException;
 import service.GameService;
 import service.UserService;
+import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.GameMessage;
 import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 
@@ -42,27 +42,49 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         try {
             try {
                 System.out.println(ctx.message());
-                UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
-                switch (command.type()) {
-                    case CONNECT -> join(command, ctx.session);
-                    case MAKE_MOVE -> leave(ctx.session);
-                    case LEAVE -> leave(ctx.session);
-                    case RESIGN -> leave(ctx.session);
+                try{
+                    UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
+                    switch (command.type()) {
+                        case CONNECT -> join(command, ctx.session);
+                        case MAKE_MOVE -> move();
+                        case LEAVE -> leave(ctx.session);
+                        case RESIGN -> resign();
+                    }
+                    return;
                 }
-            } catch (JsonParseException notCommand) {
-                ServerMessage message = new Gson().fromJson(ctx.message(), ServerMessage.class);
-                switch (message.getServerMessageType()) {
-                    case LOAD_GAME -> load();
-                    case ERROR -> load();
-                    case NOTIFICATION -> throw new IllegalStateException("Unexpected value: " + ctx);
+                catch (JsonParseException _){}
+                try {
+                    MoveCommand command = new Gson().fromJson(ctx.message(), MoveCommand.class);
+                    move();
+                    return;
                 }
-
-            } catch (DataAccessException ex) {
+                catch (JsonParseException _){}
+                try{
+                    GameMessage message = new Gson().fromJson(ctx.message(), GameMessage.class);
+                    load();
+                    return;
+                }
+                catch (JsonParseException _){}
+                try{
+                    NotificationMessage message = new Gson().fromJson(ctx.message(), NotificationMessage.class);
+                    message();
+                    return;
+                }
+                catch (JsonParseException _){}
+                try{
+                    ErrorMessage message = new Gson().fromJson(ctx.message(), ErrorMessage.class);
+                    error();
+                }
+                catch (JsonParseException ex){
+                    throw new RuntimeException("Error: Did not recognize message");
+                }
+            }
+            catch (DataAccessException ex) {
                 var error = new ErrorMessage(ERROR, ex.getCause().getMessage());
                 ctx.session.getRemote().sendString(new Gson().toJson(error));
             }
         }
-        catch (IOException ex){
+        catch (IOException ex) {
             ex.printStackTrace();
         }
     }
