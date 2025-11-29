@@ -1,9 +1,8 @@
 package websocket;
 
-import chess.ChessBoard;
+import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
-import dataaccess.SQLAuthDAO;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsCloseHandler;
 import io.javalin.websocket.WsConnectContext;
@@ -11,10 +10,12 @@ import io.javalin.websocket.WsConnectHandler;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
 import model.GetGameRequest;
+import model.JoinGameRequest;
 import org.eclipse.jetty.websocket.api.Session;
 import server.DataAccessException;
 import service.GameService;
 import service.UserService;
+import websocket.commands.JoinCommand;
 import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
@@ -46,7 +47,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 try{
                     UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
                     switch (command.type()) {
-                        case CONNECT -> join(command, ctx.session);
+                        case CONNECT -> join(new Gson().fromJson(ctx.message(), JoinCommand.class), ctx.session);
                         case MAKE_MOVE -> move(new Gson().fromJson(ctx.message(), MoveCommand.class), ctx.session);
                         case LEAVE -> leave(command, ctx.session);
                         case RESIGN -> resign(command, ctx.session);
@@ -81,15 +82,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    private void join(UserGameCommand command, Session session) throws IOException, DataAccessException {
-        game.getGame(new GetGameRequest(command.auth(), command.num()));
+    private void join(JoinCommand command, Session session) throws IOException, DataAccessException {
+        if(command.color() != null) {
+            game.joinGame(new JoinGameRequest(command.auth(), command.color(), command.num()));
+        }
+        else{
+            game.getGame(new GetGameRequest(command.auth(), command.num()));
+        }
         connections.add(session);
         String username = user.getName(command.auth());
         String message = username + " entered the game!";
         var notification = new NotificationMessage(NOTIFICATION, message);
-        session.getRemote().sendString(new Gson().toJson(new GameMessage(LOAD_GAME, new ChessBoard())));
+        session.getRemote().sendString(new Gson().toJson(new GameMessage(LOAD_GAME, new ChessGame().getBoard())));
         connections.broadcast(session, notification);
-        System.out.println("broadcasted");
+        System.out.println("join broadcasted");
 
     }
 
