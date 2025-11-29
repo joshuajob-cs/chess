@@ -84,7 +84,11 @@ public class ServerFacade {
             throw new DataAccessException("There is not a game with that number.");
         }
         gameID = gameIDs.get(gameNum - 1);
-        ws.join(authToken, gameID, color);
+        var body = new ColorAndId(color, gameID);
+        var request = buildRequest("PUT", "game", new HTTPData(body, "authorization", authToken));
+        var response = sendRequest(request);
+        ws.join(authToken, gameID);
+        handleResponse(response, null);
     }
 
     public ChessBoard getGame(int gameNum) throws DataAccessException{

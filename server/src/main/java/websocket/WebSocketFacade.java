@@ -1,10 +1,8 @@
 package websocket;
 
-import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
-import websocket.commands.JoinCommand;
 import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
 
@@ -31,9 +29,9 @@ public class WebSocketFacade extends Endpoint{
         }
     }
 
-    public void join(String authToken, int gameID, ChessGame.TeamColor color){
+    public void join(String authToken, int gameID){
         try {
-        var command = new JoinCommand(CONNECT, authToken, gameID, color);
+        var command = new UserGameCommand(CONNECT, authToken, gameID);
         this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new RuntimeException("Error: Can not join because you forgot to turn the server on.");
