@@ -4,7 +4,6 @@ import chess.ChessBoard;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import dataaccess.SQLAuthDAO;
-import dataaccess.SQLGameDAO;
 import io.javalin.websocket.WsCloseContext;
 import io.javalin.websocket.WsCloseHandler;
 import io.javalin.websocket.WsConnectContext;
@@ -14,6 +13,7 @@ import io.javalin.websocket.WsMessageHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import server.DataAccessException;
 import service.GameService;
+import service.UserService;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.GameMessage;
@@ -27,10 +27,8 @@ import static websocket.messages.ServerMessage.ServerMessageType.*;
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
     private final ConnectionManager connections = new ConnectionManager();
-    // Call only services for consistency
-    private final SQLGameDAO game = new SQLGameDAO();
-    private final SQLAuthDAO auth = new SQLAuthDAO();
-    private final GameService game2 = new GameService();
+    private final UserService user = new UserService();
+    private final GameService game = new GameService();
 
     @Override
     public void handleConnect(WsConnectContext ctx) {
@@ -50,7 +48,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     case LEAVE -> leave(ctx.session);
                     case RESIGN -> leave(ctx.session);
                 }
-            } catch (JsonParseException notCom) {
+            } catch (JsonParseException notCommand) {
                 ServerMessage message = new Gson().fromJson(ctx.message(), ServerMessage.class);
                 switch (message.getServerMessageType()) {
                     case LOAD_GAME -> load();
@@ -59,7 +57,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 }
 
             } catch (DataAccessException ex) {
-                var error = new ErrorMessage(ERROR, ex.getMessage());
+                var error = new ErrorMessage(ERROR, ex.getCause().getMessage());
                 ctx.session.getRemote().sendString(new Gson().toJson(error));
             }
         }
@@ -74,15 +72,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void join(UserGameCommand command, Session session) throws IOException, DataAccessException {
-        validate(command.num());
+        validate(command.auth(), command.num());
+        String username = user.getName(command.auth());
         connections.add(session);
-        var authData = auth.getAuth(command.auth());
-        String username;
-        if (authData == null){
-            throw new DataAccessException("Error: You are not logged in.");
-        } else{
-            username = auth.getAuth(command.auth()).username();
-        }
         String message = username + " entered the game!";
         var notification = new NotificationMessage(NOTIFICATION, message);
         session.getRemote().sendString(new Gson().toJson(new GameMessage(LOAD_GAME, new ChessBoard())));
@@ -91,9 +83,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-    private void validate(int gameNum) throws DataAccessException {
-        if (gameNum < 1 || gameNum > game.listGames().size()) {
-            throw new DataAccessException("Error: There is no game with that game number.");
+    private void validate(String authToken, int gameNum) throws DataAccessException {
+        System.out.println(game.listGames(authToken));
+        if (gameNum < 1 || gameNum > game.listGames(authToken).size()) {
+            throw new DataAccessException("400", new DataAccessException("Error: There is no game with that game number."));
         }
     }
 
@@ -104,7 +97,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void move(){
-        game2.move();
+        game.move();
         //Calls GameService
         //Sends a load game message back to everyone
     }

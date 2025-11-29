@@ -45,6 +45,13 @@ public class UserService {
         authMemory.deleteAuth(authToken);
     }
 
+    public String getName(String authToken) throws DataAccessException{
+        if(authToken == null){
+            throw new DataAccessException("401", new DataAccessException("Error: Unauthorized. Please log in."));
+        }
+        return authMemory.getAuth(authToken).username();
+    }
+
     private static String generateToken() {
         return UUID.randomUUID().toString();
     }
