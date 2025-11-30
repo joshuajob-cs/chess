@@ -1,6 +1,8 @@
 package service;
 
+import chess.ChessBoard;
 import chess.ChessGame;
+import chess.InvalidMoveException;
 import dataaccess.*;
 import model.*;
 import server.DataAccessException;
@@ -63,9 +65,15 @@ public class GameService {
         //Calls UpdateGame
     }
 
-    public void move(){
-        //Calls UpdateGame
-        // If player turn is null, it means the game is over
+    public ChessBoard move(MoveRequest request) throws DataAccessException{
+        GameData data = getGame(new GetGameRequest(request.authToken(), request.gameID()));
+        try {
+            data.game().makeMove(request.move());
+        } catch (InvalidMoveException ex) {
+            throw new DataAccessException("400", new DataAccessException(ex.getMessage()));
+        }
+        gameMemory.updateGame(data);
+        return data.game().getBoard();
     }
 
     public void resign(){

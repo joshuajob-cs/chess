@@ -11,6 +11,10 @@ public class MoveCommand extends UserGameCommand{
         this.move = move;
     }
 
+    public ChessMove move(){
+        return move;
+    }
+
     @Override
     public String toString() {
         return super.toString() +

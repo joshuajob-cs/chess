@@ -113,17 +113,20 @@ public class ChessGame {
         ChessPosition startPosition = move.getStartPosition();
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null){
-            throw new InvalidMoveException("Starting square is empty");
+            throw new InvalidMoveException("Error: The starting square  of that move is empty");
+        }
+        else if(teamTurn == null){
+            throw new InvalidMoveException("Error: The game is over");
         }
         else if(piece.pieceColor() != teamTurn){
-            throw new InvalidMoveException("It is not your turn");
+            throw new InvalidMoveException("Error: It is not your turn");
         }
         else if (validMoves(startPosition).contains(move)){
             board.movePiece(move);
             setTeamTurn(notColor(teamTurn));
         }
         else{
-            throw new InvalidMoveException("Invalid move");
+            throw new InvalidMoveException("Error: Invalid move");
         }
     }
 
