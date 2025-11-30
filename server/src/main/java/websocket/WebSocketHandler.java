@@ -50,7 +50,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
                     switch (command.type()) {
                         case CONNECT -> join(new Gson().fromJson(ctx.message(), JoinCommand.class), ctx.session);
-                        case MAKE_MOVE -> move(new Gson().fromJson(ctx.message(), MoveCommand.class));
+                        case MAKE_MOVE -> move(new Gson().fromJson(ctx.message(), MoveCommand.class), ctx.session);
                         case LEAVE -> leave(command, ctx.session);
                         case RESIGN -> resign(command, ctx.session);
                     }
@@ -102,10 +102,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         //Sends a notification to everyone
     }
 
-    private void move(MoveCommand command) throws IOException, DataAccessException{
+    private void move(MoveCommand command, Session session) throws IOException, DataAccessException{
         ChessBoard board = game.move(new MoveRequest(command.auth(), command.num(), command.move()));
-        var notification = new GameMessage(LOAD_GAME, board);
-        connections.broadcast(null, notification);
+        var gameMessage = new GameMessage(LOAD_GAME, board);
+        var notification = new NotificationMessage(NOTIFICATION, "A move was made");
+        connections.broadcast(null, gameMessage);
+        connections.broadcast(session, notification);
     }
 
     private void resign(UserGameCommand command, Session session){
