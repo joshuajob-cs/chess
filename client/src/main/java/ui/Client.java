@@ -2,6 +2,7 @@ package ui;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameList;
 import server.DataAccessException;
@@ -255,6 +256,7 @@ public class Client {
                 redraw - to see the game board
                 leave - to leave the game
                 move <FROM> <TO> - to make a move
+                move <FROM> <TO> <ROOK|BISHOP|KNIGHT|QUEEN> - promotion
                 resign - to give up
                 highlight_moves - to see all possible moves
                 help - ???
@@ -272,7 +274,7 @@ public class Client {
     }
 
     private void move(String[] params){
-        if (params.length != 2){
+        if (!(params.length == 2 || params.length == 3)){
             System.out.print(params.length + " arguments for move. ");
             fail();
             return;
@@ -289,7 +291,16 @@ public class Client {
             fail();
             return;
         }
-        server.move(new ChessMove(startPos, endPos, null));
+        ChessPiece.PieceType promotion = null;
+        if (params.length == 3){
+            if(!(params[2].equals("rook") | params[2].equals("bishop") | params[2].equals("knight") | params[2].equals("queen"))){
+                System.out.print(params[2] + " is not 'ROOK' or 'BISHOP' or 'KNIGHT' or 'QUEEN'. ");
+                fail();
+                return;
+            }
+            promotion = Enum.valueOf(ChessPiece.PieceType.class, params[2].toUpperCase());
+        }
+        server.move(new ChessMove(startPos, endPos, promotion));
     }
 
     private void resign(String[] params){
