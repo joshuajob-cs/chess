@@ -11,7 +11,7 @@ import static chess.ChessGame.TeamColor.WHITE;
 public class GameService {
     private final AuthDAO authMemory = new SQLAuthDAO();
     private final GameDAO gameMemory = new SQLGameDAO();
-    public static int nextID = 1;
+    public static int id = 1;
 
     public GameList listGames(String authToken) throws DataAccessException {
         validateRequest(authToken);
@@ -22,9 +22,10 @@ public class GameService {
         if(request.authToken() == null || request.gameName() == null){
             throw new DataAccessException("400", new DataAccessException("Error: Missing authentication token or game name"));
         }
-        validateRequest(request.authToken());
-        gameMemory.createGame(new GameData(nextID, null, null, request.gameName(), new ChessGame()));
-        return new GameID(nextID ++);
+        var games = listGames(request.authToken());
+        id = games.nextID(id);
+        gameMemory.createGame(new GameData(id, null, null, request.gameName(), new ChessGame()));
+        return new GameID(id ++);
     }
 
     public void joinGame(JoinGameRequest request) throws DataAccessException{

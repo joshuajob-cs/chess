@@ -6,7 +6,6 @@ import chess.ChessPosition;
 import model.GameList;
 import server.DataAccessException;
 import server.ServerFacade;
-import websocket.ServerMessageObserver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -150,6 +149,7 @@ public class Client {
             fail();
             return;
         }
+        System.out.println("1");
         int gameNum = server.createGame(params[0]);
         System.out.println("Type 'join " + gameNum + " <WHITE|BLACK>' to join the game you created.");
         run();
@@ -199,7 +199,6 @@ public class Client {
         ChessGame.TeamColor color = Enum.valueOf(ChessGame.TeamColor.class, params[1].toUpperCase());
         observer.setColor(color);
         server.joinGame(color, gameNum);
-        System.out.println("You joined the game!");
         run();
     }
 
