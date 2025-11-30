@@ -66,9 +66,20 @@ public class GameService {
     }
 
     public ChessBoard move(MoveRequest request) throws DataAccessException{
+        var authData = validateRequest(request.authToken());
+        String username = authData.username();
         GameData data = getGame(new GetGameRequest(request.authToken(), request.gameID()));
+        ChessGame.TeamColor color;
+        if (data.whiteUsername().equals(username)){
+            color = WHITE;
+        } else if (data.blackUsername().equals(username)) {
+            color = BLACK;
+        }
+        else{
+            throw new DataAccessException("400", new DataAccessException("Error: You are not a player, hands off!"));
+        }
         try {
-            data.game().makeMove(request.move());
+            data.game().makeMove(request.move(), color);
         } catch (InvalidMoveException ex) {
             throw new DataAccessException("400", new DataAccessException(ex.getMessage()));
         }

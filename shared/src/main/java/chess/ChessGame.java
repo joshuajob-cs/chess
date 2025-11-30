@@ -130,6 +130,15 @@ public class ChessGame {
         }
     }
 
+    public void makeMove(ChessMove move, TeamColor color) throws InvalidMoveException{
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPiece piece = board.getPiece(startPosition);
+        if (piece != null && piece.pieceColor() != color){
+            throw new InvalidMoveException("Error: That piece belongs to the other player");
+        }
+        makeMove(move);
+    }
+
     /**
      * Determines if the given team is in check
      *
