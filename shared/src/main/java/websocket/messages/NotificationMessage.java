@@ -8,4 +8,8 @@ public class NotificationMessage extends ServerMessage{
         assert (type == ServerMessageType.NOTIFICATION);
         this.message = message;
     }
+
+    public String notification(){
+        return message;
+    }
 }

@@ -1,6 +1,5 @@
 package ui;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
@@ -13,14 +12,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import static ui.EscapeSequences.*;
 
 public class Client {
     private final ServerFacade server;
     private State state = Client.State.PRELOGIN;
-    private ServerMessageObserver observer = new ServerMessageObserver();
+    private final ClientObserver observer = new ClientObserver();
 
-    public Client(int port) throws Exception{
+    public Client(int port){
         server = new ServerFacade(port, observer);
     }
 
@@ -199,9 +197,8 @@ public class Client {
             return;
         }
         ChessGame.TeamColor color = Enum.valueOf(ChessGame.TeamColor.class, params[1].toUpperCase());
+        observer.setColor(color);
         server.joinGame(color, gameNum);
-        var board = server.getGame(gameNum);
-        printBoard(board, color);
         System.out.println("You joined the game!");
         run();
     }
@@ -221,28 +218,8 @@ public class Client {
             return;
         }
         var board = server.getGame(gameNum);
-        printBoard(board, ChessGame.TeamColor.WHITE);
+        BoardUI.printBoard(board, ChessGame.TeamColor.WHITE);
         run();
-    }
-
-    private void printBoard(ChessBoard board, ChessGame.TeamColor color){
-        var boardUI = new BoardUI(board);
-        String[][] printable = boardUI.get();
-        if (color == ChessGame.TeamColor.WHITE) {
-            for (int i = 0; i < 10; i++) {
-                for (int j = 0; j < 10; j++) {
-                    System.out.print(printable[i][j]);
-                }
-                System.out.print(RESET_BG_COLOR + RESET_TEXT_COLOR + "\n");
-            }
-        } else{
-            for (int i = 9; i >= 0; i--) {
-                for (int j = 9; j >= 0; j--) {
-                    System.out.print(printable[i][j]);
-                }
-                System.out.print(RESET_BG_COLOR + RESET_TEXT_COLOR + "\n");
-            }
-        }
     }
 
     private void logout(String[] params) throws DataAccessException{

@@ -7,6 +7,10 @@ import jakarta.websocket.*;
 import websocket.commands.JoinCommand;
 import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.GameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.net.URI;
@@ -80,11 +84,14 @@ public class WebSocketFacade extends Endpoint{
     public void onOpen(Session session, EndpointConfig config) {
         this.session = session;
         session.addMessageHandler(String.class, message -> {
-            System.out.println("CLIENT RECEIVED → " + message);
             if (observer != null) {
-                observer.notify();
+                ServerMessage clientMessage = new Gson().fromJson(message, ServerMessage.class);
+                switch (clientMessage.getServerMessageType()) {
+                    case LOAD_GAME -> observer.notify(new Gson().fromJson(message, GameMessage.class));
+                    case ERROR -> observer.notify(new Gson().fromJson(message, ErrorMessage.class));
+                    case NOTIFICATION -> observer.notify(new Gson().fromJson(message, NotificationMessage.class));
+                }
             }
         });
     }
-
 }

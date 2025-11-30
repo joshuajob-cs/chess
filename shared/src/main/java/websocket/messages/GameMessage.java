@@ -10,4 +10,8 @@ public class GameMessage extends ServerMessage{
         assert (type == ServerMessageType.LOAD_GAME);
         this.game = game;
     }
+
+    public ChessBoard game(){
+        return game;
+    }
 }

@@ -1,6 +1,7 @@
 package ui;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 
 import static ui.EscapeSequences.*;
 
-public class BoardUI{
+class BoardUI{
     SquareUI[][] ui = new SquareUI[10][10];
 
     public BoardUI(ChessBoard board){
@@ -70,6 +71,26 @@ public class BoardUI{
             }
         }
         return ret;
+    }
+
+    public static void printBoard(ChessBoard board, ChessGame.TeamColor color){
+        var boardUI = new BoardUI(board);
+        String[][] printable = boardUI.get();
+        if (color == ChessGame.TeamColor.WHITE) {
+            for (int i = 0; i < 10; i++) {
+                for (int j = 0; j < 10; j++) {
+                    System.out.print(printable[i][j]);
+                }
+                System.out.print(RESET_BG_COLOR + RESET_TEXT_COLOR + "\n");
+            }
+        } else{
+            for (int i = 9; i >= 0; i--) {
+                for (int j = 9; j >= 0; j--) {
+                    System.out.print(printable[i][j]);
+                }
+                System.out.print(RESET_BG_COLOR + RESET_TEXT_COLOR + "\n");
+            }
+        }
     }
 
     public void highlight(ArrayList<ChessPosition> squares){

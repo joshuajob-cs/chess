@@ -19,7 +19,6 @@ public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final WebSocketFacade ws;
     private final String serverUrl;
-    private ServerMessageObserver observer;
     private String authToken = "";
     private List<Integer> gameIDs = null;
     private int gameID = 0;
@@ -32,7 +31,6 @@ public class ServerFacade {
     public ServerFacade(int port, ServerMessageObserver observer){
         serverUrl = "http://localhost:" + port + "/";
         ws = new WebSocketFacade(port, observer);
-        this.observer = observer;
     }
 
     public void clear() throws DataAccessException{

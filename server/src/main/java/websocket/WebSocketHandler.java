@@ -32,7 +32,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private final ConnectionManager connections = new ConnectionManager();
     private final UserService user = new UserService();
     private final GameService game = new GameService();
-    private final ServerMessageObserver observer = new ServerMessageObserver();
 
     @Override
     public void handleConnect(WsConnectContext ctx) {

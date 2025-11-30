@@ -8,4 +8,8 @@ public class ErrorMessage extends ServerMessage{
         assert (type == ServerMessageType.ERROR);
         this.errorMessage = errorMessage;
     }
+
+    public String error(){
+        return errorMessage;
+    }
 }
