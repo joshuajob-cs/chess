@@ -17,6 +17,7 @@ import static websocket.commands.UserGameCommand.CommandType.*;
 public class WebSocketFacade extends Endpoint{
     Session session;
     private final String url;
+    private ServerMessageObserver observer;
 
     public WebSocketFacade(int port){
         try {
@@ -29,6 +30,11 @@ public class WebSocketFacade extends Endpoint{
         catch (DeploymentException | IOException | URISyntaxException ex) {
             throw new RuntimeException("Error: You forgot to turn the server on. " + ex.getMessage());
         }
+    }
+
+    public WebSocketFacade(int port, ServerMessageObserver observer){
+        this(port);
+        this.observer = observer;
     }
 
     public void join(String authToken, int gameID, ChessGame.TeamColor color){
@@ -70,8 +76,15 @@ public class WebSocketFacade extends Endpoint{
         //Sends command; server redirects command to Websocket Handler
     }
 
-    //Endpoint requires this method, but you don't have to do anything
     @Override
-    public void onOpen(Session session, EndpointConfig endpointConfig) {
+    public void onOpen(Session session, EndpointConfig config) {
+        this.session = session;
+        session.addMessageHandler(String.class, message -> {
+            System.out.println("CLIENT RECEIVED → " + message);
+            if (observer != null) {
+                observer.notify();
+            }
+        });
     }
+
 }

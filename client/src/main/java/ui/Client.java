@@ -21,7 +21,7 @@ public class Client {
     private ServerMessageObserver observer = new ServerMessageObserver();
 
     public Client(int port) throws Exception{
-        server = new ServerFacade(port);
+        server = new ServerFacade(port, observer);
     }
 
     private enum State{
@@ -203,7 +203,6 @@ public class Client {
         var board = server.getGame(gameNum);
         printBoard(board, color);
         System.out.println("You joined the game!");
-        System.out.println(ServerMessageObserver.getCheese());
         run();
     }
 

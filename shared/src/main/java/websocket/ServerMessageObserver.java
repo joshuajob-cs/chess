@@ -3,13 +3,13 @@ package websocket;
 import websocket.messages.ServerMessage;
 
 public class ServerMessageObserver{
-    private static int cheese = 0;
+    private String cheese = "";
 
-    public static void setCheese() {
-        ServerMessageObserver.cheese = cheese + 1;
+    public void setCheese(String cheese) {
+        this.cheese = cheese;
     }
 
-    public static int getCheese() {
+    public String getCheese() {
         return cheese;
     }
 }

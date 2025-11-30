@@ -84,8 +84,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void join(JoinCommand command, Session session) throws IOException, DataAccessException {
-        ServerMessageObserver.setCheese();
-        System.out.println(ServerMessageObserver.getCheese());
         if(command.color() != null) {
             game.joinGame(new JoinGameRequest(command.auth(), command.color(), command.num()));
         }
