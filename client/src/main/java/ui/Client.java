@@ -272,7 +272,7 @@ public class Client {
             return;
         }
         var board = server.getGame();
-        BoardUI.printBoard(board, ChessGame.TeamColor.WHITE);
+        BoardUI.printBoard(board, observer.getColor());
         run();
     }
 
@@ -284,6 +284,7 @@ public class Client {
         }
         server.leave();
         state = State.POSTLOGIN;
+        run();
     }
 
     private void move(String[] params){
@@ -294,13 +295,13 @@ public class Client {
         }
         ChessPosition startPos = ChessPosition.parse(params[0]);
         if (startPos == null){
-            System.out.print("Incorrect format for <FROM>. a1, b2, c3 are correct formats");
+            System.out.print("Incorrect format for <FROM>. a1, b2, c3 are correct formats. ");
             fail();
             return;
         }
         ChessPosition endPos = ChessPosition.parse(params[1]);
         if (endPos == null){
-            System.out.print("Incorrect format for <TO>. a1, b2, c3 are correct formats");
+            System.out.print("Incorrect format for <TO>. a1, b2, c3 are correct formats. ");
             fail();
             return;
         }
@@ -314,6 +315,7 @@ public class Client {
             promotion = Enum.valueOf(ChessPiece.PieceType.class, params[2].toUpperCase());
         }
         server.move(new ChessMove(startPos, endPos, promotion));
+        run();
     }
 
     private void resign(String[] params){
@@ -323,10 +325,12 @@ public class Client {
             return;
         }
         server.resign();
+        run();
     }
 
     private void highlight(String[] params){
         // Local Operation
         // Utilise Board UI, give board UI the board and a list of highlighted squares
+        run();
     }
 }

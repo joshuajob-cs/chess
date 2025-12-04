@@ -14,6 +14,10 @@ class ClientObserver implements ServerMessageObserver {
         this.color = color;
     }
 
+    public ChessGame.TeamColor getColor(){
+        return color;
+    }
+
     @Override
     public void notify(ServerMessage message) {
         switch (message) {
