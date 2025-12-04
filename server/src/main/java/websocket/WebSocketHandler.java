@@ -96,8 +96,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-    private void leave(UserGameCommand command, Session session){
+    private void leave(UserGameCommand command, Session session) throws IOException, DataAccessException{
         connections.remove(session);
+        String username = user.getName(command.auth());
+        String message = username + " left the game!";
+        var notification = new NotificationMessage(NOTIFICATION, message);
         //Calls GameService
         //Sends a notification to everyone
     }

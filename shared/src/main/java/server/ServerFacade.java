@@ -111,8 +111,8 @@ public class ServerFacade {
     }
 
     public void leave(){
-        ws.leave();
-        // Calls Websocket Facade
+        ws.leave(authToken, gameID);
+        gameID = 0;
     }
 
     public void move(ChessMove move){
@@ -120,8 +120,7 @@ public class ServerFacade {
     }
 
     public void resign(){
-        ws.resign();
-        // Calls Websocket Facade
+        ws.resign(authToken, gameID);
     }
 
     private List<Integer> orderIDs(GameList list){

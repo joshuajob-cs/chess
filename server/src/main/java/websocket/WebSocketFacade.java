@@ -50,9 +50,9 @@ public class WebSocketFacade extends Endpoint{
         }
     }
 
-    public void leave(){
+    public void leave(String authToken, int gameID){
         try {
-            var command = new UserGameCommand(LEAVE, "", 0);
+            var command = new UserGameCommand(LEAVE, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new RuntimeException("Error: Can not leave because you forgot to turn the server on.");
@@ -66,13 +66,12 @@ public class WebSocketFacade extends Endpoint{
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new RuntimeException("Error: Can not move the piece because you forgot to turn the server on.");
-            //Sends command; server redirects command to Websocket Handler
         }
     }
 
-    public void resign(){
+    public void resign(String authToken, int gameID){
         try {
-            var command = new UserGameCommand(RESIGN, "", 0);
+            var command = new UserGameCommand(RESIGN, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(command));
         } catch (IOException ex) {
             throw new RuntimeException("Error: Can not resign because you forgot to turn the server on.");

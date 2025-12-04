@@ -273,7 +273,6 @@ public class Client {
         var board = server.getGame();
         BoardUI.printBoard(board, ChessGame.TeamColor.WHITE);
         run();
-        //Similar to observe, calls server.getGame()
     }
 
     private void leave(String[] params){
