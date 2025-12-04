@@ -160,22 +160,4 @@ public class ServerFacadeTests {
         facade.joinGame(ChessGame.TeamColor.WHITE, gameID);
         assertThrows(DataAccessException.class, () -> facade.joinGame(ChessGame.TeamColor.WHITE, gameID));
     }
-
-    @Test
-    public void getGame() throws DataAccessException{
-        facade.clear();
-        facade.register("me", "b", "c");
-        facade.createGame("boring");
-        facade.createGame("cool");
-        var game = facade.getGame(2);
-        assertEquals(new ChessGame().getBoard(), game);
-    }
-
-    @Test
-    public void getGameFail() throws DataAccessException {
-        facade.clear();
-        facade.register("me", "b", "c");
-        facade.createGame("boring");
-        assertThrows(DataAccessException.class, () -> facade.getGame(2));
-    }
 }

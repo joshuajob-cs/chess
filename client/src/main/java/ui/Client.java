@@ -5,8 +5,8 @@ import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameList;
+import router.Router;
 import server.DataAccessException;
-import server.ServerFacade;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,12 +14,12 @@ import java.util.Scanner;
 
 
 public class Client {
-    private final ServerFacade server;
+    private final Router server;
     private State state = Client.State.PRELOGIN;
     private final ClientObserver observer = new ClientObserver();
 
     public Client(int port){
-        server = new ServerFacade(port, observer);
+        server = new Router(port, observer);
     }
 
     private enum State{
