@@ -102,7 +102,7 @@ public class GameService {
         return data.game().getBoard();
     }
 
-    public ChessBoard resign(GetGameRequest request) throws DataAccessException{
+    public void resign(GetGameRequest request) throws DataAccessException{
         if(request.authToken() == null || request.gameID() < 1){
             throw new DataAccessException("400", new DataAccessException("Error: Missing authentication token or GameID"));
         }
@@ -111,6 +111,9 @@ public class GameService {
         if(gameData == null){
             throw new DataAccessException("400", new DataAccessException("Error: There is no game with that game number."));
         }
+        if(gameData.game().getTeamTurn() == null){
+            throw new DataAccessException("400", new DataAccessException("Error: You can not resign after the game has ended."));
+        }
         gameData.game().setTeamTurn(null);
         if (auth.username().equals(gameData.whiteUsername()) || auth.username().equals(gameData.blackUsername())){
             gameMemory.updateGame(gameData);
@@ -118,7 +121,6 @@ public class GameService {
         else{
             throw new DataAccessException("403", new DataAccessException("Error: You can not resign from a game that you are not in."));
         }
-        return gameData.game().getBoard();
     }
 
     private AuthData validateRequest(String authToken) throws DataAccessException{
