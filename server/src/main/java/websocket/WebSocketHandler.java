@@ -37,7 +37,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     @Override
     public void handleConnect(WsConnectContext ctx) {
-        System.out.println("Websocket connected");
         ctx.enableAutomaticPings();
     }
 
@@ -45,7 +44,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void handleMessage(WsMessageContext ctx){
         try {
             try {
-                System.out.println(ctx.message());
                 try{
                     UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
                     switch (command.type()) {
@@ -75,9 +73,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     @Override
-    public void handleClose(WsCloseContext ctx) {
-        System.out.println("Websocket closed");
-    }
+    public void handleClose(WsCloseContext ctx) {}
 
     private void join(JoinCommand command, Session session) throws IOException, DataAccessException {
         if(command.color() != null) {
