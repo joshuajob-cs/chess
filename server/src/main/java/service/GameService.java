@@ -75,9 +75,6 @@ public class GameService {
         } else if (auth.username().equals(gameData.blackUsername())) {
             gameMemory.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game()));
         }
-        else{
-            throw new DataAccessException("403", new DataAccessException("Error: You can not leave a game that you are not in."));
-        }
     }
 
     public ChessBoard move(MoveRequest request) throws DataAccessException{

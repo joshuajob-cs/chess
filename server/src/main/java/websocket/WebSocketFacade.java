@@ -57,7 +57,6 @@ public class WebSocketFacade extends Endpoint{
         } catch (IOException ex) {
             throw new RuntimeException("Error: Can not leave because you forgot to turn the server on.");
         }
-        //Sends command; server redirects command to Websocket Handler
     }
 
     public void move(String authToken, int gameID, ChessMove move){
@@ -76,7 +75,6 @@ public class WebSocketFacade extends Endpoint{
         } catch (IOException ex) {
             throw new RuntimeException("Error: Can not resign because you forgot to turn the server on.");
         }
-        //Sends command; server redirects command to Websocket Handler
     }
 
     @Override
