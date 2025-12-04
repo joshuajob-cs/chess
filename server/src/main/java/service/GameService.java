@@ -108,10 +108,11 @@ public class GameService {
         if(gameData == null){
             throw new DataAccessException("400", new DataAccessException("Error: There is no game with that game number."));
         }
-        if(gameData.game().getIsOver()){
+        ChessGame.GameState state = gameData.game().getState();
+        if(state == ChessGame.GameState.RESIGNED || state == ChessGame.GameState.STALEMATE || state == ChessGame.GameState.CHECKMATE){
             throw new DataAccessException("400", new DataAccessException("Error: You can not resign after the game has ended."));
         }
-        gameData.game().setIsOver(true);
+        gameData.game().resign();
         if (auth.username().equals(gameData.whiteUsername()) || auth.username().equals(gameData.blackUsername())){
             gameMemory.updateGame(gameData);
         }

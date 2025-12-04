@@ -14,7 +14,7 @@ public class ChessGame {
 
     private ChessBoard board = new ChessBoard();
     private TeamColor teamTurn = TeamColor.WHITE;
-    private boolean isOver = false;
+    private GameState state = GameState.ONGOING;
 
     public ChessGame() {
         board.resetBoard();
@@ -36,12 +36,12 @@ public class ChessGame {
         teamTurn = team;
     }
 
-    public boolean getIsOver(){
-        return isOver;
+    public GameState getState(){
+        return state;
     }
 
-    public void setIsOver(boolean isOver){
-        this.isOver = isOver;
+    public void resign(){
+        state = GameState.RESIGNED;
     }
     /**
      * Enum identifying the 2 possible teams in a chess game
@@ -49,6 +49,14 @@ public class ChessGame {
     public enum TeamColor {
         WHITE,
         BLACK
+    }
+
+    public enum GameState {
+        ONGOING,
+        RESIGNED,
+        CHECK,
+        CHECKMATE,
+        STALEMATE
     }
 
     public TeamColor notColor(TeamColor color){
@@ -123,7 +131,7 @@ public class ChessGame {
         if (piece == null){
             throw new InvalidMoveException("Error: The starting square  of that move is empty");
         }
-        else if(isOver){
+        else if(state == GameState.RESIGNED || state == GameState.STALEMATE || state == GameState.CHECKMATE){
             throw new InvalidMoveException("Error: The game is over");
         }
         else if(piece.pieceColor() != teamTurn){
@@ -135,6 +143,15 @@ public class ChessGame {
         }
         else{
             throw new InvalidMoveException("Error: Invalid move");
+        }
+        if(isInCheckmate(teamTurn)){
+            state = GameState.CHECKMATE;
+        } else if(isInCheck(teamTurn)){
+            state = GameState.CHECK;
+        } else if (isInStalemate(teamTurn)){
+            state = GameState.STALEMATE;
+        } else{
+            state = GameState.ONGOING;
         }
     }
 

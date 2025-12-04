@@ -150,7 +150,6 @@ public class Client {
             fail();
             return;
         }
-        System.out.println("1");
         int gameNum = server.createGame(params[0]);
         System.out.println("Type 'join " + gameNum + " <WHITE|BLACK>' to join the game you created.");
         run();
@@ -200,6 +199,7 @@ public class Client {
         ChessGame.TeamColor color = Enum.valueOf(ChessGame.TeamColor.class, params[1].toUpperCase());
         observer.setColor(color);
         server.joinGame(color, gameNum);
+        state = State.GAME;
         run();
     }
 
@@ -219,6 +219,7 @@ public class Client {
         }
         var board = server.getGame(gameNum);
         BoardUI.printBoard(board, ChessGame.TeamColor.WHITE);
+        state = State.GAME;
         run();
     }
 
@@ -282,6 +283,7 @@ public class Client {
             return;
         }
         server.leave();
+        state = State.POSTLOGIN;
     }
 
     private void move(String[] params){
