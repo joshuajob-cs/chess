@@ -8,53 +8,61 @@ import model.GameList;
 import router.Router;
 import server.DataAccessException;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import static ui.ClientObserver.Status.SUCCESS;
 
-public class Client {
+
+public class Client implements PropertyChangeListener {
     private final Router server;
     private State state = Client.State.PRELOGIN;
     private final ClientObserver observer = new ClientObserver();
 
     public Client(int port){
         server = new Router(port, observer);
+        observer.addPropertyChangeListener(this);
     }
 
     private enum State{
         PRELOGIN,
         POSTLOGIN,
-        GAME
+        GAME,
+        JOINING,
     }
 
     public void run(){
         Scanner scanner = new Scanner(System.in);
-        if (state == State.PRELOGIN) {
-            System.out.print("[LOGGED OUT]  >>> ");
-        }
-        else if (state == State.POSTLOGIN){
-            System.out.print("[LOGGED IN]  >>> ");
-        }
-        String[] command = scanner.nextLine().toLowerCase().split("\\s+");
-        if (command.length == 0){
-            fail();
-            return;
-        }
-        String[] parameters = Arrays.copyOfRange(command, 1, command.length);
-        try {
+        while(true) {
+            if (state == State.JOINING){
+                try { Thread.sleep(10); } catch (InterruptedException ignored) {}
+                continue;
+            }
             if (state == State.PRELOGIN) {
-                prelogin(command[0], parameters);
+                System.out.print("[LOGGED OUT]  >>> ");
+            } else if (state == State.POSTLOGIN) {
+                System.out.print("[LOGGED IN]  >>> ");
             }
-            else if (state == State.POSTLOGIN){
-                postlogin(command[0], parameters);
+            String[] command = scanner.nextLine().toLowerCase().split("\\s+");
+            if (command.length == 0) {
+                fail();
+                continue;
             }
-            else{
-                gamePhase(command[0], parameters);
+            String[] parameters = Arrays.copyOfRange(command, 1, command.length);
+            try {
+                if (state == State.PRELOGIN) {
+                    prelogin(command[0], parameters);
+                } else if (state == State.POSTLOGIN) {
+                    postlogin(command[0], parameters);
+                } else {
+                    gamePhase(command[0], parameters);
+                }
+            } catch (DataAccessException e) {
+                System.out.println(e.getMessage());
             }
-        } catch (DataAccessException e) {
-            System.out.println(e.getMessage());
-            run();
         }
     }
 
@@ -81,7 +89,6 @@ public class Client {
         quit - i'll miss you
         help - ???
         """);
-        run();
     }
 
     private void register(String[] params) throws DataAccessException{
@@ -93,7 +100,6 @@ public class Client {
         server.register(params[0], params[1], params[2]);
         System.out.println("Registered!");
         state = State.POSTLOGIN;
-        run();
     }
 
     private void login(String[] params) throws DataAccessException{
@@ -104,12 +110,10 @@ public class Client {
         }
         server.login(params[0], params[1]);
         state = State.POSTLOGIN;
-        run();
     }
 
     private void fail(){
         System.out.println("That is not valid. Try typing in 'help'.");
-        run();
     }
 
     private void postlogin(String command, String[] parameters) throws DataAccessException{
@@ -141,7 +145,6 @@ public class Client {
                 quit - i'll miss you
                 help - ???
                 """);
-        run();
     }
 
     private void create(String[] params) throws DataAccessException{
@@ -152,7 +155,6 @@ public class Client {
         }
         int gameNum = server.createGame(params[0]);
         System.out.println("Type 'join " + gameNum + " <WHITE|BLACK>' to join the game you created.");
-        run();
     }
 
     private void list(String[] params) throws DataAccessException{
@@ -163,7 +165,6 @@ public class Client {
         }
         var gameList = server.listGames();
         printGames(gameList);
-        run();
     }
 
     private void printGames(GameList list){
@@ -199,8 +200,7 @@ public class Client {
         ChessGame.TeamColor color = Enum.valueOf(ChessGame.TeamColor.class, params[1].toUpperCase());
         observer.setColor(color);
         server.joinGame(color, gameNum);
-        state = State.GAME;
-        run();
+        state = State.JOINING;
     }
 
     private void observe(String[] params) throws DataAccessException{
@@ -220,7 +220,6 @@ public class Client {
         var board = server.getGame(gameNum);
         BoardUI.printBoard(board, ChessGame.TeamColor.WHITE);
         state = State.GAME;
-        run();
     }
 
     private void logout(String[] params) throws DataAccessException{
@@ -231,7 +230,6 @@ public class Client {
         }
         server.logout();
         state = State.PRELOGIN;
-        run();
     }
 
     private void gamePhase(String command, String[] parameters) throws DataAccessException{
@@ -262,7 +260,6 @@ public class Client {
                 highlight_moves - to see all possible moves
                 help - ???
                 """);
-        run();
     }
 
     private void redraw(String[] params) throws DataAccessException{
@@ -273,7 +270,6 @@ public class Client {
         }
         var board = server.getGame();
         BoardUI.printBoard(board, observer.getColor());
-        run();
     }
 
     private void leave(String[] params){
@@ -284,7 +280,6 @@ public class Client {
         }
         server.leave();
         state = State.POSTLOGIN;
-        run();
     }
 
     private void move(String[] params){
@@ -315,7 +310,6 @@ public class Client {
             promotion = Enum.valueOf(ChessPiece.PieceType.class, params[2].toUpperCase());
         }
         server.move(new ChessMove(startPos, endPos, promotion));
-        run();
     }
 
     private void resign(String[] params){
@@ -325,12 +319,24 @@ public class Client {
             return;
         }
         server.resign();
-        run();
     }
 
     private void highlight(String[] params){
         // Local Operation
         // Utilise Board UI, give board UI the board and a list of highlighted squares
-        run();
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (state == State.JOINING){
+            Object newValue = evt.getNewValue();
+            System.out.println("New value: " + newValue);
+            if (newValue.equals(SUCCESS)){
+                state = State.GAME;
+            }
+            else{
+                state = State.POSTLOGIN;
+            }
+        }
     }
 }
