@@ -111,10 +111,10 @@ public class GameService {
         if(gameData == null){
             throw new DataAccessException("400", new DataAccessException("Error: There is no game with that game number."));
         }
-        if(gameData.game().getTeamTurn() == null){
+        if(gameData.game().getIsOver()){
             throw new DataAccessException("400", new DataAccessException("Error: You can not resign after the game has ended."));
         }
-        gameData.game().setTeamTurn(null);
+        gameData.game().setIsOver(true);
         if (auth.username().equals(gameData.whiteUsername()) || auth.username().equals(gameData.blackUsername())){
             gameMemory.updateGame(gameData);
         }

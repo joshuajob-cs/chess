@@ -14,6 +14,7 @@ public class ChessGame {
 
     private ChessBoard board = new ChessBoard();
     private TeamColor teamTurn = TeamColor.WHITE;
+    private boolean isOver = false;
 
     public ChessGame() {
         board.resetBoard();
@@ -35,6 +36,13 @@ public class ChessGame {
         teamTurn = team;
     }
 
+    public boolean getIsOver(){
+        return isOver;
+    }
+
+    public void setIsOver(boolean isOver){
+        this.isOver = isOver;
+    }
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
@@ -115,7 +123,7 @@ public class ChessGame {
         if (piece == null){
             throw new InvalidMoveException("Error: The starting square  of that move is empty");
         }
-        else if(teamTurn == null){
+        else if(isOver){
             throw new InvalidMoveException("Error: The game is over");
         }
         else if(piece.pieceColor() != teamTurn){
