@@ -92,15 +92,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         var notification = new NotificationMessage(NOTIFICATION, message);
         session.getRemote().sendString(new Gson().toJson(new GameMessage(LOAD_GAME, new ChessGame().getBoard())));
         connections.broadcast(session, notification);
-        System.out.println("join broadcasted");
 
     }
 
     private void leave(UserGameCommand command, Session session) throws IOException, DataAccessException{
+        game.leave(new GetGameRequest(command.auth(), command.num()));
         connections.remove(session);
         String username = user.getName(command.auth());
         String message = username + " left the game!";
         var notification = new NotificationMessage(NOTIFICATION, message);
+        connections.broadcast(null, notification);
         //Calls GameService
         //Sends a notification to everyone
     }
@@ -113,7 +114,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connections.broadcast(session, notification);
     }
 
-    private void resign(UserGameCommand command, Session session){
+    private void resign(UserGameCommand command, Session session) throws IOException, DataAccessException{
+        ChessBoard board = game.resign(new GetGameRequest(command.auth(), command.num()));
+        String username = user.getName(command.auth());
+        String message = username + " resigned!";
+        var notification = new NotificationMessage(NOTIFICATION, message);
+        session.getRemote().sendString(new Gson().toJson(new GameMessage(LOAD_GAME, board)));
+        connections.broadcast(session, notification);
         //Calls GameService
         //Sends a load game message back to everyone
     }

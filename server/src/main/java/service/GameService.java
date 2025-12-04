@@ -61,8 +61,23 @@ public class GameService {
         return gameData;
     }
 
-    public void leave(){
-        //Calls UpdateGame
+    public void leave(GetGameRequest request) throws DataAccessException{
+        if(request.authToken() == null || request.gameID() < 1){
+            throw new DataAccessException("400", new DataAccessException("Error: Missing authentication token or GameID"));
+        }
+        AuthData auth = validateRequest(request.authToken());
+        GameData gameData = gameMemory.getGame(request.gameID());
+        if(gameData == null){
+            throw new DataAccessException("400", new DataAccessException("Error: There is no game with that game number."));
+        }
+        if (auth.username().equals(gameData.whiteUsername())){
+            gameMemory.updateGame(new GameData(gameData.gameID(), null, gameData.blackUsername(), gameData.gameName(), gameData.game()));
+        } else if (auth.username().equals(gameData.blackUsername())) {
+            gameMemory.updateGame(new GameData(gameData.gameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game()));
+        }
+        else{
+            throw new DataAccessException("403", new DataAccessException("Error: You can not leave a game that you are not in."));
+        }
     }
 
     public ChessBoard move(MoveRequest request) throws DataAccessException{
@@ -87,8 +102,23 @@ public class GameService {
         return data.game().getBoard();
     }
 
-    public void resign(){
-        //Calls UpdateGame, player turn is null
+    public ChessBoard resign(GetGameRequest request) throws DataAccessException{
+        if(request.authToken() == null || request.gameID() < 1){
+            throw new DataAccessException("400", new DataAccessException("Error: Missing authentication token or GameID"));
+        }
+        AuthData auth = validateRequest(request.authToken());
+        GameData gameData = gameMemory.getGame(request.gameID());
+        if(gameData == null){
+            throw new DataAccessException("400", new DataAccessException("Error: There is no game with that game number."));
+        }
+        gameData.game().setTeamTurn(null);
+        if (auth.username().equals(gameData.whiteUsername()) || auth.username().equals(gameData.blackUsername())){
+            gameMemory.updateGame(gameData);
+        }
+        else{
+            throw new DataAccessException("403", new DataAccessException("Error: You can not resign from a game that you are not in."));
+        }
+        return gameData.game().getBoard();
     }
 
     private AuthData validateRequest(String authToken) throws DataAccessException{
