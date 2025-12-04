@@ -7,8 +7,7 @@ import dataaccess.*;
 import model.*;
 import server.DataAccessException;
 
-import static chess.ChessGame.TeamColor.BLACK;
-import static chess.ChessGame.TeamColor.WHITE;
+import static chess.ChessGame.TeamColor.*;
 
 public class GameService {
     private final AuthDAO authMemory = new SQLAuthDAO();
@@ -82,7 +81,9 @@ public class GameService {
         String username = authData.username();
         GameData data = getGame(new GetGameRequest(request.authToken(), request.gameID()));
         ChessGame.TeamColor color;
-        if (data.whiteUsername().equals(username)){
+        if(data.whiteUsername().equals(data.blackUsername()) && data.whiteUsername().equals(username)){
+            color = BOTH;
+        } else if (data.whiteUsername().equals(username)){
             color = WHITE;
         } else if (data.blackUsername().equals(username)) {
             color = BLACK;

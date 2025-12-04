@@ -48,7 +48,8 @@ public class ChessGame {
      */
     public enum TeamColor {
         WHITE,
-        BLACK
+        BLACK,
+        BOTH
     }
 
     public enum GameState {
@@ -158,7 +159,7 @@ public class ChessGame {
     public void makeMove(ChessMove move, TeamColor color) throws InvalidMoveException{
         ChessPosition startPosition = move.getStartPosition();
         ChessPiece piece = board.getPiece(startPosition);
-        if (piece != null && piece.pieceColor() != color){
+        if (piece != null && color != TeamColor.BOTH && piece.pieceColor() != color){
             throw new InvalidMoveException("Error: That piece belongs to the other player");
         }
         makeMove(move);
