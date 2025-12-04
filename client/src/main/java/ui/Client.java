@@ -264,13 +264,25 @@ public class Client {
         run();
     }
 
-    private void redraw(String[] params){
+    private void redraw(String[] params) throws DataAccessException{
+        if (params.length > 0){
+            System.out.print("Redraw does not take any parameters. ");
+            fail();
+            return;
+        }
+        var board = server.getGame();
+        BoardUI.printBoard(board, ChessGame.TeamColor.WHITE);
+        run();
         //Similar to observe, calls server.getGame()
     }
 
     private void leave(String[] params){
+        if (params.length > 0){
+            System.out.print("Leave does not take any parameters. ");
+            fail();
+            return;
+        }
         server.leave();
-        // Calls Server Facade
     }
 
     private void move(String[] params){
@@ -304,8 +316,12 @@ public class Client {
     }
 
     private void resign(String[] params){
+        if (params.length > 0){
+            System.out.print("Resign does not take any parameters. ");
+            fail();
+            return;
+        }
         server.resign();
-        // Calls Server Facade
     }
 
     private void highlight(String[] params){

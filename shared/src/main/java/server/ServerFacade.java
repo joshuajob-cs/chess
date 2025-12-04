@@ -98,7 +98,16 @@ public class ServerFacade {
         if (gameNum <= 0 || gameNum > data.size()){
             throw new DataAccessException("There is not a game with that number.");
         }
-        return data.get(gameNum - 1).game().getBoard();
+        gameID = gameIDs.get(gameNum - 1);
+        return data.get(gameID).game().getBoard();
+    }
+
+    public ChessBoard getGame() throws DataAccessException{
+        if (gameID == 0){
+            throw new DataAccessException("You have not joined the game");
+        }
+        var data = listGames();
+        return data.get(gameID).game().getBoard();
     }
 
     public void leave(){
