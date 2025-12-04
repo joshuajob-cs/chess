@@ -101,8 +101,19 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void move(MoveCommand command, Session session) throws IOException, DataAccessException{
-        ChessBoard board = game.move(new MoveRequest(command.auth(), command.num(), command.move()));
-        var gameMessage = new GameMessage(LOAD_GAME, board);
+        ChessGame chessGame = game.move(new MoveRequest(command.auth(), command.num(), command.move()));
+        ChessGame.GameState state = chessGame.getState();
+        if (state == ChessGame.GameState.CHECK){
+            var notification = new NotificationMessage(NOTIFICATION, "Check");
+            connections.broadcast(command.num(), null, notification);
+        } else if(state == ChessGame.GameState.CHECKMATE){
+            var notification = new NotificationMessage(NOTIFICATION, "Checkmate");
+            connections.broadcast(command.num(), null, notification);
+        } else if(state == ChessGame.GameState.STALEMATE){
+            var notification = new NotificationMessage(NOTIFICATION, "Stalemate");
+            connections.broadcast(command.num(), null, notification);
+        }
+        var gameMessage = new GameMessage(LOAD_GAME, chessGame.getBoard());
         var notification = new NotificationMessage(NOTIFICATION, "A move was made");
         connections.broadcast(command.num(), null, gameMessage);
         connections.broadcast(command.num(), session, notification);
