@@ -68,7 +68,7 @@ public class Router {
             throw new DataAccessException("There is not a game with that number.");
         }
         gameID = gameIDs.get(gameNum - 1);
-        return data.get(gameID).game().getBoard();
+        return data.get(gameNum).game().getBoard();
     }
 
     public ChessBoard getGame() throws DataAccessException{
@@ -76,7 +76,7 @@ public class Router {
             throw new DataAccessException("You have not joined the game");
         }
         var data = listGames();
-        return data.get(gameID).game().getBoard();
+        return data.get(gameIDs.indexOf(gameID)).game().getBoard();
     }
 
     public void leave(){
