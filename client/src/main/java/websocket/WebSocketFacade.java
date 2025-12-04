@@ -1,10 +1,9 @@
-package server;
+package websocket;
 
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
-import websocket.ServerMessageObserver;
 import websocket.commands.JoinCommand;
 import websocket.commands.MoveCommand;
 import websocket.commands.UserGameCommand;
