@@ -86,30 +86,30 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         else{
             game.getGame(new GetGameRequest(command.auth(), command.num()));
         }
-        connections.add(session);
+        connections.add(command.num(), session);
         String username = user.getName(command.auth());
         String message = username + " entered the game!";
         var notification = new NotificationMessage(NOTIFICATION, message);
         session.getRemote().sendString(new Gson().toJson(new GameMessage(LOAD_GAME, new ChessGame().getBoard())));
-        connections.broadcast(session, notification);
+        connections.broadcast(command.num(), session, notification);
 
     }
 
     private void leave(UserGameCommand command, Session session) throws IOException, DataAccessException{
         game.leave(new GetGameRequest(command.auth(), command.num()));
-        connections.remove(session);
+        connections.remove(command.num(), session);
         String username = user.getName(command.auth());
         String message = username + " left the game!";
         var notification = new NotificationMessage(NOTIFICATION, message);
-        connections.broadcast(null, notification);
+        connections.broadcast(command.num(), null, notification);
     }
 
     private void move(MoveCommand command, Session session) throws IOException, DataAccessException{
         ChessBoard board = game.move(new MoveRequest(command.auth(), command.num(), command.move()));
         var gameMessage = new GameMessage(LOAD_GAME, board);
         var notification = new NotificationMessage(NOTIFICATION, "A move was made");
-        connections.broadcast(null, gameMessage);
-        connections.broadcast(session, notification);
+        connections.broadcast(command.num(), null, gameMessage);
+        connections.broadcast(command.num(), session, notification);
     }
 
     private void resign(UserGameCommand command, Session session) throws IOException, DataAccessException{
@@ -118,6 +118,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         String message = username + " resigned!";
         session.getRemote().sendString(new Gson().toJson(new NotificationMessage(NOTIFICATION, "You resigned!")));
         var notification = new NotificationMessage(NOTIFICATION, message);
-        connections.broadcast(session, notification);
+        connections.broadcast(command.num(), session, notification);
     }
 }
