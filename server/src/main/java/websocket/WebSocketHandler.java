@@ -54,7 +54,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                     }
                     return;
                 }
-                catch (JsonParseException _){}
+                catch (JsonParseException ex){}
                 try{
                     new Gson().fromJson(ctx.message(), ServerMessage.class);
                 }

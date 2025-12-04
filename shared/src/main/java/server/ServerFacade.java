@@ -1,6 +1,5 @@
 package server;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.*;
@@ -9,8 +8,6 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
