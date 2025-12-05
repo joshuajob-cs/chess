@@ -132,17 +132,24 @@ public class ChessGame {
         if (piece == null){
             throw new InvalidMoveException("Error: The starting square of that move is empty");
         }
-        else if(state == GameState.RESIGNED || state == GameState.STALEMATE || state == GameState.CHECKMATE){
+        if(state == GameState.RESIGNED || state == GameState.STALEMATE || state == GameState.CHECKMATE){
             throw new InvalidMoveException("Error: The game is over");
         }
-        else if(piece.pieceColor() != teamTurn){
+        if(piece.pieceColor() != teamTurn){
             throw new InvalidMoveException("Error: It is not your turn");
         }
-        else if (validMoves(startPosition).contains(move)){
+        var moves = validMoves(startPosition);
+        if (moves.contains(move)){
             board.movePiece(move);
             setTeamTurn(notColor(teamTurn));
         }
         else{
+            if(moves.isEmpty()){
+                throw new InvalidMoveException("Error: The piece has no valid moves");
+            }
+            if (moves.iterator().next().getPromotionPiece() != null){
+                throw new InvalidMoveException("Error: No promotion (try 'help')");
+            }
             throw new InvalidMoveException("Error: Invalid move");
         }
         if(isInCheckmate(teamTurn)){

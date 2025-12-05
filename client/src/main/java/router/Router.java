@@ -1,5 +1,4 @@
 package router;
-import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessMove;
 import model.*;

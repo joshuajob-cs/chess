@@ -243,7 +243,7 @@ public class Client implements PropertyChangeListener {
             case "leave" -> leave(parameters);
             case "move" -> move(parameters);
             case "resign" -> resign(parameters);
-            case "highlight_moves" -> highlight(parameters);
+            case "highlight" -> highlight(parameters);
             default -> fail();
         }
     }
@@ -261,7 +261,7 @@ public class Client implements PropertyChangeListener {
                 move <FROM> <TO> - to make a move
                 move <FROM> <TO> <ROOK|BISHOP|KNIGHT|QUEEN> - promotion
                 resign - to give up
-                highlight_moves <SQUARE> - to see all possible moves
+                highlight <SQUARE> - to see all possible moves
                 help - ???
                 """);
     }
