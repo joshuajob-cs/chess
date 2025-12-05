@@ -10,6 +10,7 @@ import io.javalin.websocket.WsConnectContext;
 import io.javalin.websocket.WsConnectHandler;
 import io.javalin.websocket.WsMessageContext;
 import io.javalin.websocket.WsMessageHandler;
+import model.GameData;
 import model.GetGameRequest;
 import model.JoinGameRequest;
 import model.MoveRequest;
@@ -104,22 +105,32 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void move(MoveCommand command, Session session) throws IOException, DataAccessException{
-        ChessGame chessGame = game.move(new MoveRequest(command.auth(), command.num(), command.move()));
+        GameData data = game.move(new MoveRequest(command.auth(), command.num(), command.move()));
+        ChessGame chessGame = data.game();
         String username = user.getName(command.auth());
+        String opponent;
+        if (data.whiteUsername().equals(username)){
+            opponent = data.blackUsername();
+        }
+        else{
+            opponent = data.whiteUsername();
+        }
+
         ChessGame.GameState state = chessGame.getState();
         if (state == ChessGame.GameState.CHECK){
-            var notification = new NotificationMessage(NOTIFICATION, username + " is in check!");
+            var notification = new NotificationMessage(NOTIFICATION, opponent + " is in check!");
             connections.broadcast(command.num(), null, notification);
         } else if(state == ChessGame.GameState.CHECKMATE){
-            var notification = new NotificationMessage(NOTIFICATION, username + " is in checkmate!");
+            var notification = new NotificationMessage(NOTIFICATION, opponent + " is in checkmate!");
             connections.broadcast(command.num(), null, notification);
         } else if(state == ChessGame.GameState.STALEMATE){
-            var notification = new NotificationMessage(NOTIFICATION, username + " is in stalemate!");
+            var notification = new NotificationMessage(NOTIFICATION, opponent + " is in stalemate!");
             connections.broadcast(command.num(), null, notification);
         }
+
         var gameMessage = new GameMessage(LOAD_GAME, chessGame.getBoard());
         connections.broadcast(command.num(), null, gameMessage);
-        var notification = new NotificationMessage(NOTIFICATION, username + "moved from " +
+        var notification = new NotificationMessage(NOTIFICATION, username + " moved from " +
                 unparse(command.move().getStartPosition()) + " to " + unparse(command.move().getEndPosition()) + "!");
         connections.broadcast(command.num(), session, notification);
     }

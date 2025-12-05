@@ -76,7 +76,7 @@ public class GameService {
         }
     }
 
-    public ChessGame move(MoveRequest request) throws DataAccessException{
+    public GameData move(MoveRequest request) throws DataAccessException{
         var authData = validateRequest(request.authToken());
         String username = authData.username();
         GameData data = getGame(new GetGameRequest(request.authToken(), request.gameID()));
@@ -97,7 +97,7 @@ public class GameService {
             throw new DataAccessException("400", new DataAccessException(ex.getMessage()));
         }
         gameMemory.updateGame(data);
-        return data.game();
+        return data;
     }
 
     public void resign(GetGameRequest request) throws DataAccessException{

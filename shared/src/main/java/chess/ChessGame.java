@@ -130,7 +130,7 @@ public class ChessGame {
         ChessPosition startPosition = move.getStartPosition();
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null){
-            throw new InvalidMoveException("Error: The starting square  of that move is empty");
+            throw new InvalidMoveException("Error: The starting square of that move is empty");
         }
         else if(state == GameState.RESIGNED || state == GameState.STALEMATE || state == GameState.CHECKMATE){
             throw new InvalidMoveException("Error: The game is over");
