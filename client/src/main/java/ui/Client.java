@@ -334,8 +334,8 @@ public class Client implements PropertyChangeListener {
             return;
         }
         ChessGame board = server.getGame();
-        board.validMoves(piece);
-        BoardUI.printBoard(board.getBoard(), observer.getColor());
+        var moves = new ArrayList<>(board.validMoves(piece));
+        BoardUI.highlight(board.getBoard(), observer.getColor(), moves);
     }
 
     @Override

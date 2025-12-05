@@ -1,9 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.util.ArrayList;
 
@@ -101,10 +98,10 @@ class BoardUI{
         }
     }
 
-    public static void highlight(ChessBoard board, ChessGame.TeamColor color, ArrayList<ChessPosition> squares){
+    public static void highlight(ChessBoard board, ChessGame.TeamColor color, ArrayList<ChessMove> squares){
         var boardUI = new BoardUI(board);
-        for(ChessPosition square: squares){
-            boardUI.setSquare(square, SET_BG_COLOR_YELLOW);
+        for(ChessMove square: squares){
+            boardUI.setSquare(square.getEndPosition(), SET_BG_COLOR_YELLOW);
         }
         print(boardUI, color);
     }
