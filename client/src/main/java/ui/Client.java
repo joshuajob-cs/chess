@@ -217,6 +217,7 @@ public class Client implements PropertyChangeListener {
             fail();
             return;
         }
+        server.joinGame(null, gameNum);
         var board = server.getGame(gameNum);
         BoardUI.printBoard(board, ChessGame.TeamColor.WHITE);
         state = State.GAME;

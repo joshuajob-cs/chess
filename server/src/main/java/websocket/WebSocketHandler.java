@@ -1,5 +1,6 @@
 package websocket;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
@@ -84,12 +85,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             message = username + " entered the game as " + command.color() + "!";
         }
         else{
-            game.getGame(new GetGameRequest(command.auth(), command.num()));
             message = username + " is watching you!";
         }
+        ChessBoard board = game.getGame(new GetGameRequest(command.auth(), command.num())).game().getBoard();
         connections.add(command.num(), session);
         var notification = new NotificationMessage(NOTIFICATION, message);
-        session.getRemote().sendString(new Gson().toJson(new GameMessage(LOAD_GAME, new ChessGame().getBoard())));
+        session.getRemote().sendString(new Gson().toJson(new GameMessage(LOAD_GAME, board)));
         connections.broadcast(command.num(), session, notification);
 
     }
