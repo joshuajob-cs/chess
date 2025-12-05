@@ -318,7 +318,15 @@ public class Client implements PropertyChangeListener {
             fail();
             return;
         }
-        server.resign();
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Do you really want to resign?  Type in 'resign' a second time to resign.");
+        String command = scanner.nextLine().toLowerCase();
+        if (command.equals("resign")) {
+            server.resign();
+        }
+        else{
+            System.out.println("You chose not to resign");
+        }
     }
 
     private void highlight(String[] params) throws DataAccessException{
