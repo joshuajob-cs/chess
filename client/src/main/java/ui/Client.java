@@ -217,10 +217,9 @@ public class Client implements PropertyChangeListener {
             fail();
             return;
         }
+        observer.setColor(ChessGame.TeamColor.WHITE);
         server.joinGame(null, gameNum);
-        var board = server.getGame(gameNum);
-        BoardUI.printBoard(board, ChessGame.TeamColor.WHITE);
-        state = State.GAME;
+        state = State.JOINING;
     }
 
     private void logout(String[] params) throws DataAccessException{
