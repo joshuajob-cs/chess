@@ -329,7 +329,6 @@ public class Client implements PropertyChangeListener {
         String command = scanner.nextLine().toLowerCase();
         if (command.equals("resign")) {
             server.resign();
-            System.out.println("You resigned!");
         }
         else{
             System.out.println("You chose not to resign");
