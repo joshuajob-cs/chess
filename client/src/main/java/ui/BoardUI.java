@@ -71,8 +71,8 @@ class BoardUI{
     }
 
     private void setSquare(ChessPosition pos, String bg){
-        SquareUI oldSquare = ui[7 - pos.getRow()][pos.getColumn()];
-        ui[7 - pos.getRow()][pos.getColumn()] = new SquareUI(bg, oldSquare.textColor(), oldSquare.text());
+        SquareUI oldSquare = ui[9 - pos.getRow()][pos.getColumn()];
+        ui[9 - pos.getRow()][pos.getColumn()] = new SquareUI(bg, oldSquare.textColor(), oldSquare.text());
     }
 
     public static void printBoard(ChessBoard board, ChessGame.TeamColor color){
