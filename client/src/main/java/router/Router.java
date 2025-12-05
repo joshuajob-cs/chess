@@ -41,19 +41,20 @@ public class Router {
     }
 
     public GameList listGames() throws DataAccessException{
-        return server.listGames();
+        var games = server.listGames();
+        gameIDs = orderIDs(games);
+        return games;
     }
 
     public int createGame(String name) throws DataAccessException{
         var gameID = server.createGame(name);
-        var games = listGames();
-        gameIDs = orderIDs(games);
+        listGames();
         return gameIDs.indexOf(gameID) + 1;
     }
 
     public void joinGame(ChessGame.TeamColor color, int gameNum) throws DataAccessException{
         if (gameIDs == null){
-            gameIDs = orderIDs(listGames());
+            listGames();
         }
         if (gameNum <= 0 || gameNum > gameIDs.size()){
             throw new DataAccessException("There is not a game with that number.");
@@ -68,7 +69,7 @@ public class Router {
             throw new DataAccessException("There is not a game with that number.");
         }
         gameID = gameIDs.get(gameNum - 1);
-        return data.get(gameNum).game().getBoard();
+        return data.get(gameNum - 1).game().getBoard();
     }
 
     public ChessBoard getGame() throws DataAccessException{

@@ -127,6 +127,7 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        System.out.println("Call to make move:" + move);
         ChessPosition startPosition = move.getStartPosition();
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null){
@@ -183,6 +184,7 @@ public class ChessGame {
             capturedPiece = board.getPiece(move.getEndPosition());
             board.movePiece(move);
             if (!isInCheck(teamColor)){
+                board.undoMove(move, capturedPiece);
                 return true;
             }
             board.undoMove(move, capturedPiece);
@@ -198,6 +200,7 @@ public class ChessGame {
             move = new ChessMove(startPosition, endPosition, null);
             board.movePiece(move);
             if (!isInCheck(teamColor)){
+                board.undoMove(move, capturedPiece);
                 return true;
             }
             board.undoMove(move, capturedPiece);

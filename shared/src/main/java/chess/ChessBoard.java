@@ -29,6 +29,7 @@ public class ChessBoard {
     }
 
     public void movePiece(ChessMove move){
+        System.out.println("Moved piece " + move);
         ChessPosition startPosition = move.getStartPosition();
         ChessPiece piece = getPiece(startPosition);
         if (move.getPromotionPiece() != null){
@@ -39,6 +40,7 @@ public class ChessBoard {
     }
 
     public void undoMove(ChessMove move, ChessPiece replacedPiece){
+        System.out.println("Undid move " + move);
         ChessPosition endPosition = move.getEndPosition();
         ChessPiece piece = getPiece(endPosition);
         if (move.getPromotionPiece() != null){

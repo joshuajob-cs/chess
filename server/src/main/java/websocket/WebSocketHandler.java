@@ -1,6 +1,5 @@
 package websocket;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;

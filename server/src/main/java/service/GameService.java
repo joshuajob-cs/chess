@@ -77,6 +77,7 @@ public class GameService {
     }
 
     public GameData move(MoveRequest request) throws DataAccessException{
+        System.out.println("Call to game service move" + request);
         var authData = validateRequest(request.authToken());
         String username = authData.username();
         GameData data = getGame(new GetGameRequest(request.authToken(), request.gameID()));
