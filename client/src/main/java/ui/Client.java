@@ -21,6 +21,7 @@ public class Client implements PropertyChangeListener {
     private final Router server;
     private State state = Client.State.PRELOGIN;
     private final ClientObserver observer = new ClientObserver();
+    private String nextMessage = "";
 
     public Client(int port){
         server = new Router(port, observer);
@@ -32,12 +33,13 @@ public class Client implements PropertyChangeListener {
         POSTLOGIN,
         GAME,
         JOINING,
+        WAITING,
     }
 
     public void run(){
         Scanner scanner = new Scanner(System.in);
         while(true) {
-            if (state == State.JOINING){
+            if (state == State.JOINING || state == State.WAITING){
                 try { Thread.sleep(10); } catch (InterruptedException ignored) {}
                 continue;
             }
@@ -200,6 +202,7 @@ public class Client implements PropertyChangeListener {
         ChessGame.TeamColor color = Enum.valueOf(ChessGame.TeamColor.class, params[1].toUpperCase());
         observer.setColor(color);
         server.joinGame(color, gameNum);
+        nextMessage = "You entered the game!";
         state = State.JOINING;
     }
 
@@ -219,6 +222,7 @@ public class Client implements PropertyChangeListener {
         }
         observer.setColor(ChessGame.TeamColor.WHITE);
         server.joinGame(null, gameNum);
+        nextMessage = "You are observing the game!";
         state = State.JOINING;
     }
 
@@ -310,6 +314,8 @@ public class Client implements PropertyChangeListener {
             promotion = Enum.valueOf(ChessPiece.PieceType.class, params[2].toUpperCase());
         }
         server.move(new ChessMove(startPos, endPos, promotion));
+        nextMessage = "You moved from " + params[0] + " to " + params[1] + "!";
+        state = State.WAITING;
     }
 
     private void resign(String[] params){
@@ -323,6 +329,7 @@ public class Client implements PropertyChangeListener {
         String command = scanner.nextLine().toLowerCase();
         if (command.equals("resign")) {
             server.resign();
+            System.out.println("You resigned!");
         }
         else{
             System.out.println("You chose not to resign");
@@ -352,9 +359,17 @@ public class Client implements PropertyChangeListener {
             Object newValue = evt.getNewValue();
             if (newValue.equals(SUCCESS)){
                 state = State.GAME;
+                System.out.println(nextMessage);
             }
             else{
                 state = State.POSTLOGIN;
+            }
+        }
+        if (state == State.WAITING){
+            state = State.GAME;
+            Object newValue = evt.getNewValue();
+            if (newValue.equals(SUCCESS)){
+                System.out.println(nextMessage);
             }
         }
     }
