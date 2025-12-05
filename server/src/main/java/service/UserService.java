@@ -49,7 +49,11 @@ public class UserService {
         if(authToken == null){
             throw new DataAccessException("401", new DataAccessException("Error: Unauthorized. Please log in."));
         }
-        return authMemory.getAuth(authToken).username();
+        AuthData data = authMemory.getAuth(authToken);
+        if (data == null){
+            throw new DataAccessException("401", new DataAccessException("Error: Unauthorized. Please log in."));
+        }
+        return data.username();
     }
 
     private static String generateToken() {
