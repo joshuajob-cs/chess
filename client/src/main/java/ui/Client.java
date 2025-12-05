@@ -330,7 +330,6 @@ public class Client implements PropertyChangeListener {
     public void propertyChange(PropertyChangeEvent evt) {
         if (state == State.JOINING){
             Object newValue = evt.getNewValue();
-            System.out.println("New value: " + newValue);
             if (newValue.equals(SUCCESS)){
                 state = State.GAME;
             }

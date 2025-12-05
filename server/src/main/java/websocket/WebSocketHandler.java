@@ -27,6 +27,7 @@ import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 
+import static chess.ChessPosition.unparse;
 import static websocket.messages.ServerMessage.ServerMessageType.*;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
@@ -76,15 +77,17 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     public void handleClose(WsCloseContext ctx) {}
 
     private void join(JoinCommand command, Session session) throws IOException, DataAccessException {
+        String username = user.getName(command.auth());
+        String message;
         if(command.color() != null) {
             game.joinGame(new JoinGameRequest(command.auth(), command.color(), command.num()));
+            message = username + " entered the game as " + command.color() + "!";
         }
         else{
             game.getGame(new GetGameRequest(command.auth(), command.num()));
+            message = username + " is watching you!";
         }
         connections.add(command.num(), session);
-        String username = user.getName(command.auth());
-        String message = username + " entered the game!";
         var notification = new NotificationMessage(NOTIFICATION, message);
         session.getRemote().sendString(new Gson().toJson(new GameMessage(LOAD_GAME, new ChessGame().getBoard())));
         connections.broadcast(command.num(), session, notification);
@@ -102,20 +105,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void move(MoveCommand command, Session session) throws IOException, DataAccessException{
         ChessGame chessGame = game.move(new MoveRequest(command.auth(), command.num(), command.move()));
+        String username = user.getName(command.auth());
         ChessGame.GameState state = chessGame.getState();
         if (state == ChessGame.GameState.CHECK){
-            var notification = new NotificationMessage(NOTIFICATION, "Check");
+            var notification = new NotificationMessage(NOTIFICATION, username + " is in check!");
             connections.broadcast(command.num(), null, notification);
         } else if(state == ChessGame.GameState.CHECKMATE){
-            var notification = new NotificationMessage(NOTIFICATION, "Checkmate");
+            var notification = new NotificationMessage(NOTIFICATION, username + " is in checkmate!");
             connections.broadcast(command.num(), null, notification);
         } else if(state == ChessGame.GameState.STALEMATE){
-            var notification = new NotificationMessage(NOTIFICATION, "Stalemate");
+            var notification = new NotificationMessage(NOTIFICATION, username + " is in stalemate!");
             connections.broadcast(command.num(), null, notification);
         }
         var gameMessage = new GameMessage(LOAD_GAME, chessGame.getBoard());
-        var notification = new NotificationMessage(NOTIFICATION, "A move was made");
         connections.broadcast(command.num(), null, gameMessage);
+        var notification = new NotificationMessage(NOTIFICATION, username + "moved from " +
+                unparse(command.move().getStartPosition()) + " to " + unparse(command.move().getEndPosition()) + "!");
         connections.broadcast(command.num(), session, notification);
     }
 

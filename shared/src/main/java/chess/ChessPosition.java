@@ -86,6 +86,12 @@ public record ChessPosition (int row, int col){
         return new ChessPosition(row, col);
     }
 
+    public static String unparse(ChessPosition pos){
+        char char1 = (char)('a' + pos.col() - 1);
+        char char2 = (char)('1' + pos.row() - 1);
+        return "" + char1 + char2;
+    }
+
     @Override
     public String toString() {
         return "(" + getRow() +
