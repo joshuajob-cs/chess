@@ -257,7 +257,7 @@ public class Client implements PropertyChangeListener {
                 move <FROM> <TO> - to make a move
                 move <FROM> <TO> <ROOK|BISHOP|KNIGHT|QUEEN> - promotion
                 resign - to give up
-                highlight_moves - to see all possible moves
+                highlight_moves <SQUARE> - to see all possible moves
                 help - ???
                 """);
     }
@@ -269,7 +269,7 @@ public class Client implements PropertyChangeListener {
             return;
         }
         var board = server.getGame();
-        BoardUI.printBoard(board, observer.getColor());
+        BoardUI.printBoard(board.getBoard(), observer.getColor());
     }
 
     private void leave(String[] params){
@@ -321,9 +321,21 @@ public class Client implements PropertyChangeListener {
         server.resign();
     }
 
-    private void highlight(String[] params){
-        // Local Operation
-        // Utilise Board UI, give board UI the board and a list of highlighted squares
+    private void highlight(String[] params) throws DataAccessException{
+        if (params.length != 1){
+            System.out.print(params.length + " arguments for move. ");
+            fail();
+            return;
+        }
+        ChessPosition piece = ChessPosition.parse(params[0]);
+        if (piece == null){
+            System.out.print("Incorrect format for <SQUARE>. a1, b2, c3 are correct formats. ");
+            fail();
+            return;
+        }
+        ChessGame board = server.getGame();
+        board.validMoves(piece);
+        BoardUI.printBoard(board.getBoard(), observer.getColor());
     }
 
     @Override

@@ -63,21 +63,12 @@ public class Router {
         ws.join(authToken, gameID, color);
     }
 
-    public ChessBoard getGame(int gameNum) throws DataAccessException{
-        var data = listGames();
-        if (gameNum <= 0 || gameNum > data.size()){
-            throw new DataAccessException("There is not a game with that number.");
-        }
-        gameID = gameIDs.get(gameNum - 1);
-        return data.get(gameNum - 1).game().getBoard();
-    }
-
-    public ChessBoard getGame() throws DataAccessException{
+    public ChessGame getGame() throws DataAccessException{
         if (gameID == 0){
             throw new DataAccessException("You have not joined the game");
         }
         var data = listGames();
-        return data.get(gameIDs.indexOf(gameID)).game().getBoard();
+        return data.get(gameIDs.indexOf(gameID)).game();
     }
 
     public void leave(){

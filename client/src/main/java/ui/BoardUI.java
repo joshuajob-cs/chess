@@ -73,9 +73,17 @@ class BoardUI{
         return ret;
     }
 
+    private void setSquare(ChessPosition pos, String bg){
+        SquareUI oldSquare = ui[7 - pos.getRow()][pos.getColumn()];
+        ui[7 - pos.getRow()][pos.getColumn()] = new SquareUI(bg, oldSquare.textColor(), oldSquare.text());
+    }
+
     public static void printBoard(ChessBoard board, ChessGame.TeamColor color){
-        var boardUI = new BoardUI(board);
-        String[][] printable = boardUI.get();
+        print(new BoardUI(board), color);
+    }
+
+    private static void print(BoardUI board, ChessGame.TeamColor color){
+        String[][] printable = board.get();
         if (color == ChessGame.TeamColor.WHITE) {
             for (int i = 0; i < 10; i++) {
                 for (int j = 0; j < 10; j++) {
@@ -93,8 +101,12 @@ class BoardUI{
         }
     }
 
-    public void highlight(ArrayList<ChessPosition> squares){
-
+    public static void highlight(ChessBoard board, ChessGame.TeamColor color, ArrayList<ChessPosition> squares){
+        var boardUI = new BoardUI(board);
+        for(ChessPosition square: squares){
+            boardUI.setSquare(square, SET_BG_COLOR_YELLOW);
+        }
+        print(boardUI, color);
     }
 
     private record SquareUI(String bg, String textColor, String text){}
